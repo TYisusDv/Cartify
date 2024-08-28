@@ -1,0 +1,49 @@
+@use '../base/vars' as v;
+
+.link {
+    color: v.$color-primary;
+
+    &:hover {
+        @apply underline;
+    }
+}
+
+.input-group {
+    @apply flex relative w-full h-14 rounded-2xl items-center px-3 gap-1 transition-all ease-in-out duration-300;
+    background: v.$bg-input;
+    border: 2px solid rgba(255, 255, 255, 0.089);
+
+    .label {
+        @apply absolute text-white font-bold text-gray-300 text-sm transition-all ease-in-out duration-300;
+    }
+
+    .input {
+        @apply w-full h-12 bg-transparent text-white font-semibold pt-3;
+
+        &:focus {
+            @apply outline-none;
+        }
+
+        &:not(:placeholder-shown) + .label {
+            @apply text-xs;
+            transform: translateY(-10px);
+        }
+    }
+
+    .icon {
+        @apply text-white;
+    }
+
+    &:focus-within {
+        border: 2px solid v.$color-primary;
+
+        .label {
+            color: v.$color-primary;
+        }
+    }
+
+    &:focus-within .label, &.has-text .label {
+        @apply text-xs;
+        transform: translateY(-10px);
+    }
+}

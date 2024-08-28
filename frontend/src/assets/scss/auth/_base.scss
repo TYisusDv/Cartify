@@ -1,0 +1,13 @@
+@use '../base/vars' as v;
+
+.auth-page {
+    @apply relative h-screen w-screen;
+    background: url('../../images/bg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+
+    .auth-bg {
+        @apply h-screen w-screen;
+        background: linear-gradient(to right, rgba(v.$bg-color, 1) 0%, rgba(v.$bg-color, 0.8) 100%);
+    }
+}
