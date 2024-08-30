@@ -1,0 +1,13 @@
+{
+    "home": "Home",
+    "point_of_sell": "Point of sell",
+    "inventory": "Inventory",
+    "statistics": "Statistics",
+    "users": "Users",
+    "clients": "Clients",
+    "locations": "Locations",
+    "products": "Products",
+    "suppliers": "Suppliers",
+    "sales": "Sales",
+    "logout": "Log out"
+}

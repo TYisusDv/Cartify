@@ -4,6 +4,7 @@ import { AuthLoginValues } from '../../types/auth';
 import { AlertType } from '../../types/alert';
 import { UserAccountIcon, LockPasswordIcon } from 'hugeicons-react';
 import { handleChange } from '../../utils/formUtils';
+import { saveToken } from '../../utils/authUtils';
 import { v4 as uuidv4 } from 'uuid';
 import InputGroup from '../../components/InputGroup';
 import useFormSubmit from '../../hooks/useFormSubmit';
@@ -31,7 +32,8 @@ const AuthPage: React.FC<AuthPageProps> = ({ addAlert }) => {
           addAlert({ id: uuidv4(), text: response_data.resp, type: 'danger', timeout: 3000 });
           return;
         }
-
+        
+        saveToken(response_data.resp.accessToken)
         addAlert({ id: uuidv4(), text: 'Success! Welcome to Carsync.', type: 'primary', timeout: 3000 });
       }      
     };

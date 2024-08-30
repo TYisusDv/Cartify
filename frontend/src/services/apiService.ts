@@ -5,7 +5,7 @@ const apiService = axios.create({
   baseURL: 'http://127.0.0.1:8000/v1',
 });
 
-axios.interceptors.request.use(
+apiService.interceptors.request.use(
   config => {
     const token = localStorage.getItem(TOKEN_KEY);
     if (token) {

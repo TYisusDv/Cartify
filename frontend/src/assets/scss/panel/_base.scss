@@ -1,0 +1,5 @@
+@use '../base/vars' as v;
+
+.panel-page {
+    @apply flex relative h-screen;
+}
