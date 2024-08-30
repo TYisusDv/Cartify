@@ -25,7 +25,7 @@ class LoginInAPIView(APIView):
         
         user = authenticate(request, username = username, password = password)
         if user is None:
-            return JsonResponse({'success': False, 'resp': 'Incorrect user or password.'}, status = 401)
+            return JsonResponse({'success': False, 'resp': 'Incorrect user or password'}, status = 401)
         
         login(request, user)            
         
