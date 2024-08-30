@@ -1,10 +1,8 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-#from .views import ArticuloViewSet
-
-router = DefaultRouter()
-#router.register(r'articulos', ArticuloViewSet)
+from .views import (
+    LoginInAPIView
+)
 
 urlpatterns = [
-    #path('', include(router.urls)),
+    path('auth/log-in', LoginInAPIView.as_view(), name='auth-log-in'),
 ]

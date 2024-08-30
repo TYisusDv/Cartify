@@ -1,8 +1,8 @@
-export interface AuthResponse {
-    token: string;
+export interface AuthLoginResponse {
+    accessToken: string;
 }
 
-export interface AuthFormValues {
-    email: string;
+export interface AuthLoginValues {
+    username: string;
     password: string;
 }

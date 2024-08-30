@@ -1,13 +1,6 @@
-import axios from 'axios';
+import apiService from './apiService';
 
-const API_URL = 'https://your-api-url.com/api/auth';
-
-export const login = async (email: string, password: string) => {
-  const response = await axios.post(`${API_URL}/login`, { email, password });
-  return response.data;
-};
-
-export const register = async (email: string, password: string) => {
-  const response = await axios.post(`${API_URL}/register`, { email, password });
-  return response.data;
+export const login = async (username: string, password: string) => {
+  const response = await apiService.post('/auth/log-in', { username, password });
+  return response;
 };
