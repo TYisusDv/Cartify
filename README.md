@@ -42,14 +42,15 @@
 ### Environment Variables
 Create a .env file in the root directory to manage environment variables. Example:
 
-```bash
-POSTGRES_DB = your_db_name
-POSTGRES_USER = your_db_user
-POSTGRES_PASSWORD = your_db_password
-POSTGRES_HOST = db
-POSTGRES_PORT = 5432
-DJANGO_SECRET_KEY = your_secret_key
-DJANGO_CORS_ALLOWED_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000"
+1. **Create file .env**:
+   ```bash
+   POSTGRES_DB = your_db_name
+   POSTGRES_USER = your_db_user
+   POSTGRES_PASSWORD = your_db_password
+   POSTGRES_HOST = db
+   POSTGRES_PORT = 5432
+   DJANGO_SECRET_KEY = your_secret_key
+   DJANGO_CORS_ALLOWED_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000"
 
 ### Prerequisites
 
