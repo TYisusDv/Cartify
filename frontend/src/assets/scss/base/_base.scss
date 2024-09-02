@@ -1,64 +1,95 @@
-@use '../base/vars' as v;
+@use "../base/vars" as v;
+
+@import 'animate.css/animate.min.css';
 
 .link {
-    color: v.$color-primary;
+  color: v.$color-primary;
 
-    &:hover {
-        @apply underline;
-    }
+  &:hover {
+    @apply underline;
+  }
 }
 
 .input-group {
-    @apply flex relative w-full h-14 rounded-2xl items-center px-3 gap-1 transition-all ease-in-out duration-300;
-    background: v.$bg-input;
-    border: 2px solid rgba(255, 255, 255, 0.089);    
+  @apply flex relative w-full h-14 rounded-2xl items-center px-3 gap-1 transition-all ease-in-out duration-300;
+  background: v.$bg-input;
+  border: 2px solid rgba(255, 255, 255, 0.089);
+
+  .label {
+    @apply absolute text-white font-bold text-gray-300 text-sm transition-all ease-in-out duration-300;
+  }
+
+  .input {
+    @apply w-full h-12 bg-transparent text-white font-semibold pt-3;
+
+    &:focus {
+      @apply outline-none;
+    }
+
+    &:not(:placeholder-shown) + .label {
+      @apply text-xs;
+      transform: translateY(-10px);
+    }
+  }
+
+  .icon {
+    @apply text-white;
+  }
+
+  &:focus-within {
+    border: 2px solid v.$color-primary;
+    box-shadow: 0 0 0 4px rgba(v.$color-primary, 0.15);
 
     .label {
-        @apply absolute text-white font-bold text-gray-300 text-sm transition-all ease-in-out duration-300;
+      color: v.$color-primary;
     }
+  }
 
-    .input {
-        @apply w-full h-12 bg-transparent text-white font-semibold pt-3;
-
-        &:focus {
-            @apply outline-none;
-        }
-
-        &:not(:placeholder-shown) + .label {
-            @apply text-xs;
-            transform: translateY(-10px);
-        }
-    }
-
-    .icon {
-        @apply text-white;
-    }
-
-    &:focus-within {
-        border: 2px solid v.$color-primary;
-        box-shadow: 0 0 0 4px rgba(v.$color-primary, 0.15);
-
-        .label {
-            color: v.$color-primary;
-        }
-    }
-
-    &:focus-within .label, &.has-text .label {
-        @apply text-xs;
-        transform: translateY(-10px);
-    }
+  &:focus-within .label,
+  &.has-text .label {
+    @apply text-xs;
+    transform: translateY(-10px);
+  }
 }
 
 .btn {
-    @apply w-full h-14 rounded-3xl font-semibold text-white transition-all ease-in-out duration-200;
-    background: v.$color-primary;
-    border: 2px solid v.$color-primary;
+  @apply w-full h-14 rounded-3xl font-semibold text-white transition-all ease-in-out duration-200;
+  background: v.$color-primary;
+  border: 2px solid v.$color-primary;
 
-    &:hover {
-        background: rgba(v.$color-primary, 0.15);
-    }
+  &:hover {
+    background: rgba(v.$color-primary, 0.15);
+  }
 
-    &:disabled {
-        @apply bg-gray-700 border-gray-700;
-    }
+  &:disabled {
+    @apply bg-gray-700 border-gray-700;
+  }
+}
+
+.loader {
+  height: 50px;
+  aspect-ratio: 1.5;
+  --c: no-repeat linear-gradient(#000000 0 0);
+  background: var(--c), var(--c);
+  background-size: 66% 50%;
+  animation: l1 1.5s infinite linear;
+}
+
+@keyframes l1 {
+  0% {
+    background-position: 0 0, 0 100%;
+  }
+  25% {
+    background-position: 100% 0, 0 100%;
+  }
+  47%,
+  53% {
+    background-position: 100% 0, 100% 100%;
+  }
+  75% {
+    background-position: 0 0, 100% 100%;
+  }
+  100% {
+    background-position: 0 0, 0 100%;
+  }
 }

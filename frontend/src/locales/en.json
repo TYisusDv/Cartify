@@ -9,5 +9,6 @@
     "products": "Products",
     "suppliers": "Suppliers",
     "sales": "Sales",
-    "logout": "Log out"
+    "logout": "Log out",
+    "session_closing": "The session is closing..."
 }

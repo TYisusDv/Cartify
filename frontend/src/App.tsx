@@ -3,6 +3,8 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { AlertType } from './types/alert';
 import { isAuthenticated } from './utils/authUtils';
 import Alert from './components/Alert';
+import PreLoader from './pages/loader/PreLoader';
+import DelayedSuspense from './pages/loader/DelayedSuspense';
 
 const AuthPage = React.lazy(() => import('./pages/auth/authPage'));
 const PanelPage = React.lazy(() => import('./pages/panelPage'));
@@ -29,13 +31,13 @@ function App() {
             <Alert key={alert.id} id={alert.id} text={alert.text} type={alert.type} removeAlert={removeAlert} />
           ))}
         </div>        
-        <Suspense fallback={<div>Loading...</div>}>
+        <DelayedSuspense fallback={<PreLoader />} delay={1000}>
           {isAuthenticated() ? (
-            <PanelPage addAlert={addAlert}/> 
+            <PanelPage addAlert={addAlert} /> 
           ) : (
-            <AuthPage addAlert={addAlert}/> 
+            <AuthPage addAlert={addAlert} /> 
           )}
-        </Suspense>        
+        </DelayedSuspense>    
       </div>
     </Router>
   );

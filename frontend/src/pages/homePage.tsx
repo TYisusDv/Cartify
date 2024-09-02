@@ -1,19 +1,21 @@
 import React from 'react';
 import useTranslations from '../hooks/useTranslations';
-
+import DelayedSuspense from './loader/DelayedSuspense';
+import SkeletonLoader from './loader/SkeletonLoader';
 
 const HomePage: React.FC = () => {
   const { translations } = useTranslations();
 
   return (
-    <>
-        <div className='flex w-full p-8'>
-            <h1 className='text-2xl font-bold'>{translations.home}</h1>
-        </div>
-        <div className='flex p-8'>
-
-        </div>
-    </>
+    <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>        
+     <div className='flex flex-col w-full p-8 animate__animated animate__fadeIn'>
+          <h1 className='text-2xl font-bold'>{translations.home}</h1>
+          <span className='text-sm text-gray-700 '>Cierra sesiond</span>
+      </div>
+      <div className='flex p-8'>
+  
+      </div>
+    </DelayedSuspense>
   );
 };
 
