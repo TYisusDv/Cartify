@@ -1,7 +1,7 @@
 import React from 'react';
 import useTranslations from '../hooks/useTranslations';
-import DelayedSuspense from './loader/DelayedSuspense';
-import SkeletonLoader from './loader/SkeletonLoader';
+import DelayedSuspense from '../components/DelayedSuspense';
+import SkeletonLoader from '../components/SkeletonLoader';
 
 const HomePage: React.FC = () => {
   const { translations } = useTranslations();

@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { removeToken } from '../../utils/authUtils';
 import useTranslations from '../../hooks/useTranslations';
-import DelayedSuspense from '../loader/DelayedSuspense';
-import SkeletonLoader from '../loader/SkeletonLoader';
+import DelayedSuspense from '../../components/DelayedSuspense';
+import SkeletonLoader from '../../components/SkeletonLoader';
 
 const AuthLogoutPage: React.FC = () => {
   const { translations } = useTranslations();
@@ -15,7 +15,7 @@ const AuthLogoutPage: React.FC = () => {
       navigate('/', { replace: true }); 
       window.location.reload();
     }, 2000);
-  }, []);
+  }, [navigate]);
 
   return (
     <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>        

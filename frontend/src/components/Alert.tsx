@@ -86,7 +86,7 @@ const Alert: React.FC<AlertType> = ({
 
   return (
     <div
-      className={`flex items-center w-full max-w-xs p-4 rounded-lg shadow text-gray-400 bg-gray-900 min-w-60 gap-2 transition-all duration-300 ease-in-out opacity-0 ${isClosing ? "opacity-0" : "opacity-100"
+      className={`flex items-center w-full max-w-xs p-4 rounded-lg shadow text-gray-700 bg-white dark:bg-slate-800 dark:text-gray-200 min-w-60 gap-2 transition-all duration-300 ease-in-out opacity-0 ${isClosing ? "opacity-0" : "opacity-100"
         }`}
       role="alert"
     >
@@ -98,7 +98,7 @@ const Alert: React.FC<AlertType> = ({
       <div className="ms-3 text-sm font-normal">{text}</div>
       <button
         type="button"
-        className="ms-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 inline-flex items-center justify-center h-8 w-8 text-gray-500 hover:text-white bg-gray-900 hover:bg-gray-800"
+        className="ms-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 inline-flex items-center justify-center h-8 w-8 text-gray-700 bg-white hover:bg-gray-200 dark:hover:text-white dark:bg-slate-800 dark:hover:bg-slate-900 dark:text-gray-200"
         aria-label="Close"
         onClick={handleClose}
       >

@@ -1,9 +1,9 @@
 import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
+import { Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
 import { AlertType } from '../types/alert';
 import { Analytics02Icon, BarCode02Icon, DashboardSquare01Icon, DistributionIcon, LocationUser04Icon, LogoutSquare01Icon, SearchList02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, UserGroupIcon } from 'hugeicons-react';
 import useTranslations from '../hooks/useTranslations';
-import SkeletonLoader from './loader/SkeletonLoader';
+import SkeletonLoader from '../components/SkeletonLoader';
 
 interface PanelPageProps {
   addAlert: (alert: AlertType) => void;
@@ -11,7 +11,7 @@ interface PanelPageProps {
 
 const HomePage = React.lazy(() => import('../pages/homePage'));
 const AuthLogoutPage = React.lazy(() => import('../pages/auth/authLogoutPage'));
-
+const ManageUsersPage = React.lazy(() => import('../pages/manage/manageUsersPage'));
 
 const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
   const { translations } = useTranslations();
@@ -22,7 +22,7 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
   };
 
   return (
-    <section className='panel-page animate__animated animate__fadeIn'>
+    <section className='flex relative h-screen animate__animated animate__fadeIn'>
       <nav className='fixed flex flex-col w-[260px] h-full border-r-2 border-gray-100 gap-2 p-8 z-10'>
         <div className='w-full'>
           <h1 className='text-2xl font-bold'>Carsync</h1>
@@ -48,9 +48,10 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
       <div className='relative flex flex-col w-full h-full pl-[260px]'>
         <Suspense fallback={<SkeletonLoader />}>
           <Routes>
-            <Route path="/" element={<Navigate to="/home" />} />
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/auth/logout" element={<AuthLogoutPage />} />
+            <Route path='/' element={<Navigate to='/home' />} />
+            <Route path='/home' element={<HomePage />} />
+            <Route path='/manage/users' element={<ManageUsersPage />} />
+            <Route path='/auth/logout' element={<AuthLogoutPage />} />
           </Routes>
         </Suspense>
       </div>    

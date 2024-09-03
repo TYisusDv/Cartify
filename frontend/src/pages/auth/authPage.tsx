@@ -39,17 +39,17 @@ const AuthPage: React.FC<AuthPageProps> = ({ addAlert }) => {
     };
 
     return (
-      <section className='auth-page'>        
-        <div className='auth-bg'></div>
+      <section className='auth-page relative h-screen w-screen bg-cover bg-no-repeat'>        
+        <div className='h-screen w-screen bg-gradient-to-r from-white dark:from-slate-900 dark:to-slate-600/50'></div>
         <div className='flex flex-col h-full absolute top-0 left-0'>          
           <header className='flex h-16 items-center px-14 w-screen box-border'>
-            <h1 className='text-xl text-white font-bold cursor-default'>Carsync</h1>
+            <h1 className='text-xl font-bold cursor-default dark:text-white'>Carsync</h1>
           </header>
           <div className='flex flex-col h-full px-14 box-border justify-center w-full md:w-8/12 lg:w-6/12 xl:w-4/12'>
             <div>
-              <p className='text-gray-400 font-bold text-lg uppercase'>Manage your business</p>
-              <h2 className='text-5xl text-white font-bold'>Log in to your account.</h2>
-              <div className='text-gray-500 font-bold mt-4'>You don't have an account? <a className='link' href='s'>Register</a></div>
+              <p className='text-gray-600 font-bold text-lg uppercase dark:text-gray-400'>Manage your business</p>
+              <h2 className='text-5xl font-bold dark:text-white'>Log in to your account.</h2>
+              <div className='text-gray-600 font-bold mt-4 dark:text-gray-400'>You don't have an account? <a className='text-blue-600 hover:underline' href='s'>Register</a></div>
             </div>
             <form onSubmit={onSubmit} autoComplete='off'>
               <div className='grid grid-cols-1 w-full gap-2 mt-9'>
@@ -58,7 +58,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ addAlert }) => {
                     id='username'
                     name='username'
                     label='Username' 
-                    icon={<UserAccountIcon className='icon' size={28} />} 
+                    icon={<UserAccountIcon className='icon text-gray-700' size={28} />} 
                     onChange={handleChange(setFormValues)} 
                   />
                 </div>
@@ -68,7 +68,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ addAlert }) => {
                     name='password'
                     label='Password' 
                     type='password'
-                    icon={<LockPasswordIcon className='icon' size={28} />} 
+                    icon={<LockPasswordIcon className='icon text-gray-700' size={28} />} 
                     onChange={handleChange(setFormValues)}
                   />
                 </div>

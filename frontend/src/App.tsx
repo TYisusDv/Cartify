@@ -1,10 +1,10 @@
-import React, { useState, Suspense } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AlertType } from './types/alert';
 import { isAuthenticated } from './utils/authUtils';
 import Alert from './components/Alert';
-import PreLoader from './pages/loader/PreLoader';
-import DelayedSuspense from './pages/loader/DelayedSuspense';
+import PreLoader from './components/PreLoader';
+import DelayedSuspense from './components/DelayedSuspense';
 
 const AuthPage = React.lazy(() => import('./pages/auth/authPage'));
 const PanelPage = React.lazy(() => import('./pages/panelPage'));
@@ -24,22 +24,22 @@ function App() {
   };
 
   return (
-    <Router>
       <div className='App'>
         <div className='flex flex-col absolute top-0 right-0 z-10 p-2 gap-2'>        
           {alerts.map(alert => (
             <Alert key={alert.id} id={alert.id} text={alert.text} type={alert.type} removeAlert={removeAlert} />
           ))}
-        </div>        
-        <DelayedSuspense fallback={<PreLoader />} delay={1000}>
-          {isAuthenticated() ? (
-            <PanelPage addAlert={addAlert} /> 
-          ) : (
-            <AuthPage addAlert={addAlert} /> 
-          )}
-        </DelayedSuspense>    
+        </div> 
+        <Router>    
+          <DelayedSuspense fallback={<PreLoader />} delay={1000}>
+            {isAuthenticated() ? (
+              <PanelPage addAlert={addAlert} /> 
+            ) : (
+              <AuthPage addAlert={addAlert} /> 
+            )}
+          </DelayedSuspense>   
+        </Router> 
       </div>
-    </Router>
   );
 }
 

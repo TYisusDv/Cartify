@@ -10,5 +10,6 @@
     "suppliers": "Suppliers",
     "sales": "Sales",
     "logout": "Log out",
-    "session_closing": "The session is closing..."
+    "session_closing": "The session is closing...",
+    "manage_users_info": "Manage users here. Add, edit & grant permissions based on your role!"
 }
