@@ -20,8 +20,8 @@ const AuthLogoutPage: React.FC = () => {
   return (
     <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>        
       <div className='flex flex-col w-full p-8 animate__animated animate__fadeIn'>
-          <h1 className='text-2xl font-bold'>{translations.logout}</h1>
-          <span className='text-sm text-gray-700 '>{translations.session_closing} </span>
+          <h1 className='text-2xl font-bold dark:text-white'>{translations.logout}</h1>
+          <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.session_closing} </span>
       </div>
       <div className='flex p-8'>
   

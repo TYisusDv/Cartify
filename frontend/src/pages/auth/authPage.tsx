@@ -40,7 +40,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ addAlert }) => {
 
     return (
       <section className='auth-page relative h-screen w-screen bg-cover bg-no-repeat'>        
-        <div className='h-screen w-screen bg-gradient-to-r from-white dark:from-slate-900 dark:to-slate-600/50'></div>
+        <div className='h-screen w-screen bg-gradient-to-r from-white to-white/60 dark:from-slate-900 dark:to-slate-600/50'></div>
         <div className='flex flex-col h-full absolute top-0 left-0'>          
           <header className='flex h-16 items-center px-14 w-screen box-border'>
             <h1 className='text-xl font-bold cursor-default dark:text-white'>Carsync</h1>

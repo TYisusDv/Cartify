@@ -9,8 +9,8 @@ const HomePage: React.FC = () => {
   return (
     <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>        
      <div className='flex flex-col w-full p-8 animate__animated animate__fadeIn'>
-          <h1 className='text-2xl font-bold'>{translations.home}</h1>
-          <span className='text-sm text-gray-700 '>Cierra sesiond</span>
+          <h1 className='text-2xl font-bold dark:text-white'>{translations.home}</h1>
+          <span className='text-sm text-gray-600 dark:text-slate-400'>Cierra sesiond</span>
       </div>
       <div className='flex p-8'>
   

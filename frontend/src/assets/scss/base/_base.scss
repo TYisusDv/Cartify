@@ -61,6 +61,22 @@
   }
 }
 
+.dark  {
+  .loader {
+    --c: no-repeat linear-gradient(#f3f4f6 0 0);
+    background: var(--c), var(--c);
+    background-size: 66% 50%;
+  }
+}
+
+.light {
+  .loader {
+    --c: no-repeat linear-gradient(#000000 0 0);
+    background: var(--c), var(--c);
+    background-size: 66% 50%;
+  }
+}
+
 @keyframes l1 {
   0% {
     background-position: 0 0, 0 100%;
