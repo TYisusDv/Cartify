@@ -11,7 +11,13 @@
     "sales": "Sales",
     "logout": "Log out",
     "general": "General",
+    "system": "System",
+    "dark": "Dark",
+    "light": "Light",
+    "english": "English",
+    "spanish": "Spanish",
     "session_closing": "The session is closing...",
     "manage_users_info": "Manage users here. Add, edit & grant permissions based on your role!",
+    "manage_clients_info": "Manage clients here. Add, edit & delete!",
     "error_404": "Page not found"
 }

@@ -1,7 +1,7 @@
 @import "animate.css/animate.min.css";
 
 .input-group {
-  @apply flex relative w-full h-14 bg-white rounded-2xl items-center border-2 border-gray-200 px-3 gap-1 transition-all ease-in-out duration-300 dark:bg-slate-800 dark:border-slate-700;
+  @apply flex relative w-full h-14 bg-transparent rounded-2xl items-center border-2 border-gray-200 px-3 gap-1 transition-all ease-in-out duration-300  dark:border-slate-600;
 
   .label {
     @apply absolute font-bold text-black text-sm transition-all ease-in-out duration-300 dark:text-white;

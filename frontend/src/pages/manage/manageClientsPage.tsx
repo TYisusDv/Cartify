@@ -1,20 +1,28 @@
 import React, { useState } from 'react';
-import { Search01Icon, UserGroupIcon } from 'hugeicons-react';
-import { handleChange } from '../../utils/formUtils';
+import { UserGroupIcon } from 'hugeicons-react';
+
 import useTranslations from '../../hooks/useTranslations';
 import DelayedSuspense from '../../components/DelayedSuspense';
 import SkeletonLoader from '../../components/SkeletonLoader';
-import InputGroup from '../../components/InputGroup';
+import Table from '../../components/Table';
 
-const ManageUsersPage: React.FC = () => {
+const ManageClientsPage: React.FC = () => {
     const { translations } = useTranslations();
-    const [formValues, setFormValues] = useState({ search: '' });
 
+
+    const table_header = [
+        { name: 'id', headerName: 'ID' },
+        { name: 'clientName', headerName: 'Sucursal' },
+        { name: 'alias', headerName: 'Alias' },
+        { name: 'fullname', headerName: 'Nombre completo' },
+        { name: 'phoneNumber', headerName: 'Phone Number' },
+    ];
+    
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
             <div className='flex flex-col w-full p-8 animate__animated animate__fadeIn'>
-                <h1 className='text-2xl font-bold dark:text-white'>{translations.users}</h1>
-                <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_users_info}</span>
+                <h1 className='text-2xl font-bold dark:text-white'>{translations.clients}</h1>
+                <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_clients_info}</span>
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn'>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t-2 border-b-2 border-gray-100 py-6 dark:border-slate-600'>
@@ -23,7 +31,7 @@ const ManageUsersPage: React.FC = () => {
                             <UserGroupIcon />
                         </div>
                         <div>
-                            <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total</h2>
+                            <h2 className='text-sm u font-semibold text-gray-600 dark:text-slate-400'>Total</h2>
                             <h3 className='text-lg font-bold dark:text-white'>18</h3>
                         </div>
                     </div>
@@ -55,56 +63,12 @@ const ManageUsersPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                <div className='flex flex-col mt-8 gap-2'>
-                    <div className='flex justify-between gap-2'>
-                        <div></div>
-                        <div className='w-full max-w-72'>
-                            <InputGroup 
-                                id='search'
-                                name='search'
-                                label='Search' 
-                                icon={<Search01Icon className='icon' size={20} />} 
-                                onChange={handleChange(setFormValues)} 
-                            />
-                        </div>
-                    </div>
-                    <div className='flex w-full'>  
-                        <div className="relative overflow-x-auto sm:rounded-lg w-full">
-                            <table className="w-full text-sm text-left">
-                                <thead className="text-sm text-gray-700 uppercase bg-gray-200 dark:bg-slate-600 dark:text-white">
-                                    <tr>
-                                        <th scope="col" className="px-6 py-3">
-                                            Product name
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Product name
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            <span className="sr-only">Edit</span>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr className="text-sm text-gray-700 bg-gray-100 dark:bg-slate-700 dark:text-white">                                       
-                                        <td className="px-6 py-4">
-                                            Laptop
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            Laptop
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                    </div>
+                <div className='w-full mt-6'>
+                    <Table endpoint='/' header={table_header} />
                 </div>
             </div>
         </DelayedSuspense>
     );
 };
 
-export default ManageUsersPage;
+export default ManageClientsPage;

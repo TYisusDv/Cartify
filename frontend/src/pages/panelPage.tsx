@@ -14,13 +14,13 @@ interface PanelPageProps {
 const HomePage = React.lazy(() => import('../pages/homePage'));
 const AuthLogoutPage = React.lazy(() => import('../pages/auth/authLogoutPage'));
 const ManageUsersPage = React.lazy(() => import('../pages/manage/manageUsersPage'));
+const ManageClientsPage = React.lazy(() => import('../pages/manage/manageClientsPage'));
 const SettingGeneralPage = React.lazy(() => import('../pages/settings/settingGeneralPage'));
-
 
 const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
   const [isModalSettingsOpen, setIsModalSettingsOpen] = useState(false);
   const { translations } = useTranslations();
-  const location = useLocation(); 
+  const location = useLocation();
 
   const getLinkClass = (path: string) => {
     return location.pathname === path ? 'text-black font-semibold dark:text-white' : 'text-gray-700 dark:text-slate-300';
@@ -28,7 +28,7 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
 
   const getSettingsLinkClass = (hash: string) => {
     const isActive = location.hash === hash;
-    
+
     return isActive
       ? 'bg-gray-200 rounded-lg dark:text-white dark:bg-slate-600'
       : 'text-gray-700 dark:text-slate-300';
@@ -66,8 +66,8 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
           <li className='flex justify-between items-center'>
             <Link to='/auth/logout' className={`flex text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/auth/logout')}`}>
               <LogoutSquare01Icon /> {translations.logout}
-            </Link> 
-            <Link to='#settings/general' className='text-gray-700 bg-gray-200 rounded-full p-1 hover:bg-blue-600 hover:text-white dark:text-slate-300 dark:bg-slate-600' onClick={openModalSettings}>
+            </Link>
+            <Link to='#settings/general' className='text-gray-700 bg-gray-200 rounded-full p-1 hover:bg-blue-600 hover:text-white dark:text-slate-300 dark:bg-slate-600 dark:hover:bg-blue-600' onClick={openModalSettings}>
               <Settings02Icon />
             </Link>
           </li>
@@ -79,29 +79,28 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
             <Route path='/' element={<Navigate to='/home' />} />
             <Route path='/home' element={<HomePage />} />
             <Route path='/manage/users' element={<ManageUsersPage />} />
+            <Route path='/manage/clients' element={<ManageClientsPage />} />
             <Route path='/auth/logout' element={<AuthLogoutPage />} />
             <Route path='*' element={<ErrorPage code={404} detail={translations.error_404} />} />
           </Routes>
         </Suspense>
-      </div>  
+      </div>
       {isModalSettingsOpen && (
-        <Modal onClose={closeModalSettings}>
+        <Modal title={translations.settings} onClose={closeModalSettings}>
           <div className='flex items-center gap-12'>
             <ul>
               <li><Link to='#settings/general' className={`flex w-44 text-base p-2 hover:text-black gap-3 dark:hover:text-white ${getSettingsLinkClass('#settings/general')}`}><Settings02Icon />  {translations.general}</Link></li>
             </ul>
-            <div className='flex flex-col w-full p-2'>
-              <Suspense fallback={<div className='flex w-full pl-24'><Loading03Icon size={20} className='animate-spin dark:text-white' /></div>}>
-                <Routes>
-                  {location.hash === '#settings/general' && (
-                    <Route path='*' element={<SettingGeneralPage />} />
-                  )}
-                </Routes>
-              </Suspense>
-            </div>
+            <Suspense fallback={<div className='flex w-full pl-24'><Loading03Icon size={20} className='animate-spin dark:text-white' /></div>}>
+              <Routes>
+                {location.hash === '#settings/general' && (
+                  <Route path='*' element={<SettingGeneralPage />} />
+                )}
+              </Routes>
+            </Suspense>
           </div>
         </Modal>
-      )}      
+      )}
     </section>
   );
 };
