@@ -14,6 +14,7 @@ import SelectGroup from '../../components/SelectGroup';
 import { listTypesOfIds } from '../../services/typesOfIdsService';
 import { addClient } from '../../services/clientsService';
 import useFormSubmit from '../../hooks/useFormSubmit';
+import ManageAddClientPage from './clients/manageAddClientPage';
 
 interface ManageClientsProps {
     addAlert: (alert: AlertType) => void;
@@ -141,6 +142,7 @@ const ManageClientsPage: React.FC<ManageClientsProps> = ({ addAlert }) => {
         }
     };
 
+
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
             <div className='flex items-center justify-between w-full p-8 animate__animated animate__fadeIn'>
@@ -197,114 +199,7 @@ const ManageClientsPage: React.FC<ManageClientsProps> = ({ addAlert }) => {
             </div>
             {isModalAddOpen && (
                 <Modal title={translations.add_client} onClose={closeModalAdd}>
-                    <form autoComplete='off' onSubmit={onSubmit}>
-                        <div className='flex flex-col gap-2 w-full'>
-                            <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full animate__animated animate__fadeIn z-10'>
-                                <h3 className='text-sm font-semibold dark:text-gray-100 pl-1'>{translations.location}</h3>
-                                <div className='min-w-40'>
-                                    <SelectGroup options={locations} onChange={handleLocationChange} />
-                                </div>
-                            </div>
-                            <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
-                                <div className='col-span-1 z-10'>
-                                    <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full animate__animated animate__fadeIn z-10'>
-                                        <h3 className='text-sm font-semibold dark:text-gray-100 pl-1'>{translations.identification_type}</h3>
-                                        <div className='min-w-40'>
-                                            <SelectGroup options={typesOfIds} onChange={handleTypeOfIdsChange} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='col-span-1'>
-                                    <InputGroup
-                                        id='identification_id'
-                                        name='identification_id'
-                                        label={translations.identification_id}
-                                        icon={<UserIdVerificationIcon className='icon' size={24} />}
-                                        onChange={handleChange(setFormValues)}
-                                    />
-                                </div>
-                            </div>
-                            <InputGroup
-                                id='alias'
-                                name='alias'
-                                label={translations.alias}
-                                icon={<UserQuestion02Icon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
-                            />
-                            <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
-                                <div className='col-span-1'>
-                                    <InputGroup
-                                        id='firstname'
-                                        name='firstname'
-                                        label={translations.firstname}
-                                        icon={<UserCircleIcon className='icon' size={24} />}
-                                        onChange={handleChange(setFormValues)}
-                                    />
-                                </div>
-                                <div className='col-span-1'>
-                                    <InputGroup
-                                        id='middlename'
-                                        name='middlename'
-                                        label={translations.middlename}
-                                        icon={<UserCircleIcon className='icon' size={24} />}
-                                        onChange={handleChange(setFormValues)}
-                                    />
-                                </div>
-                            </div>
-                            <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
-                                <div className='col-span-1'>
-                                    <InputGroup
-                                        id='lastname'
-                                        name='lastname'
-                                        label={translations.lastname}
-                                        icon={<UserAccountIcon className='icon' size={24} />}
-                                        onChange={handleChange(setFormValues)}
-                                    />
-                                </div>
-                                <div className='col-span-1'>
-                                    <InputGroup
-                                        id='second_lastname'
-                                        name='second_lastname'
-                                        label={translations.second_lastname}
-                                        icon={<UserAccountIcon className='icon' size={24} />}
-                                        onChange={handleChange(setFormValues)}
-                                    />
-                                </div>
-                            </div>
-                            <InputGroup
-                                id='email'
-                                name='email'
-                                label={translations.email}
-                                icon={<Mail01Icon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
-                            />
-                            <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
-                                <div className='col-span-1'>
-                                    <InputGroup
-                                        id='mobile'
-                                        name='mobile'
-                                        label={translations.mobile_number}
-                                        icon={<SmartPhone01Icon className='icon' size={24} />}
-                                        onChange={handleChange(setFormValues)}
-                                    />
-                                </div>
-                                <div className='col-span-1'>
-                                    <InputGroup
-                                        id='phone'
-                                        name='phone'
-                                        label={translations.phone_number}
-                                        icon={<TelephoneIcon className='icon' size={24} />}
-                                        onChange={handleChange(setFormValues)}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>
-                            <div className='col-span-1 md:col-end-3 w-full'>
-                                <button type='submit' className='btn h-12 max-w-48 float-end'>Agregar</button>
-                            </div>
-                        </div>
-                    </form>
+                    <ManageAddClientPage addAlert={addAlert} />
                 </Modal>
             )}
         </DelayedSuspense>
