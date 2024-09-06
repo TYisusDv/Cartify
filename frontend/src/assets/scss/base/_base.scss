@@ -4,11 +4,11 @@
   @apply flex relative w-full h-14 bg-transparent rounded-2xl items-center border-2 border-gray-200 px-3 gap-1 transition-all ease-in-out duration-300  dark:border-slate-600;
 
   .label {
-    @apply absolute font-bold text-black text-sm transition-all ease-in-out duration-300 dark:text-white;
+    @apply absolute cursor-text font-bold text-black text-sm transition-all ease-in-out duration-300 dark:text-white;
   }
 
   .input {
-    @apply w-full h-12 bg-transparent text-black font-semibold pt-3 dark:text-white;
+    @apply text-sm w-full h-12 bg-transparent text-black font-semibold pt-3 dark:text-white;
 
     &:focus {
       @apply outline-none;
@@ -24,17 +24,17 @@
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.3);
 
     .label {
-      @apply text-xs -translate-y-[10px] text-blue-600 !important;
+      @apply text-xs -translate-y-[8px] text-blue-600 !important;
     }
   }
 
   &.has-text .label {
-    @apply text-xs -translate-y-[10px] text-gray-600 dark:text-slate-400;
+    @apply text-xs -translate-y-[8px] text-gray-600 dark:text-slate-400;
   }
 }
 
 .btn {
-  @apply w-full h-14 rounded-3xl font-semibold bg-blue-600 border-2 border-blue-600 text-white transition-all ease-in-out duration-200;
+  @apply flex justify-center items-center w-full h-14 rounded-3xl font-semibold bg-blue-600 border-2 border-blue-600 text-white transition-all ease-in-out duration-200 gap-1;
 
   &:hover {
     @apply text-blue-600;

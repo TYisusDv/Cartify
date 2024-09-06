@@ -69,11 +69,15 @@ const SettingGeneralPage: React.FC = () => {
             <div className='flex flex-col gap-2 w-full p-2'>
                 <div className='flex items-center justify-between animate__animated animate__fadeIn z-20'>
                     <h3 className='dark:text-gray-100'>{translations.theme}</h3>
-                    <SelectGroup options={theme_options} value={selectedTheme} onChange={handleThemeChange} />
+                    <div className='min-w-32'>
+                        <SelectGroup options={theme_options} value={selectedTheme} onChange={handleThemeChange} />
+                    </div>
                 </div>
                 <div className='flex items-center justify-between animate__animated animate__fadeIn z-10'>
                     <h3 className='dark:text-gray-100'>{translations.language}</h3>
-                    <SelectGroup options={language_options} value={selectedLanguage} onChange={handleLanguageChange} />
+                    <div className='min-w-32'>
+                        <SelectGroup options={language_options} value={selectedLanguage} onChange={handleLanguageChange} />
+                    </div>
                 </div>
             </div>            
         </DelayedSuspense>

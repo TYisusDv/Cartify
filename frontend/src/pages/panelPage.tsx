@@ -18,8 +18,8 @@ const ManageClientsPage = React.lazy(() => import('../pages/manage/manageClients
 const SettingGeneralPage = React.lazy(() => import('../pages/settings/settingGeneralPage'));
 
 const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
-  const [isModalSettingsOpen, setIsModalSettingsOpen] = useState(false);
   const { translations } = useTranslations();
+  const [isModalSettingsOpen, setIsModalSettingsOpen] = useState(false);
   const location = useLocation();
 
   const getLinkClass = (path: string) => {
@@ -79,7 +79,7 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
             <Route path='/' element={<Navigate to='/home' />} />
             <Route path='/home' element={<HomePage />} />
             <Route path='/manage/users' element={<ManageUsersPage />} />
-            <Route path='/manage/clients' element={<ManageClientsPage />} />
+            <Route path='/manage/clients' element={<ManageClientsPage addAlert={addAlert} />} />
             <Route path='/auth/logout' element={<AuthLogoutPage />} />
             <Route path='*' element={<ErrorPage code={404} detail={translations.error_404} />} />
           </Routes>
