@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { cloneElement, ReactElement, useEffect, useState } from "react";
 import { Search01Icon } from 'hugeicons-react';
 import { handleChange } from '../utils/formUtils';
+import { getTable } from '../services/tableService';
 import InputGroup from "./InputGroup";
+import useTranslations from "../hooks/useTranslations";
 
 interface Header {
     name: string;
@@ -15,18 +17,40 @@ interface DataRow {
 interface TableProps {
     endpoint: string;
     header: Header[];
+    tbody: ReactElement;
 }
 
-const Table: React.FC<TableProps> = ({ endpoint, header }) => {
+const Table: React.FC<TableProps> = ({ endpoint, header, tbody }) => {
+    const { translations } = useTranslations();
     const [formValues, setFormValues] = useState({ search: '' });
     const [data, setData] = useState<DataRow[]>([]);
-
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const itemsPerPage = 10;
 
-    const totalPages = 2;
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const params = {
+                    query: 'table',
+                    page: currentPage,
+                    show: itemsPerPage,
+                    search: formValues.search || ''
+                };
+                
+                const response = await getTable(endpoint, params);
+                const response_data = response.data;
+                if (response_data) {
+                    setData(response_data.resp); 
+                    setTotalPages(response_data.total_pages);
+                }
+            } catch (error) {
+                
+            }
+        };
 
-    const currentData = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+        fetchData();
+    }, [endpoint, currentPage, formValues.search]); 
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -39,9 +63,10 @@ const Table: React.FC<TableProps> = ({ endpoint, header }) => {
                     <InputGroup
                         id='search'
                         name='search'
-                        label='Search'
+                        label={translations.search}
                         icon={<Search01Icon className='icon' size={20} />}
                         onChange={handleChange(setFormValues)}
+                        required={false}
                     />
                 </div>
             </div>
@@ -57,17 +82,7 @@ const Table: React.FC<TableProps> = ({ endpoint, header }) => {
                                 ))}
                             </tr>
                         </thead>
-                        <tbody>
-                            {data.map((row, index) => (
-                                <tr key={index} className="text-sm text-gray-800 bg-gray-100 dark:bg-slate-700 dark:text-slate-200">
-                                    {header.map((header) => (
-                                        <td key={header.name} className="px-6 py-4">
-                                            {row[header.name]}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
+                        {cloneElement(tbody, { data })}
                     </table>
                 </div>
                 <div className="flex justify-end items-center mt-4">

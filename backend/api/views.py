@@ -3,6 +3,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer,
+    TokenRefreshSerializer
 )
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
@@ -12,7 +13,7 @@ from django.core.paginator import Paginator
 from .serializers import *
 from .models import *
 
-class LoginInAPIView(APIView):
+class LoginAPIView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
   
@@ -26,7 +27,7 @@ class LoginInAPIView(APIView):
         
         user = authenticate(request, username = username, password = password)
         if user is None:
-            return JsonResponse({'success': False, 'resp': 'Incorrect user or password'}, status = 401)
+            return JsonResponse({'success': False, 'resp': 'Incorrect user or password'}, status = 400)
         
         login(request, user)            
         
@@ -51,48 +52,69 @@ class LoginInAPIView(APIView):
             }
         })
 
+class AuthRefreshAPIView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+  
+    def post(self, request):        
+        serializer = TokenRefreshSerializer(data = request.data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': 'Invalid refresh token'}, status = 400)
+        
+        token = serializer.validated_data
+
+        return JsonResponse({
+            'success': True,
+            'resp': {
+                'accessToken': str(token['access']),
+            }
+        })
+
+class ManageStatesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+  
+    def get(self, request):
+        query = request.query_params.get('query', None)
+        if query == 'list':
+            search_query = request.query_params.get('search', None)
+
+            results = StatesModel.objects.filter(
+                Q(name__icontains = search_query)
+            )
+            serialized = StatesSerializer(results, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+    
+class ManageCitiesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+  
+    def get(self, request):
+        query = request.query_params.get('query', None)
+        if query == 'list':
+            search_query = request.query_params.get('search', None)
+
+            results = CitiesModel.objects.filter(
+                Q(name__icontains = search_query)
+            )
+            serialized = CitiesSerializer(results, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+
 class ManageLocationsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
   
     def get(self, request):
         query = request.query_params.get('query', None)
-        if query == 'table':
-            search_query = request.query_params.get('search', '')
-            page_number = request.query_params.get('page', 1)
-            order_by = request.query_params.get('order_by', 'id')
-            order = request.query_params.get('order', 'desc')
-            show = request.query_params.get('show', 10)
-            
-            if order_by == 'actions':
-                order_by = 'id'
-
-            model = LocationsModel.objects.filter(
-                Q(id__icontains = search_query) |
-                Q(name__icontains = search_query) |
-                Q(credits__icontains = search_query) |
-                Q(days__icontains = search_query) |
-                Q(price__icontains = search_query) |
-                Q(group__name__icontains = search_query),
-                status = True
-            )
-
-            if order == 'desc':
-                order_by = f'-{order_by}'
-
-            model = model.order_by(order_by)
-            paginator = Paginator(model, show)
-            model = paginator.page(page_number)
-
-            serialized = LocationsSerializer(model, many = True)
-
-            return JsonResponse({
-                'success': True,
-                'data': serialized.data,
-                'total_pages': paginator.num_pages,
-                'current_page': model.number
-            })  
-        elif query == 'list':
+        if query == 'list':
             results = LocationsModel.objects.filter(status = True)
             serialized = LocationsSerializer(results, many = True)
             
@@ -107,6 +129,40 @@ class ManageTypesOfIdsAPIView(APIView):
   
     def get(self, request):
         query = request.query_params.get('query', None)
+        if query == 'list':
+            results = TypesOfIdsModel.objects.filter(status = True)
+            serialized = TypesOfIdsSerializer(results, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+
+class ManageCountriesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+  
+    def get(self, request):
+        query = request.query_params.get('query', None)
+        if query == 'list':
+            search_query = request.query_params.get('search', None)
+
+            results = CountriesModel.objects.filter(
+                Q(id__icontains = search_query)
+            )
+            serialized = CountriesSerializer(results, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+
+class ManageClientsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        query = request.query_params.get('query', None)
         if query == 'table':
             search_query = request.query_params.get('search', '')
             page_number = request.query_params.get('page', 1)
@@ -117,14 +173,8 @@ class ManageTypesOfIdsAPIView(APIView):
             if order_by == 'actions':
                 order_by = 'id'
 
-            model = TypesOfIdsModel.objects.filter(
-                Q(id__icontains = search_query) |
-                Q(name__icontains = search_query) |
-                Q(credits__icontains = search_query) |
-                Q(days__icontains = search_query) |
-                Q(price__icontains = search_query) |
-                Q(group__name__icontains = search_query),
-                status = True
+            model = ClientsModel.objects.filter(
+                Q(id__icontains = search_query)
             )
 
             if order == 'desc':
@@ -134,31 +184,23 @@ class ManageTypesOfIdsAPIView(APIView):
             paginator = Paginator(model, show)
             model = paginator.page(page_number)
 
-            serialized = TypesOfIdsSerializer(model, many = True)
+            serialized = ClientsSerializer(model, many = True)
 
             return JsonResponse({
                 'success': True,
-                'data': serialized.data,
+                'resp': serialized.data,
                 'total_pages': paginator.num_pages,
                 'current_page': model.number
-            })  
-        elif query == 'list':
-            results = TypesOfIdsModel.objects.filter(status = True)
-            serialized = TypesOfIdsSerializer(results, many = True)
-            
-            return JsonResponse({
-                'success': True,
-                'resp': serialized.data
             })
 
-class ManageClientsAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-  
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
     def post(self, request):
         with transaction.atomic():
-            person_serializer = AddPersonSerializer(data = request.data)
-            
+            person_serializer = AddPersonSerializer(data = request.data)            
             if not person_serializer.is_valid():
                 transaction.set_rollback(True)
                 return JsonResponse({
@@ -167,17 +209,37 @@ class ManageClientsAPIView(APIView):
                 }, status = 400)
 
             person_instance = person_serializer.save()
+            
+            country_id = request.data.get('country_id', None)
+            country_instance = CountriesModel.objects.get_or_create(id = country_id)[0]
+            state = request.data.get('state', None)
+            state_instance = StatesModel.objects.get_or_create(name = state, country = country_instance)[0]
+            city = request.data.get('city', None)
+            city_instance = CitiesModel.objects.get_or_create(name = city, state = state_instance)[0]
+
+            request.data['city_id'] = city_instance.id
+
+            addresses_serializer = AddAddressesSerializer(data = request.data)            
+            if not addresses_serializer.is_valid():
+                transaction.set_rollback(True)
+                return JsonResponse({
+                    'success': False, 
+                    'resp': addresses_serializer.errors
+                }, status = 400)
+
+            address_instance = addresses_serializer.save()
+            person_instance.addresses.add(address_instance)
+
             request.data['person_id'] = person_instance.id
 
-            client_serializer = AddClientSerializer(data = request.data)
-            
+            client_serializer = AddClientSerializer(data = request.data)            
             if not client_serializer.is_valid():
                 transaction.set_rollback(True)
                 return JsonResponse({
                     'success': False, 
                     'resp': client_serializer.errors
                 }, status = 400)
-
+            
             client_serializer.save()
 
             return JsonResponse({

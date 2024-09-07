@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 
 interface ModalProps {
     children: ReactNode;
@@ -7,8 +7,21 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ children, title, onClose }) => {
+    useEffect(() => {
+        const panelContent = document.querySelector('.panel-content') as HTMLElement;
+        if (panelContent) {
+            panelContent.classList.add('overflow-hidden');
+        }
+
+        return () => {
+            if (panelContent) {
+                panelContent.classList.remove('overflow-hidden');
+            }
+        };
+    }, []);
+
     return (
-        <div className='absolute top-0 left-0 flex items-center justify-center h-screen w-screen p-2 z-50 bg-black/50 dark:bg-slate-800/80 animate__animated animate__fadeIn'>
+        <div className='absolute top-0 left-0 flex items-center justify-center h-full w-full p-2 z-50 bg-black/50 dark:bg-slate-800/80 animate__animated animate__fadeIn animate__faster'>
             <div className='flex flex-col bg-white h-auto w-full max-w-[680px] rounded-3xl dark:bg-slate-700'>
                 <div className='flex justify-between w-full p-5 border-b-2 border-gray-200 dark:border-slate-600'>
                     <h1 className='text-lg font-bold dark:text-white'>{title}</h1>

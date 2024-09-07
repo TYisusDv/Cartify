@@ -21,6 +21,71 @@ class LogInSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'password']
 
+class CountriesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CountriesModel
+        fields = '__all__'
+
+class StatesSerializer(serializers.ModelSerializer):
+    country =  CountriesSerializer(read_only = True)
+
+    class Meta:
+        model = StatesModel
+        fields = '__all__'
+
+class CitiesSerializer(serializers.ModelSerializer):
+    state =  StatesSerializer(read_only = True)
+
+    class Meta:
+        model = CitiesModel
+        fields = '__all__'
+
+class AddressesSerializer(serializers.ModelSerializer):
+    city =  CitiesSerializer(read_only = True)
+
+    class Meta:
+        model = AddressesModel
+        fields = '__all__'
+
+class AddAddressesSerializer(serializers.ModelSerializer):
+    street = serializers.CharField(error_messages = {
+        'required': 'The street is required.',
+        'blank': 'The street cannot be blank.',
+        'null': 'The street cannot be blank.',
+        'max_length': 'The street cannot exceed 100 characters.',
+    }, max_length = 100)
+
+    area = serializers.CharField(error_messages = {
+        'required': 'The area is required.',
+        'blank': 'The area cannot be blank.',
+        'null': 'The area cannot be blank.',
+        'max_length': 'The area cannot exceed 100 characters.',
+    }, max_length = 50, allow_blank = True, allow_null = True)
+
+    city_id = serializers.IntegerField(error_messages = {
+        'required': 'The city is required.',
+        'blank': 'The city cannot be blank.',
+        'null': 'The city cannot be blank.',
+        'invalid': 'The city is invalid.',
+    })
+    
+    def create(self, validated_data):
+        try: 
+            return super().create(validated_data)
+        except IntegrityError as e:
+            raise serializers.ValidationError(f'An ocurred has error! City not found. {e}')
+    
+    class Meta:
+        model = AddressesModel
+        fields = ['street', 'area', 'city_id']
+
+class PersonSerializer(serializers.ModelSerializer):
+    addresses =  AddressesSerializer(many = True, read_only = True)
+
+    class Meta:
+        model = PersonsModel
+        fields = '__all__'
+
 class AddPersonSerializer(serializers.ModelSerializer):
     identification_id = serializers.CharField(error_messages = {
         'required': 'The identification is required.',
@@ -102,6 +167,13 @@ class AddPersonSerializer(serializers.ModelSerializer):
         model = PersonsModel
         fields = ['identification_id', 'alias', 'firstname', 'middlename', 'lastname', 'second_lastname', 'mobile', 'phone', 'birthdate', 'type_of_ids_id']
 
+class ClientsSerializer(serializers.ModelSerializer):
+    person = PersonSerializer(read_only = True)
+
+    class Meta:
+        model = ClientsModel
+        fields = '__all__'
+
 class AddClientSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(error_messages = {
         'required': 'The email is required.',
@@ -163,4 +235,9 @@ class LocationsSerializer(serializers.ModelSerializer):
 class TypesOfIdsSerializer(serializers.ModelSerializer):
     class Meta:
         model = TypesOfIdsModel
+        fields = '__all__'
+
+class CountriesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CountriesModel
         fields = '__all__'

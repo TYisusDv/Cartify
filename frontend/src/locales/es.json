@@ -34,5 +34,19 @@
     "suppliers": "Proveedores",
     "system": "Sistema",
     "theme": "Tema",
-    "users": "Usuarios"
+    "users": "Usuarios",
+    "birthdate": "Fecha de nacimiento",
+    "note": "Nota",
+    "class_client": "Clase de cliente",
+    "allow_credit": "Permitir ventas a credito?",
+    "search": "Buscar",
+    "phone": "Teléfono",
+    "actions": "Acciones",
+    "city": "Ciudad",
+    "address_state": "Dpto/Estado/Región",
+    "address_city": "Ciudad/Municipio",
+    "street": "Direccion",
+    "address_area": "Zona/Barrio/Distrito",
+    "country": "Pais",
+    "no_data": "No hay datos disponibles"
 }

@@ -43,24 +43,24 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
   };
 
   return (
-    <section className='flex relative h-screen animate__animated animate__fadeIn dark:bg-slate-800'>
+    <section className='flex relative h-screen animate__animated animate__fadeIn animate__faster dark:bg-slate-800'>
       <nav className='fixed flex flex-col w-[260px] h-full border-r-2 border-gray-100 gap-2 p-8 z-10 dark:border-r-slate-600'>
         <div className='w-full'>
           <h1 className='text-2xl font-bold dark:text-white'>Carsync</h1>
         </div>
-        <ul className='flex flex-col mt-16 gap-6'>
-          <li><Link to='/home' className={`flex text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/home')}`}><DashboardSquare01Icon /> {translations.home}</Link></li>
-          <hr className='-m-2 border-[1.6px] dark:border-slate-600' />
-          <li><Link to='/pos' className={`flex text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/pos')}`}><ShoppingCartCheck02Icon /> {translations.point_of_sell}</Link></li>
-          <li><Link to='/inventory' className={`flex text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/inventory')}`}><SearchList02Icon />  {translations.inventory}</Link></li>
-          <li><Link to='/statistics' className={`flex text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/statistics')}`}><Analytics02Icon />  {translations.statistics}</Link></li>
-          <hr className='-m-2 border-[1.6px] dark:border-slate-600' />
-          <li><Link to='/manage/users' className={`flex text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/users')}`}><UserGroupIcon />  {translations.users}</Link></li>
-          <li><Link to='/manage/clients' className={`flex text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/clients')}`}><LocationUser04Icon />  {translations.clients}</Link></li>
-          <li><Link to='/manage/locations' className={`flex text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/locations')}`}><StoreLocation02Icon />  {translations.locations}</Link></li>
-          <li><Link to='/manage/products' className={`flex text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/products')}`}><BarCode02Icon />  {translations.products}</Link></li>
-          <li><Link to='/manage/suppliers' className={`flex text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/suppliers')}`}><DistributionIcon />  {translations.suppliers}</Link></li>
-          <li><Link to='/manage/sales' className={`flex text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/sales')}`}><ShoppingBasketSecure03Icon />  {translations.sales}</Link></li>
+        <ul className='flex flex-col mt-16 gap-2'>
+          <li><Link to='/home' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/home')}`}><DashboardSquare01Icon /> {translations.home}</Link></li>
+          <hr className='border-[1.6px] dark:border-slate-600' />
+          <li><Link to='/pos' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/pos')}`}><ShoppingCartCheck02Icon /> {translations.point_of_sell}</Link></li>
+          <li><Link to='/inventory' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/inventory')}`}><SearchList02Icon />  {translations.inventory}</Link></li>
+          <li><Link to='/statistics' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/statistics')}`}><Analytics02Icon />  {translations.statistics}</Link></li>
+          <hr className='border-[1.6px] dark:border-slate-600' />
+          <li><Link to='/manage/users' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/users')}`}><UserGroupIcon />  {translations.users}</Link></li>
+          <li><Link to='/manage/clients' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/clients')}`}><LocationUser04Icon />  {translations.clients}</Link></li>
+          <li><Link to='/manage/locations' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/locations')}`}><StoreLocation02Icon />  {translations.locations}</Link></li>
+          <li><Link to='/manage/products' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/products')}`}><BarCode02Icon />  {translations.products}</Link></li>
+          <li><Link to='/manage/suppliers' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/suppliers')}`}><DistributionIcon />  {translations.suppliers}</Link></li>
+          <li><Link to='/manage/sales' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/sales')}`}><ShoppingBasketSecure03Icon />  {translations.sales}</Link></li>
         </ul>
         <ul className='flex flex-col w-full bottom-0 gap-6 mt-auto'>
           <li className='flex justify-between items-center'>
@@ -73,7 +73,7 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
           </li>
         </ul>
       </nav>
-      <div className='relative flex flex-col w-full h-full pl-[260px]'>
+      <div className='panel-content relative flex flex-col w-full h-full pl-[260px] overflow-auto'>
         <Suspense fallback={<SkeletonLoader />}>
           <Routes>
             <Route path='/' element={<Navigate to='/home' />} />

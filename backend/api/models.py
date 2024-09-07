@@ -20,7 +20,6 @@ class TypesOfIdsModel(models.Model):
 class CountriesModel(models.Model):
     id = models.AutoField(primary_key = True)
     name = models.CharField(max_length = 50, null = False)
-    status = models.BooleanField(default = True, null = False)
     
     class Meta: 
         db_table = 'countries'
@@ -28,7 +27,6 @@ class CountriesModel(models.Model):
 class StatesModel(models.Model):
     id = models.AutoField(primary_key = True)
     name = models.CharField(max_length = 50, null = False)
-    status = models.BooleanField(default = True, null = False)
     country = models.ForeignKey(CountriesModel, null = False, on_delete = models.RESTRICT)
 
     class Meta: 
@@ -37,7 +35,6 @@ class StatesModel(models.Model):
 class CitiesModel(models.Model):
     id = models.AutoField(primary_key = True)
     name = models.CharField(max_length = 50, null = False)
-    status = models.BooleanField(default = True, null = False)
     state = models.ForeignKey(StatesModel, null = False, on_delete = models.RESTRICT)
     
     class Meta: 

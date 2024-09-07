@@ -12,11 +12,11 @@ const ManageUsersPage: React.FC = () => {
 
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
-            <div className='flex flex-col w-full p-8 animate__animated animate__fadeIn'>
+            <div className='flex flex-col w-full p-8 animate__animated animate__fadeIn animate__faster'>
                 <h1 className='text-2xl font-bold dark:text-white'>{translations.users}</h1>
                 <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_users_info}</span>
             </div>
-            <div className='flex flex-col p-8 animate__animated animate__fadeIn'>
+            <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t-2 border-b-2 border-gray-100 py-6 dark:border-slate-600'>
                     <div className='col-span-1 flex items-center gap-3 border-r-0 border-b-2 pb-5 border-gray-100 md:border-r-2 lg:border-b-0 lg:p-0 dark:border-slate-600'>
                         <div className='flex justify-center items-center h-12 w-12 bg-gray-200 rounded-full dark:bg-slate-600 dark:text-white'>

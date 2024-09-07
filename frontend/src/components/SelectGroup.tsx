@@ -16,12 +16,28 @@ const SelectGroup: React.FC<SelectGroupProps> = ({ options, value, onChange }) =
   const [selectedValue, setSelectedValue] = useState(value || '');
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLSelectElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (value) {
       setSelectedValue(value);
     }
   }, [value]);
+
+  useEffect(() => {
+    // Maneja el clic fuera del componente
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    // Agregar y limpiar el listener de eventos
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleSelect = (value: string) => {
     setSelectedValue(value);
@@ -35,7 +51,7 @@ const SelectGroup: React.FC<SelectGroupProps> = ({ options, value, onChange }) =
   };
 
   return (
-    <div className='relative w-full'>
+    <div ref={containerRef} className='relative w-full'>
       <select ref={selectRef} className='hidden' value={selectedValue} onChange={(e) => handleSelect(e.target.value)}>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -50,7 +66,7 @@ const SelectGroup: React.FC<SelectGroupProps> = ({ options, value, onChange }) =
         <ul className='absolute left-0 top-full text-sm mt-1 w-full border border-gray-200 rounded-md bg-white dark:bg-slate-700 dark:text-white dark:border-slate-600'>
           {options.map((option) => (
             <li key={option.value} className={`flex items-center justify-between cursor-pointer p-2 gap-2 hover:bg-gray-200 dark:hover:bg-slate-600 ${selectedValue === option.value ? 'bg-gray-200 dark:bg-slate-600' : ''}`} onClick={() => handleSelect(option.value)}>
-              {option.label} {selectedValue === option.value ? <CheckmarkCircle01Icon size={18} /> : ''}
+              {option.label} {selectedValue === option.value ? <CheckmarkCircle01Icon className='text-black dark:text-white' size={18} /> : ''}
             </li>
           ))}
         </ul>
