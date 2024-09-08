@@ -1,54 +1,50 @@
-import { Location01Icon, TelephoneIcon, UserAccountIcon } from 'hugeicons-react';
 import React from 'react';
+import { Location01Icon, TelephoneIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 
 interface ManageClientsTableProps {
     data?: Array<{ [key: string]: any }>;
+    selected: string | undefined;
+    setSelected: (value: string | undefined) => void;
 }
 
-const ManageClientsTablePage: React.FC<ManageClientsTableProps> = ({ data }) => {
-    const { translations } = useTranslations();
+const ManageClientsTablePage: React.FC<ManageClientsTableProps> = ({ data, selected, setSelected }) => {
+    const { translations } = useTranslations();    
 
     return (
         <tbody>
             {data && data.length > 0 ? (
                 data.map((row, index) => (
-                    <tr key={index} className='text-sm text-gray-800 bg-gray-100 dark:bg-slate-700 dark:text-slate-200'>
+                    <tr key={index} className={`text-sm text-gray-800 bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/80 ${selected === row.id ? 'bg-gray-200/80 dark:bg-slate-700/60' : ''}`} onClick={() => setSelected(row.id)}>
                         <td className='px-6 py-4'>
-                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'><UserAccountIcon size={22} /> {row.id}</span>
+                           {row.person.alias || '-'}
                         </td>
                         <td className='px-6 py-4'>
-                           {row.person.alias || 'N/A'}
+                           {row.person.firstname || '-'}
                         </td>
                         <td className='px-6 py-4'>
-                           {row.person.firstname || 'N/A'}
+                           {row.person.middlename || '-'}
                         </td>
                         <td className='px-6 py-4'>
-                           {row.person.middlename || 'N/A'}
+                           {row.person.lastname || '-'}
                         </td>
                         <td className='px-6 py-4'>
-                           {row.person.lastname || 'N/A'}
+                           {row.person.second_lastname || '-'}
                         </td>
                         <td className='px-6 py-4'>
-                           {row.person.second_lastname || 'N/A'}
+                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'><TelephoneIcon size={22} /> {row.person.phone || '-'}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'><TelephoneIcon size={22} /> {row.person.phone || 'N/A'}</span>
+                           {row.person.birthdate || '-'}
                         </td>
                         <td className='px-6 py-4'>
-                           {row.person.birthdate || 'N/A'}
-                        </td>
-                        <td className='px-6 py-4'>
-                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'><Location01Icon size={22} /> {row.person.addresses[0]?.city.name || 'N/A'}</span>
-                        </td>
-                        <td className='px-6 py-4'>
-                            <button type='submit' className='btn h-9 w-24 float-end rounded-xl'>{translations.actions}</button>
+                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'><Location01Icon size={22} /> {row.person.addresses[0]?.city.name || '-'}</span>
                         </td>
                     </tr>
                 ))
             ) : (
                 <tr>
-                    <td colSpan={10} className='px-6 py-4 text-center dark:text-white'>{translations.no_data}</td>
+                    <td colSpan={8} className='px-6 py-4 text-center dark:text-white'>{translations.no_data}</td>
                 </tr>
             )}                  
         </tbody>

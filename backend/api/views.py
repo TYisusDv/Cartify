@@ -77,7 +77,7 @@ class ManageStatesAPIView(APIView):
     def get(self, request):
         query = request.query_params.get('query', None)
         if query == 'list':
-            search_query = request.query_params.get('search', None)
+            search_query = request.query_params.get('search', '')
 
             results = StatesModel.objects.filter(
                 Q(name__icontains = search_query)
@@ -96,7 +96,7 @@ class ManageCitiesAPIView(APIView):
     def get(self, request):
         query = request.query_params.get('query', None)
         if query == 'list':
-            search_query = request.query_params.get('search', None)
+            search_query = request.query_params.get('search', '')
 
             results = CitiesModel.objects.filter(
                 Q(name__icontains = search_query)
@@ -145,7 +145,7 @@ class ManageCountriesAPIView(APIView):
     def get(self, request):
         query = request.query_params.get('query', None)
         if query == 'list':
-            search_query = request.query_params.get('search', None)
+            search_query = request.query_params.get('search', '')
 
             results = CountriesModel.objects.filter(
                 Q(id__icontains = search_query)
@@ -192,6 +192,16 @@ class ManageClientsAPIView(APIView):
                 'total_pages': paginator.num_pages,
                 'current_page': model.number
             })
+
+        elif query == 'get':
+            client_id = request.query_params.get('id', None)
+            client = ClientsModel.objects.get(pk = client_id)
+            serialized = ClientsSerializer(client)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })        
 
         return JsonResponse({
             'success': True, 
@@ -246,3 +256,38 @@ class ManageClientsAPIView(APIView):
                 'success': True, 
                 'resp': 'Added successfully.'
             })
+    
+    def delete(self, request):
+        with transaction.atomic():
+            try:
+                client_serializer = DeleteClientSerializer(data = request.query_params)  
+                if not client_serializer.is_valid():
+                    transaction.set_rollback(True)
+                    return JsonResponse({
+                        'success': False, 
+                        'resp': client_serializer.errors
+                    }, status = 400)
+
+                client_id = request.query_params.get('id', None) 
+
+                client = ClientsModel.objects.get(id = client_id) 
+                person = client.person       
+                person_addresses = PersonsAddresses.objects.filter(person = person)
+
+                for person_address in person_addresses:
+                    person_address.address.delete()
+                    person_address.delete() 
+
+                client.delete()
+                person.delete()
+                
+                return JsonResponse({
+                    'success': True,
+                    'resp': 'Deleted successfully.'
+                }, status = 200)
+            except ClientsModel.DoesNotExist:
+                transaction.set_rollback(True)
+                return JsonResponse({
+                    'success': False,
+                    'resp': 'Client not found.'
+                }, status = 404)

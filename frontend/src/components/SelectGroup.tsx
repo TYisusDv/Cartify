@@ -1,5 +1,6 @@
 import { ArrowDown01Icon, CheckmarkCircle01Icon } from 'hugeicons-react';
 import React, { useState, useRef, useEffect } from 'react';
+import useClickOutside from '../hooks/useClickOutSide';
 
 interface Option {
   value: string;
@@ -24,20 +25,7 @@ const SelectGroup: React.FC<SelectGroupProps> = ({ options, value, onChange }) =
     }
   }, [value]);
 
-  useEffect(() => {
-    // Maneja el clic fuera del componente
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    // Agregar y limpiar el listener de eventos
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+  useClickOutside(containerRef, () => setIsOpen(false));
 
   const handleSelect = (value: string) => {
     setSelectedValue(value);

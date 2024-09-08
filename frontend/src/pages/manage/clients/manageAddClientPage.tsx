@@ -12,36 +12,17 @@ import InputGroup from '../../../components/InputGroup';
 import SelectGroup from '../../../components/SelectGroup';
 import useFormSubmit from '../../../hooks/useFormSubmit';
 import InputList from '../../../components/InputList';
+import { Client, initialClient } from '../../../types/clientsType';
 
-interface ManageClientsProps {
+interface ManageAddClientProps {
     addAlert: (alert: AlertType) => void;
     onClose: () => void;
+    handleTableReload: () => void;
 }
 
-const ManageAddClientPage: React.FC<ManageClientsProps> = ({ addAlert, onClose }) => {
+const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose, handleTableReload }) => {
     const { translations } = useTranslations();
-    const [formValues, setFormValues] = useState({
-        identification_id: null,
-        alias: null,
-        firstname: null,
-        middlename: null,
-        lastname: null,
-        second_lastname: null,
-        mobile: null,
-        phone: null,
-        birthdate: null,
-        type_of_ids_id: null,
-        location_id: null,
-        email: null,
-        client_class: null,
-        allow_credit: '1',
-        note: null,
-        street: null,
-        area: null,
-        city: null, 
-        state: null,
-        country_id: null,
-    });
+    const [formValues, setFormValues] = useState<Client>(initialClient);
     const [locations, setLocations] = useState([]);
     const [typesOfIds, setTypesOfIds] = useState([]);
     const [countries, setCountries] = useState([]);
@@ -156,6 +137,7 @@ const ManageAddClientPage: React.FC<ManageClientsProps> = ({ addAlert, onClose }
 
             addAlert({ id: uuidv4(), text: response_data.resp, type: 'primary', timeout: 3000 });
             onClose();
+            handleTableReload();
         }
     };
 

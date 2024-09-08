@@ -227,6 +227,18 @@ class AddClientSerializer(serializers.ModelSerializer):
         model = ClientsModel
         fields = ['email', 'client_class', 'allow_credit', 'note', 'location_id', 'person_id']
 
+class DeleteClientSerializer(serializers.ModelSerializer):    
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The client is required.',
+        'blank': 'The client cannot be blank.',
+        'null': 'The client cannot be blank.',
+        'invalid': 'The client is invalid.',
+    })
+    
+    class Meta:
+        model = ClientsModel
+        fields = ['id']
+
 class LocationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = LocationsModel

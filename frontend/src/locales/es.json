@@ -48,5 +48,7 @@
     "street": "Direccion",
     "address_area": "Zona/Barrio/Distrito",
     "country": "Pais",
+    "delete_client": "Eliminar cliente",
+    "delete_client_sure": "¿Está seguro/a de que desea eliminar el cliente?",
     "no_data": "No hay datos disponibles"
 }

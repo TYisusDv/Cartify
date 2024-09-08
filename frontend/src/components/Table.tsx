@@ -18,9 +18,10 @@ interface TableProps {
     endpoint: string;
     header: Header[];
     tbody: ReactElement;
+    reloadTable: number;
 }
 
-const Table: React.FC<TableProps> = ({ endpoint, header, tbody }) => {
+const Table: React.FC<TableProps> = ({ endpoint, header, tbody, reloadTable }) => {
     const { translations } = useTranslations();
     const [formValues, setFormValues] = useState({ search: '' });
     const [data, setData] = useState<DataRow[]>([]);
@@ -45,12 +46,12 @@ const Table: React.FC<TableProps> = ({ endpoint, header, tbody }) => {
                     setTotalPages(response_data.total_pages);
                 }
             } catch (error) {
-                
+                console.error('Error al cargar los datos:', error);
             }
         };
 
         fetchData();
-    }, [endpoint, currentPage, formValues.search]); 
+    }, [endpoint, currentPage, formValues.search, reloadTable]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);

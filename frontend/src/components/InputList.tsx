@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import apiService from '../services/apiService';
+import useClickOutside from '../hooks/useClickOutSide';
 
 interface InputListProps {
     id: string;
@@ -15,7 +16,7 @@ interface InputListProps {
 interface Suggestion {
     id: number;
     name: string;
-    status?: boolean; // Incluye si es relevante para tu lógica
+    status?: boolean;
 }
 
 interface ApiResponse {
@@ -74,18 +75,7 @@ const InputList: React.FC<InputListProps> = ({ id, name, label, icon, onChange, 
         setShowSuggestions(false);
     };
 
-    const handleClickOutside = (event: MouseEvent) => {
-        if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-            setShowSuggestions(false);
-        }
-    };
-
-    useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
+    useClickOutside(containerRef, () => setShowSuggestions(false));
 
     return (
         <div className={`input-group relative ${hasText ? 'has-text' : ''}`} ref={containerRef}>

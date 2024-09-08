@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Add01Icon, UserGroupIcon } from 'hugeicons-react';
+import { Add01Icon, Delete02Icon, PencilEdit02Icon, UserGroupIcon } from 'hugeicons-react';
 import { AlertType } from '../../types/alert';
 import useTranslations from '../../hooks/useTranslations';
 import DelayedSuspense from '../../components/DelayedSuspense';
@@ -8,6 +8,7 @@ import Table from '../../components/Table';
 import Modal from '../../components/Modal';
 import ManageAddClientPage from './clients/manageAddClientPage';
 import ManageClientsTablePage from './clients/manageClientsTablePage';
+import ManageDeleteClientPage from './clients/manageDeleteClientPage';
 
 interface ManageClientsProps {
     addAlert: (alert: AlertType) => void;
@@ -15,18 +16,19 @@ interface ManageClientsProps {
 
 const ManageClientsPage: React.FC<ManageClientsProps> = ({ addAlert }) => {
     const { translations } = useTranslations();
-    const [isModalAddOpen, setIsModalAddOpen] = useState(false);
+    const [selected, setSelected] = useState<string | undefined>();
+    const [isModalOpen, setIsModalOpen] = useState({ add: false, delete: false });
+    const [reloadTable, setReloadTable] = useState(0);
 
-    const openModalAdd = () => {
-        setIsModalAddOpen(true);
+    const handleTableReload = () => {
+        setReloadTable(prev => prev + 1); 
     };
 
-    const closeModalAdd = () => {
-        setIsModalAddOpen(false);
+    const toggleModal = (modalType: 'add' | 'delete', isOpen: boolean) => {
+        setIsModalOpen(prev => ({ ...prev, [modalType]: isOpen }));
     };
 
     const table_header = [
-        { name: 'id', headerName: 'ID' },        
         { name: 'person.alias', headerName: translations.alias },
         { name: 'person.firstname', headerName: translations.firstname },
         { name: 'person.middlename', headerName: translations.middlename },
@@ -35,7 +37,6 @@ const ManageClientsPage: React.FC<ManageClientsProps> = ({ addAlert }) => {
         { name: 'person.phone', headerName: translations.phone },
         { name: 'person.birthdate', headerName: translations.birthdate },
         { name: 'person.addresses[0].city.name', headerName:  translations.address_city },
-        { name: 'id', headerName: translations.actions },
     ];
 
     return (
@@ -45,8 +46,10 @@ const ManageClientsPage: React.FC<ManageClientsProps> = ({ addAlert }) => {
                     <h1 className='text-2xl font-bold dark:text-white'>{translations.clients}</h1>
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_clients_info}</span>
                 </div>
-                <div>
-                    <button className='bg-gray-200 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white dark:bg-slate-600 dark:text-white rounded-full p-3' onClick={openModalAdd}><Add01Icon /></button>
+                <div className='flex gap-2'>
+                    <button className='bg-red-600 text-white hover:bg-gray-200 hover:text-black dark:hover:bg-slate-600 disabled:bg-gray-100 disabled:text-black dark:disabled:bg-slate-700 dark:hover:text-white dark:bg-red-600 dark:text-white rounded-full p-3' onClick={() => toggleModal('delete', true)} disabled={selected === undefined}><Delete02Icon /></button>
+                    <button className='bg-yellow-600 text-white hover:bg-gray-200 hover:text-black dark:hover:bg-slate-600 disabled:bg-gray-100 disabled:text-black dark:disabled:bg-slate-700 dark:hover:text-white dark:bg-yellow-600 dark:text-white rounded-full p-3' onClick={() => toggleModal('add', true)} disabled={selected === undefined}><PencilEdit02Icon /></button>
+                    <button className='bg-blue-600 text-white hover:bg-gray-200 hover:text-black dark:hover:bg-slate-600 disabled:bg-gray-100 disabled:text-black dark:disabled:bg-slate-700 dark:hover:text-white dark:bg-blue-600 dark:text-white rounded-full p-3' onClick={() => toggleModal('add', true)}><Add01Icon /></button>
                 </div>
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
@@ -89,12 +92,18 @@ const ManageClientsPage: React.FC<ManageClientsProps> = ({ addAlert }) => {
                     </div>
                 </div>
                 <div className='w-full mt-6'>
-                    <Table endpoint='manage/clients' header={table_header} tbody={<ManageClientsTablePage />} />
+                    <Table endpoint='manage/clients' reloadTable={reloadTable} header={table_header} tbody={<ManageClientsTablePage selected={selected} setSelected={setSelected} />} />
                 </div>
             </div>
-            {isModalAddOpen && (
-                <Modal title={translations.add_client} onClose={closeModalAdd}>
-                    <ManageAddClientPage addAlert={addAlert} onClose={closeModalAdd} />
+            {isModalOpen.add && (
+                <Modal title={translations.add_client} onClose={() => toggleModal('add', false)}>
+                    <ManageAddClientPage addAlert={addAlert} onClose={() => toggleModal('add', false)} handleTableReload={handleTableReload} />
+                </Modal>
+            )}
+
+            {isModalOpen.delete && (
+                <Modal title={translations.delete_client_sure} onClose={() => toggleModal('delete', false)}>
+                    <ManageDeleteClientPage addAlert={addAlert} client_id={selected} onClose={() => toggleModal('delete', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}
         </DelayedSuspense>

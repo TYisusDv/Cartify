@@ -67,8 +67,8 @@ class PersonsModel(models.Model):
         db_table = 'persons'
 
 class PersonsAddresses(models.Model):
-    person = models.ForeignKey(PersonsModel, on_delete = models.RESTRICT)
-    address = models.ForeignKey(AddressesModel, on_delete = models.RESTRICT)
+    person = models.ForeignKey(PersonsModel, on_delete = models.CASCADE)
+    address = models.ForeignKey(AddressesModel, on_delete = models.CASCADE)
 
     class Meta: 
         db_table = 'persons_addresses'
@@ -81,7 +81,7 @@ class ClientsModel(models.Model):
     note = models.CharField(max_length = 100, null = True)
     date_reg = models.DateTimeField(null = False, default = timezone.now)
     location = models.ForeignKey(LocationsModel, null = False, on_delete = models.RESTRICT)
-    person = models.OneToOneField(PersonsModel, on_delete = models.RESTRICT)
+    person = models.OneToOneField(PersonsModel, on_delete = models.CASCADE)
 
     class Meta: 
         db_table = 'clients'
