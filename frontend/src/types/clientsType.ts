@@ -1,45 +1,51 @@
 export interface Client {
-    identification_id: string | null;
+    identification_id: string;
     alias: string | null;
-    firstname: string | null;
+    type_id: number | null;
+    occupation: string | null;
+    firstname: string;
     middlename: string | null;
-    lastname: string | null;
+    lastname: string;
     second_lastname: string | null;
     mobile: string | null;
     phone: string | null;
     birthdate: string | null;
-    type_of_ids_id: string | null;
-    location_id: string | null;
+    type_id_id: string | null;
+    location_id: number;
     email: string | null;
-    client_class: string | null;
-    allow_credit: string | null;
+    allow_credit: string;
     note: string | null;
-    street: string | null;
+    street: string;
     area: string | null;
-    city: string | null;
-    state: string | null;
-    country_id: string | null;
+    city: string;
+    state: string;
+    country_id: number;
+    profile_picture: File | null;
+    identification_picture: File | null;
 }
 
 export const initialClient: Client = {
-    identification_id: null,
+    identification_id: '',
+    occupation: null,
     alias: null,
-    firstname: null,
+    type_id: null,
+    firstname: '',
     middlename: null,
-    lastname: null,
+    lastname: '',
     second_lastname: null,
     mobile: null,
     phone: null,
     birthdate: null,
-    type_of_ids_id: null,
-    location_id: null,
+    type_id_id: null,
+    location_id: 0,
     email: null,
-    client_class: null,
     allow_credit: '1',
     note: null,
-    street: null,
+    street: '',
     area: null,
-    city: null,
-    state: null,
-    country_id: null,
+    city: '',
+    state: '',
+    country_id: 0,
+    profile_picture: null,
+    identification_picture: null,
 };

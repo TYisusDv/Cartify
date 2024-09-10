@@ -75,7 +75,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ addAlert }) => {
                 </div>
               </div>
               <div className='grid grid-cols-1 md:grid-cols-2 w-full gap-2 mt-6'>              
-                <div className='col-span-1 col-end-3'>
+                <div className='col-span-1 md:col-end-3'>
                   <button className='btn' disabled={isLoading}>Log in</button>
                 </div>
               </div>

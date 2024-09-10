@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { getRefreshToken, getToken, removeRefreshToken, removeToken, saveToken } from '../utils/authUtils'; 
 
+export const URL_BACKEND = 'http://127.0.0.1:8000/v1'
 const apiService = axios.create({
-  baseURL: 'http://127.0.0.1:8000/v1',
+  baseURL: URL_BACKEND,
 });
 
 apiService.interceptors.request.use(

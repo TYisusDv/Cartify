@@ -123,15 +123,15 @@ class ManageLocationsAPIView(APIView):
                 'resp': serialized.data
             })
 
-class ManageTypesOfIdsAPIView(APIView):
+class ManageTypesIdsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
   
     def get(self, request):
         query = request.query_params.get('query', None)
         if query == 'list':
-            results = TypesOfIdsModel.objects.filter(status = True)
-            serialized = TypesOfIdsSerializer(results, many = True)
+            results = TypesIdsModel.objects.filter(status = True)
+            serialized = TypesIdsSerializer(results, many = True)
             
             return JsonResponse({
                 'success': True,
@@ -151,6 +151,21 @@ class ManageCountriesAPIView(APIView):
                 Q(id__icontains = search_query)
             )
             serialized = CountriesSerializer(results, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+
+class ManageTypesClientsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+  
+    def get(self, request):
+        query = request.query_params.get('query', None)
+        if query == 'list':
+            results = TypesClientsModel.objects.filter()
+            serialized = TypesClientsSerializer(results, many = True)
             
             return JsonResponse({
                 'success': True,
@@ -201,7 +216,17 @@ class ManageClientsAPIView(APIView):
             return JsonResponse({
                 'success': True,
                 'resp': serialized.data
-            })        
+            }) 
+        
+        elif query == 'count':
+            total = ClientsModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
 
         return JsonResponse({
             'success': True, 
@@ -210,7 +235,13 @@ class ManageClientsAPIView(APIView):
 
     def post(self, request):
         with transaction.atomic():
-            person_serializer = AddPersonSerializer(data = request.data)            
+            data = request.data.copy()
+            
+            for key, value in data.items():                
+                if value == '':
+                    data[key] = None
+            
+            person_serializer = AddPersonSerializer(data = data)            
             if not person_serializer.is_valid():
                 transaction.set_rollback(True)
                 return JsonResponse({
@@ -220,16 +251,16 @@ class ManageClientsAPIView(APIView):
 
             person_instance = person_serializer.save()
             
-            country_id = request.data.get('country_id', None)
+            country_id = data.get('country_id', None)
             country_instance = CountriesModel.objects.get_or_create(id = country_id)[0]
-            state = request.data.get('state', None)
-            state_instance = StatesModel.objects.get_or_create(name = state, country = country_instance)[0]
-            city = request.data.get('city', None)
-            city_instance = CitiesModel.objects.get_or_create(name = city, state = state_instance)[0]
+            state = data.get('state', None)
+            state_instance = StatesModel.objects.get_or_create(name = state.capitalize() if not None else None, country = country_instance)[0]
+            city = data.get('city', None)
+            city_instance = CitiesModel.objects.get_or_create(name = city.capitalize() if not None else None, state = state_instance)[0]
 
-            request.data['city_id'] = city_instance.id
+            data['city_id'] = city_instance.id
 
-            addresses_serializer = AddAddressesSerializer(data = request.data)            
+            addresses_serializer = AddAddressesSerializer(data = data)            
             if not addresses_serializer.is_valid():
                 transaction.set_rollback(True)
                 return JsonResponse({
@@ -240,9 +271,9 @@ class ManageClientsAPIView(APIView):
             address_instance = addresses_serializer.save()
             person_instance.addresses.add(address_instance)
 
-            request.data['person_id'] = person_instance.id
+            data['person_id'] = person_instance.id
 
-            client_serializer = AddClientSerializer(data = request.data)            
+            client_serializer = AddClientSerializer(data = data)            
             if not client_serializer.is_valid():
                 transaction.set_rollback(True)
                 return JsonResponse({

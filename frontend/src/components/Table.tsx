@@ -72,7 +72,7 @@ const Table: React.FC<TableProps> = ({ endpoint, header, tbody, reloadTable }) =
                 </div>
             </div>
             <div className='flex flex-col w-full'>
-                <div className="relative overflow-x-auto rounded-lg w-full">
+                <div className="overflow-x-auto rounded-lg w-full">
                     <table className="w-full text-sm text-left">
                         <thead className="text-sm text-black uppercase bg-gray-200 dark:bg-slate-600 dark:text-white">
                             <tr>

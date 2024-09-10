@@ -69,7 +69,7 @@ const ManageUsersPage: React.FC = () => {
                         </div>
                     </div>
                     <div className='flex w-full'>  
-                        <div className="relative overflow-x-auto sm:rounded-lg w-full">
+                        <div className="overflow-x-auto sm:rounded-lg w-full">
                             <table className="w-full text-sm text-left">
                                 <thead className="text-sm text-gray-700 uppercase bg-gray-200 dark:bg-slate-600 dark:text-white">
                                     <tr>

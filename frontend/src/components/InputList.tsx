@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
+import React, { useState, ChangeEvent, useRef } from 'react';
 import apiService from '../services/apiService';
 import useClickOutside from '../hooks/useClickOutSide';
 
@@ -55,12 +55,10 @@ const InputList: React.FC<InputListProps> = ({ id, name, label, icon, onChange, 
                     setSuggestions(response_data.resp);
                     setShowSuggestions(true);
                 } else {
-                    console.error('Error fetching suggestions:', response_data);
                     setSuggestions([]);
                     setShowSuggestions(false);
                 }
             } catch (error) {
-                console.error('Error fetching suggestions:', error);
                 setSuggestions([]);
                 setShowSuggestions(false);
             }
@@ -73,6 +71,7 @@ const InputList: React.FC<InputListProps> = ({ id, name, label, icon, onChange, 
     const handleSuggestionClick = (suggestion: Suggestion) => {
         setInputValue(suggestion.name);
         setShowSuggestions(false);
+        onChange({ target: { name: name, value: suggestion.name } } as ChangeEvent<HTMLInputElement>);
     };
 
     useClickOutside(containerRef, () => setShowSuggestions(false));

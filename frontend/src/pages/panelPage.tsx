@@ -50,11 +50,11 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
         </div>
         <ul className='flex flex-col mt-16 gap-2'>
           <li><Link to='/home' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/home')}`}><DashboardSquare01Icon /> {translations.home}</Link></li>
-          <hr className='border-[1.6px] dark:border-slate-600' />
+          <hr className='border dark:border-slate-600' />
           <li><Link to='/pos' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/pos')}`}><ShoppingCartCheck02Icon /> {translations.point_of_sell}</Link></li>
           <li><Link to='/inventory' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/inventory')}`}><SearchList02Icon />  {translations.inventory}</Link></li>
           <li><Link to='/statistics' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/statistics')}`}><Analytics02Icon />  {translations.statistics}</Link></li>
-          <hr className='border-[1.6px] dark:border-slate-600' />
+          <hr className='border dark:border-slate-600' />
           <li><Link to='/manage/users' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/users')}`}><UserGroupIcon />  {translations.users}</Link></li>
           <li><Link to='/manage/clients' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/clients')}`}><LocationUser04Icon />  {translations.clients}</Link></li>
           <li><Link to='/manage/locations' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/locations')}`}><StoreLocation02Icon />  {translations.locations}</Link></li>

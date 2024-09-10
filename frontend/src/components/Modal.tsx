@@ -21,7 +21,7 @@ const Modal: React.FC<ModalProps> = ({ children, title, onClose }) => {
     }, []);
 
     return (
-        <div className='absolute top-0 left-0 flex items-center justify-center h-full w-full p-2 z-50 bg-black/50 dark:bg-slate-800/80 animate__animated animate__fadeIn animate__faster'>
+        <div className='absolute top-0 left-0 flex items-center justify-center h-full w-full p-2 z-50 bg-black/50 dark:bg-slate-800/80 animate__animated animate__fadeIn animate__faster overflow-auto'>
             <div className='flex flex-col bg-white h-auto w-full max-w-[680px] rounded-3xl dark:bg-slate-700'>
                 <div className='flex justify-between w-full p-5 border-b-2 border-gray-200 dark:border-slate-600'>
                     <h1 className='text-lg font-bold dark:text-white'>{title}</h1>

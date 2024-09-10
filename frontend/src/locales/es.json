@@ -50,5 +50,8 @@
     "country": "Pais",
     "delete_client": "Eliminar cliente",
     "delete_client_sure": "¿Está seguro/a de que desea eliminar el cliente?",
-    "no_data": "No hay datos disponibles"
+    "no_data": "No hay datos disponibles",
+    "occupation": "Ocupación",
+    "profile_picture_client": "Foto del cliente",
+    "identification_picture_client": "Foto del documento del cliente"
 }
