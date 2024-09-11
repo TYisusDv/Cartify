@@ -22,11 +22,13 @@ class LogInSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'password']
 
+#Countries
 class CountriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = CountriesModel
         fields = '__all__'
 
+#States
 class StatesSerializer(serializers.ModelSerializer):
     country =  CountriesSerializer(read_only = True)
 
@@ -34,6 +36,7 @@ class StatesSerializer(serializers.ModelSerializer):
         model = StatesModel
         fields = '__all__'
 
+#Cities
 class CitiesSerializer(serializers.ModelSerializer):
     state =  StatesSerializer(read_only = True)
 
@@ -41,6 +44,7 @@ class CitiesSerializer(serializers.ModelSerializer):
         model = CitiesModel
         fields = '__all__'
 
+#Addresses
 class AddressesSerializer(serializers.ModelSerializer):
     city =  CitiesSerializer(read_only = True)
 
@@ -80,6 +84,7 @@ class AddAddressesSerializer(serializers.ModelSerializer):
         model = AddressesModel
         fields = ['street', 'area', 'city_id']
 
+#Person
 class PersonSerializer(serializers.ModelSerializer):
     addresses =  AddressesSerializer(many = True, read_only = True)
 
@@ -106,16 +111,17 @@ class AddPersonSerializer(serializers.ModelSerializer):
         allow_null = True
     )
 
-    identification_picture = serializers.ImageField(error_messages = {
-            'required': 'The identification picture is required.',
-            'blank': 'The identification picture cannot be blank.',
-            'null': 'The identification picture cannot be blank.',
-            'invalid': 'The identification picture is invalid.',
-        }, 
-        validators=[
-            FileExtensionValidator(allowed_extensions = ['jpg', 'jpeg', 'png'])
-        ], 
-        allow_null = True
+    identification_pictures = serializers.ListField(
+        child=serializers.ImageField(
+            error_messages={
+                'invalid': 'One or more identification pictures are invalid.',
+            },
+            validators=[
+                FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
+            ],
+        ),
+        allow_empty=True,
+        allow_null=True
     )
 
     alias = serializers.CharField(error_messages = {
@@ -189,20 +195,28 @@ class AddPersonSerializer(serializers.ModelSerializer):
     })
 
     def create(self, validated_data):
-        try: 
-            return super().create(validated_data)
+        try:
+            identification_pictures = validated_data.pop('identification_pictures', [])
+            person_instance = super().create(validated_data)
+
+            for picture in identification_pictures:
+                IdentificationPictures.objects.create(person = person_instance, image = picture)
+
+            return person_instance
         except IntegrityError as e:
-            raise serializers.ValidationError('An ocurred has error! Type identification or person not found.')
+            raise serializers.ValidationError('An error occurred! Type identification or person not found.')
     
     class Meta:
         model = PersonsModel
-        fields = ['identification_id', 'profile_picture', 'identification_picture', 'alias', 'occupation', 'firstname', 'middlename', 'lastname', 'second_lastname', 'mobile', 'phone', 'birthdate', 'type_id_id']
+        fields = ['identification_id', 'profile_picture', 'identification_pictures', 'alias', 'occupation', 'firstname', 'middlename', 'lastname', 'second_lastname', 'mobile', 'phone', 'birthdate', 'type_id_id']
 
-class TypesClientsSerializer(serializers.ModelSerializer):
+#Client types
+class ClientTypesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TypesClientsModel
+        model = ClientTypesModel
         fields = '__all__'
 
+#Clients
 class ClientsSerializer(serializers.ModelSerializer):
     person = PersonSerializer(read_only = True)
 
@@ -275,17 +289,20 @@ class DeleteClientSerializer(serializers.ModelSerializer):
         model = ClientsModel
         fields = ['id']
 
+#Contact types
+class ContactTypesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactTypesModel
+        fields = '__all__'
+
+#Locations
 class LocationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = LocationsModel
         fields = '__all__'
 
+#Types Ids
 class TypesIdsSerializer(serializers.ModelSerializer):
     class Meta:
         model = TypesIdsModel
-        fields = '__all__'
-
-class CountriesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CountriesModel
         fields = '__all__'

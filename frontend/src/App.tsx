@@ -59,7 +59,7 @@ function App() {
 
   return (
     <div className='App'>
-      <div className='flex flex-col absolute top-0 right-0 z-10 p-2 gap-2'>
+      <div className='flex flex-col absolute top-0 right-0 p-2 gap-2 z-[99]'>
         {alerts.map(alert => (
           <Alert key={alert.id} id={alert.id} text={alert.text} type={alert.type} removeAlert={removeAlert} />
         ))}

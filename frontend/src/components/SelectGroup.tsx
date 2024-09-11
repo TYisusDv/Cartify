@@ -1,6 +1,7 @@
 import { ArrowDown01Icon, CheckmarkCircle01Icon } from 'hugeicons-react';
 import React, { useState, useRef, useEffect } from 'react';
 import useClickOutside from '../hooks/useClickOutSide';
+import useTranslations from '../hooks/useTranslations';
 
 interface Option {
   value: string;
@@ -14,6 +15,7 @@ interface SelectGroupProps {
 }
 
 const SelectGroup: React.FC<SelectGroupProps> = ({ options, value, onChange }) => {
+  const { translations } = useTranslations();
   const [selectedValue, setSelectedValue] = useState(value || '');
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLSelectElement>(null);
@@ -48,7 +50,7 @@ const SelectGroup: React.FC<SelectGroupProps> = ({ options, value, onChange }) =
         ))}
       </select>
       <div className='flex items-center justify-between cursor-pointer text-sm p-2 rounded-md gap-2 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600' onClick={() => setIsOpen(!isOpen)}>
-        {options.find((option) => option.value === selectedValue)?.label || 'Select an option'} <ArrowDown01Icon size={20} />
+        {options.find((option) => option.value === selectedValue)?.label || translations.select_an_option} <ArrowDown01Icon size={20} />
       </div>
       {isOpen && (
         <ul className='absolute left-0 top-full text-sm mt-1 w-full border border-gray-200 rounded-md bg-white dark:bg-slate-700 dark:text-white dark:border-slate-600'>

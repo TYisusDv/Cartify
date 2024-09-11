@@ -70,6 +70,25 @@ class AuthRefreshAPIView(APIView):
             }
         })
 
+class ManageCountriesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+  
+    def get(self, request):
+        query = request.query_params.get('query', None)
+        if query == 'list':
+            search_query = request.query_params.get('search', '')
+
+            results = CountriesModel.objects.filter(
+                Q(id__icontains = search_query)
+            )
+            serialized = CountriesSerializer(results, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+
 class ManageStatesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -138,34 +157,30 @@ class ManageTypesIdsAPIView(APIView):
                 'resp': serialized.data
             })
 
-class ManageCountriesAPIView(APIView):
+class ManageContactTypesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
   
     def get(self, request):
         query = request.query_params.get('query', None)
         if query == 'list':
-            search_query = request.query_params.get('search', '')
-
-            results = CountriesModel.objects.filter(
-                Q(id__icontains = search_query)
-            )
-            serialized = CountriesSerializer(results, many = True)
+            results = ContactTypesModel.objects.filter()
+            serialized = ContactTypesSerializer(results, many = True)
             
             return JsonResponse({
                 'success': True,
                 'resp': serialized.data
             })
-
-class ManageTypesClientsAPIView(APIView):
+        
+class ManageClientTypesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
   
     def get(self, request):
         query = request.query_params.get('query', None)
         if query == 'list':
-            results = TypesClientsModel.objects.filter()
-            serialized = TypesClientsSerializer(results, many = True)
+            results = ClientTypesModel.objects.filter()
+            serialized = ClientTypesSerializer(results, many = True)
             
             return JsonResponse({
                 'success': True,
@@ -237,54 +252,54 @@ class ManageClientsAPIView(APIView):
         with transaction.atomic():
             data = request.data.copy()
             
-            for key, value in data.items():                
+            for key, value in data.items():
                 if value == '':
                     data[key] = None
-            
-            person_serializer = AddPersonSerializer(data = data)            
+
+            person_serializer = AddPersonSerializer(data=data)
             if not person_serializer.is_valid():
                 transaction.set_rollback(True)
                 return JsonResponse({
-                    'success': False, 
+                    'success': False,
                     'resp': person_serializer.errors
-                }, status = 400)
+                }, status=400)
 
             person_instance = person_serializer.save()
             
             country_id = data.get('country_id', None)
-            country_instance = CountriesModel.objects.get_or_create(id = country_id)[0]
+            country_instance = CountriesModel.objects.get_or_create(id=country_id)[0]
             state = data.get('state', None)
-            state_instance = StatesModel.objects.get_or_create(name = state.capitalize() if not None else None, country = country_instance)[0]
+            state_instance = StatesModel.objects.get_or_create(name=state.capitalize() if state else None, country=country_instance)[0]
             city = data.get('city', None)
-            city_instance = CitiesModel.objects.get_or_create(name = city.capitalize() if not None else None, state = state_instance)[0]
+            city_instance = CitiesModel.objects.get_or_create(name=city.capitalize() if city else None, state=state_instance)[0]
 
             data['city_id'] = city_instance.id
 
-            addresses_serializer = AddAddressesSerializer(data = data)            
+            addresses_serializer = AddAddressesSerializer(data=data)
             if not addresses_serializer.is_valid():
                 transaction.set_rollback(True)
                 return JsonResponse({
-                    'success': False, 
+                    'success': False,
                     'resp': addresses_serializer.errors
-                }, status = 400)
+                }, status=400)
 
             address_instance = addresses_serializer.save()
             person_instance.addresses.add(address_instance)
 
             data['person_id'] = person_instance.id
 
-            client_serializer = AddClientSerializer(data = data)            
+            client_serializer = AddClientSerializer(data=data)
             if not client_serializer.is_valid():
                 transaction.set_rollback(True)
                 return JsonResponse({
-                    'success': False, 
+                    'success': False,
                     'resp': client_serializer.errors
-                }, status = 400)
-            
+                }, status=400)
+
             client_serializer.save()
 
             return JsonResponse({
-                'success': True, 
+                'success': True,
                 'resp': 'Added successfully.'
             })
     

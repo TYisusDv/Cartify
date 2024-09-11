@@ -21,7 +21,8 @@ export interface Client {
     state: string;
     country_id: number;
     profile_picture: File | null;
-    identification_picture: File | null;
+    identification_pictures: File[];
+    contact_types_id: number | null;
 }
 
 export const initialClient: Client = {
@@ -47,5 +48,6 @@ export const initialClient: Client = {
     state: '',
     country_id: 0,
     profile_picture: null,
-    identification_picture: null,
+    identification_pictures: [],
+    contact_types_id: 0
 };

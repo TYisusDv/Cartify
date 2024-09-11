@@ -25,7 +25,6 @@ const ManageClientsPage: React.FC<ManageClientsProps> = ({ addAlert }) => {
     const [countClients, setCountClients] = useState(0);
     const [modalProfilePicture, setModalProfilePicture] = useState('');
 
-
     const handleTableReload = () => {
         setReloadTable(prev => prev + 1);
     };
@@ -110,10 +109,10 @@ const ManageClientsPage: React.FC<ManageClientsProps> = ({ addAlert }) => {
             {isModalOpen.profile_picture && (
                 <Modal title={translations.profile_picture_client} onClose={() => toggleModal('profile_picture', false)}>
                     <div className='flex w-full h-full justify-center'>
-                        <img src={`${URL_BACKEND}${modalProfilePicture}`} className='h-full w-auto max-h-96 rounded-2xl' />
+                        <img src={`${URL_BACKEND}${modalProfilePicture}`} className='h-[600px] w-full rounded-2xl' />
                     </div>
                 </Modal>
-            )}
+            )}            
         </DelayedSuspense>
     );
 };
