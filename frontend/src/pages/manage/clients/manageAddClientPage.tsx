@@ -16,14 +16,7 @@ import useFormSubmit from '../../../hooks/useFormSubmit';
 import InputList from '../../../components/InputList';
 import Modal from '../../../components/Modal';
 import { listContactTypes } from '../../../services/contactTypesService';
-
-interface Contact {
-    contact_types_id: string;
-    contact_relationship: string;
-    contact_fullname: string;
-    contact_phone: string;
-    contact_address: string;
-}
+import { Contact } from '../../../types/contactsType';
 
 interface ManageAddClientProps {
     addAlert: (alert: AlertType) => void;
@@ -59,11 +52,12 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
     const documentsPictureInput = useRef<HTMLInputElement | null>(null);
     const [isModalOpen, setIsModalOpen] = useState({ contacts: false });
     const [formContactValues, setFormContactValues] = useState<Contact>({
-        contact_types_id: '',
-        contact_relationship: '',
-        contact_fullname: '',
-        contact_phone: '',
-        contact_address: ''
+        type_id: '',
+        type_label: '',
+        relationship: '',
+        fullname: '',
+        phone: '',
+        address: ''
     });
     const [contacts, setContacts] = useState<Contact[]>([]);
 
@@ -71,10 +65,10 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
         setIsModalOpen(prev => ({ ...prev, [modalType]: isOpen }));
     };
 
-    const handleFieldChange = (fieldName: keyof Client) => (value: any) => {
+    const handleFieldChange = (fieldName: keyof Client) => (option: any) => {
         setFormValues(prevFormValues => ({
             ...prevFormValues,
-            [fieldName]: value,
+            [fieldName]: option.value,
         }));
     };
 
@@ -246,6 +240,8 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                 formData.append(key, '');
             }
         });
+
+        formData.append('contacts', JSON.stringify(contacts));
 
         return await addClient(formData);
     };
@@ -419,18 +415,33 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
         }));
     }
 
-    const handleContactFieldChange = (field: keyof typeof formContactValues) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setFormContactValues({
-            ...formContactValues,
-            [field]: event.target.value
-        });
-    };
+    const handleContactFieldChange = (fieldName: keyof Contact) => (option: any) => {
+        if (option.target) {
+            const { value } = option.target;
+            
+            setFormContactValues(prevFormContactValues => ({
+                ...prevFormContactValues,
+                [fieldName]: value
+            }));
+        }
+        else if (option instanceof Object) {
+            setFormContactValues(prevFormContactValues => ({
+                ...prevFormContactValues,
+                [fieldName]: option.value,
+            }));
 
-    const handleContactSelectChange = (field: keyof typeof formContactValues) => (value: string) => {
-        setFormContactValues({
-            ...formContactValues,
-            [field]: value
-        });
+            if (fieldName === 'type_id') {
+                setFormContactValues(prevFormContactValues => ({
+                    ...prevFormContactValues,
+                    'type_label': option.label,
+                }));
+            }
+        } else {
+            setFormContactValues(prevFormContactValues => ({
+                ...prevFormContactValues,
+                [fieldName]: option
+            }));
+        }
     };
 
     const handleContactSubmit = async (e: React.FormEvent) => {
@@ -439,11 +450,12 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
         setContacts([...contacts, formContactValues]);
 
         setFormContactValues({
-            contact_types_id: '',
-            contact_relationship: '',
-            contact_fullname: '',
-            contact_phone: '',
-            contact_address: ''
+            type_id: '',
+            type_label: '',
+            relationship: '',
+            fullname: '',
+            phone: '',
+            address: ''
         });
 
         toggleModal('contacts', false)
@@ -782,11 +794,11 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                                     <tbody >
                                         {contacts.map((contact, index) => (
                                             <tr key={index} className='text-xs text-gray-800 bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/80'>
-                                                <td className='pl-6 py-4'>{contact.contact_types_id}</td>
-                                                <td className='px-6 py-4'>{contact.contact_relationship}</td>
-                                                <td className='px-6 py-4'>{contact.contact_fullname}</td>
-                                                <td className='px-6 py-4'>{contact.contact_address}</td>
-                                                <td className='px-6 py-4'>{contact.contact_phone}</td>
+                                                <td className='px-6 py-4'>{contact.type_label}</td>
+                                                <td className='px-6 py-4'>{contact.relationship}</td>
+                                                <td className='px-6 py-4'>{contact.fullname}</td>
+                                                <td className='px-6 py-4'>{contact.address}</td>
+                                                <td className='px-6 py-4'>{contact.phone}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -808,7 +820,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
                                 <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.type} <span className='text-red-500'>*</span></h3>
                                 <div className='w-full'>
-                                    <SelectGroup options={contactTypes} onChange={handleContactSelectChange('contact_types_id')} />
+                                    <SelectGroup options={contactTypes} onChange={handleContactFieldChange('type_id')} />
                                 </div>
                             </div>
                             <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
@@ -818,7 +830,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                                         name='contact_relationship'
                                         label={translations.relationship}
                                         icon={<UserQuestion02Icon className='icon' size={24} />}
-                                        onChange={handleContactFieldChange('contact_relationship')}
+                                        onChange={handleContactFieldChange('relationship')}
                                         required={true}
                                     />
                                 </div>
@@ -828,7 +840,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                                         name='contact_fullname'
                                         label={translations.fullname}
                                         icon={<UserCircleIcon className='icon' size={24} />}
-                                        onChange={handleContactFieldChange('contact_fullname')}
+                                        onChange={handleContactFieldChange('fullname')}
                                         required={true}
                                     />
                                 </div>
@@ -840,7 +852,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                                         name='contact_phone'
                                         label={translations.phone_number}
                                         icon={<TelephoneIcon className='icon' size={24} />}
-                                        onChange={handleContactFieldChange('contact_phone')}
+                                        onChange={handleContactFieldChange('phone')}
                                         required={true}
                                     />
                                 </div>
@@ -850,7 +862,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                                         name='contact_address'
                                         label={translations.street}
                                         icon={<RoadLocation01Icon className='icon' size={24} />}
-                                        onChange={handleContactFieldChange('contact_address')}
+                                        onChange={handleContactFieldChange('address')}
                                         required={true}
                                     />
                                 </div>

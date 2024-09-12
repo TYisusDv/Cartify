@@ -11,7 +11,7 @@ interface Option {
 interface SelectGroupProps {
   options: Option[];
   value?: string;
-  onChange?: (value: string) => void;
+  onChange?: (option: Option) => void;
 }
 
 const SelectGroup: React.FC<SelectGroupProps> = ({ options, value, onChange }) => {
@@ -30,13 +30,16 @@ const SelectGroup: React.FC<SelectGroupProps> = ({ options, value, onChange }) =
   useClickOutside(containerRef, () => setIsOpen(false));
 
   const handleSelect = (value: string) => {
-    setSelectedValue(value);
-    setIsOpen(false);
-    if (onChange) {
-      onChange(value);
-    }
-    if (selectRef.current) {
-      selectRef.current.value = value;
+    const selectedOption = options.find(option => option.value === value);
+    if (selectedOption) {
+      setSelectedValue(value);
+      setIsOpen(false);
+      if (onChange) {
+        onChange(selectedOption); // Pasar el objeto completo
+      }
+      if (selectRef.current) {
+        selectRef.current.value = value;
+      }
     }
   };
 

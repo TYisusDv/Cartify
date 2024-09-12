@@ -22,6 +22,18 @@ class LogInSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'password']
 
+#Locations
+class LocationsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LocationsModel
+        fields = '__all__'
+
+#Types Ids
+class TypesIdsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TypesIdsModel
+        fields = '__all__'
+        
 #Countries
 class CountriesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -73,20 +85,28 @@ class AddAddressesSerializer(serializers.ModelSerializer):
         'null': 'The city cannot be blank.',
         'invalid': 'The city is invalid.',
     })
+
+    person_id = serializers.IntegerField(error_messages = {
+        'required': 'The person is required.',
+        'blank': 'The person cannot be blank.',
+        'null': 'The person cannot be blank.',
+        'invalid': 'The person is invalid.',
+    })
     
     def create(self, validated_data):
         try: 
             return super().create(validated_data)
         except IntegrityError as e:
-            raise serializers.ValidationError(f'An ocurred has error! City not found. {e}')
+            raise serializers.ValidationError(f'An ocurred has error! City or person not found. {e}')
     
     class Meta:
         model = AddressesModel
-        fields = ['street', 'area', 'city_id']
+        fields = ['street', 'area', 'city_id', 'person_id']
 
 #Person
 class PersonSerializer(serializers.ModelSerializer):
-    addresses =  AddressesSerializer(many = True, read_only = True)
+    addresses = AddressesSerializer(many = True, read_only = True)
+    type_id = TypesIdsSerializer(read_only = True)
 
     class Meta:
         model = PersonsModel
@@ -112,16 +132,18 @@ class AddPersonSerializer(serializers.ModelSerializer):
     )
 
     identification_pictures = serializers.ListField(
-        child=serializers.ImageField(
+        child = serializers.ImageField(
             error_messages={
                 'invalid': 'One or more identification pictures are invalid.',
             },
             validators=[
                 FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
-            ],
+            ], 
+            allow_null = True
         ),
-        allow_empty=True,
-        allow_null=True
+        allow_empty = True,
+        allow_null = True,
+        required = False
     )
 
     alias = serializers.CharField(error_messages = {
@@ -210,6 +232,86 @@ class AddPersonSerializer(serializers.ModelSerializer):
         model = PersonsModel
         fields = ['identification_id', 'profile_picture', 'identification_pictures', 'alias', 'occupation', 'firstname', 'middlename', 'lastname', 'second_lastname', 'mobile', 'phone', 'birthdate', 'type_id_id']
 
+#Contact types
+class ContactTypesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactTypesModel
+        fields = '__all__'
+
+#ClientContacts
+class ClientContactsSerializer(serializers.ModelSerializer):
+    type = ContactTypesSerializer(read_only = True)
+
+    class Meta:
+        model = ClientContactsModel
+        fields = '__all__'
+
+class AddClientContactSerializer(serializers.ModelSerializer):
+    relationship = serializers.CharField(
+        error_messages = {
+            'required': 'The contact relationship is required.',
+            'blank': 'The contact relationship cannot be blank.',
+            'null': 'The contact relationship cannot be blank.',
+            'max_length': 'The contact relationship cannot exceed 100 characters.',
+        }, max_length = 100
+    )
+
+    fullname = serializers.CharField(
+        error_messages = {
+            'required': 'The contact fullname is required.',
+            'blank': 'The contact fullname cannot be blank.',
+            'null': 'The contact fullname cannot be blank.',
+            'max_length': 'The contact fullname cannot exceed 254 characters.',
+        }
+    )
+
+    phone = serializers.CharField(
+        error_messages = {
+            'required': 'The contact phone is required.',
+            'blank': 'The contact phone cannot be blank.',
+            'null': 'The contact phone cannot be blank.',
+            'max_length': 'The contact phone cannot exceed 20 characters.',
+        }, max_length = 20
+    )
+
+    address = serializers.CharField(
+        error_messages = {
+            'required': 'The contact address is required.',
+            'blank': 'The contact address cannot be blank.',
+            'null': 'The contact address cannot be blank.',
+            'max_length': 'The contact address cannot exceed 254 characters.',
+        }
+    )
+
+    type_id = serializers.IntegerField(
+        error_messages = {
+            'required': 'The contact type is required.',
+            'blank': 'The contact type cannot be blank.',
+            'null': 'The contact type cannot be blank.',
+            'invalid': 'The contact type is invalid.',
+        }
+    )
+
+    client_id = serializers.IntegerField(
+        error_messages = {
+            'required': 'The client is required.',
+            'blank': 'The client cannot be blank.',
+            'null': 'The client cannot be blank.',
+            'invalid': 'The client is invalid.',
+        }
+    )
+    
+    def create(self, validated_data):
+        try: 
+            return super().create(validated_data)
+        except IntegrityError as e:
+            raise serializers.ValidationError(f'An ocurred has error! Type or client not found. {e}')
+    
+    class Meta:
+        model = ClientContactsModel
+        fields = ['relationship', 'fullname', 'phone', 'address', 'type_id', 'client_id']
+
+
 #Client types
 class ClientTypesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -219,6 +321,9 @@ class ClientTypesSerializer(serializers.ModelSerializer):
 #Clients
 class ClientsSerializer(serializers.ModelSerializer):
     person = PersonSerializer(read_only = True)
+    location = LocationsSerializer(read_only = True)
+    type = ClientTypesSerializer(read_only = True)
+    contacts = ClientContactsSerializer(many = True, read_only = True)
 
     class Meta:
         model = ClientsModel
@@ -226,38 +331,38 @@ class ClientsSerializer(serializers.ModelSerializer):
 
 class AddClientSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(error_messages = {
-        'required': 'The email is required.',
-        'blank': 'The email cannot be blank.',
-        'null': 'The email cannot be blank.',
-        'max_length': 'The email cannot exceed 50 characters.',
+        'required': 'The client email is required.',
+        'blank': 'The client email cannot be blank.',
+        'null': 'The client email cannot be blank.',
+        'max_length': 'The clientemail cannot exceed 50 characters.',
     }, allow_blank = True, allow_null = True)
 
     allow_credit = serializers.BooleanField(error_messages = {
-        'required': 'The allow credit is required.',
-        'blank': 'The allow credit cannot be blank.',
-        'null': 'The allow credit cannot be blank.',
-        'invalid': 'The allow credit is invalid.',
+        'required': 'The client allow credit is required.',
+        'blank': 'The client allow credit cannot be blank.',
+        'null': 'The client allow credit cannot be blank.',
+        'invalid': 'The client allow credit is invalid.',
     }, default = True)
 
     note = serializers.CharField(error_messages = {
-        'required': 'The note is required.',
-        'blank': 'The note cannot be blank.',
-        'null': 'The note cannot be blank.',
-        'max_length': 'The note cannot exceed 100 characters.',
+        'required': 'The client note is required.',
+        'blank': 'The client note cannot be blank.',
+        'null': 'The client note cannot be blank.',
+        'max_length': 'The client note cannot exceed 100 characters.',
     }, max_length = 100, allow_blank = True, allow_null = True)
 
     location_id = serializers.IntegerField(error_messages = {
-        'required': 'The location is required.',
-        'blank': 'The location cannot be blank.',
-        'null': 'The location cannot be blank.',
-        'invalid': 'The location is invalid.',
+        'required': 'The client location is required.',
+        'blank': 'The client location cannot be blank.',
+        'null': 'The client location cannot be blank.',
+        'invalid': 'The client location is invalid.',
     })
 
     type_id = serializers.IntegerField(error_messages = {
-        'required': 'The class client is required.',
-        'blank': 'The class client cannot be blank.',
-        'null': 'The class client cannot be blank.',
-        'invalid': 'The class client is invalid.',
+        'required': 'The client type is required.',
+        'blank': 'The client typet cannot be blank.',
+        'null': 'The client type cannot be blank.',
+        'invalid': 'The client type is invalid.',
     }, allow_null = True)
 
     person_id = serializers.IntegerField(error_messages = {
@@ -288,21 +393,3 @@ class DeleteClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientsModel
         fields = ['id']
-
-#Contact types
-class ContactTypesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ContactTypesModel
-        fields = '__all__'
-
-#Locations
-class LocationsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LocationsModel
-        fields = '__all__'
-
-#Types Ids
-class TypesIdsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TypesIdsModel
-        fields = '__all__'

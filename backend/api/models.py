@@ -51,14 +51,6 @@ class CitiesModel(models.Model):
     class Meta: 
         db_table = 'cities'
 
-class AddressesModel(models.Model):
-    id = models.AutoField(primary_key = True)
-    street = models.CharField(max_length = 100, null = False, blank = False)
-    area = models.CharField(max_length = 50, null = True, blank = False)
-    city = models.ForeignKey(CitiesModel, null = False, blank = False, on_delete = models.RESTRICT)
-
-    class Meta: 
-        db_table = 'addresses'
 
 class PersonsModel(models.Model):
     id = models.AutoField(primary_key = True)
@@ -74,7 +66,6 @@ class PersonsModel(models.Model):
     phone = models.CharField(max_length = 20, null = True, blank = False)
     birthdate = models.DateField(null = True, blank = False)
     type_id = models.ForeignKey(TypesIdsModel, null = False, blank = False, on_delete = models.RESTRICT)
-    addresses = models.ManyToManyField(AddressesModel, through='PersonsAddresses')
 
     def delete(self, *args, **kwargs):
         if self.profile_picture:
@@ -92,19 +83,22 @@ class PersonsModel(models.Model):
     class Meta: 
         db_table = 'persons'
 
+class AddressesModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    street = models.CharField(max_length = 100, null = False, blank = False)
+    area = models.CharField(max_length = 50, null = True, blank = False)
+    city = models.ForeignKey(CitiesModel, null = False, blank = False, on_delete = models.RESTRICT)
+    person = models.ForeignKey(PersonsModel, related_name='addresses', null = False, blank = False, on_delete = models.CASCADE)
+
+    class Meta:
+        db_table = 'addresses'
+
 class IdentificationPictures(models.Model):
     person = models.ForeignKey(PersonsModel, on_delete = models.CASCADE)
     image = models.ImageField(upload_to = upload_to_identifications, null = True, blank = True)
 
     class Meta: 
         db_table = 'identification_pictures'
-
-class PersonsAddresses(models.Model):
-    person = models.ForeignKey(PersonsModel, on_delete = models.CASCADE)
-    address = models.ForeignKey(AddressesModel, on_delete = models.CASCADE)
-
-    class Meta: 
-        db_table = 'persons_addresses'
 
 class ClientTypesModel(models.Model):
     id = models.AutoField(primary_key = True)
@@ -140,7 +134,7 @@ class ClientContactsModel(models.Model):
     phone = models.CharField(max_length = 20, null = False, blank = False)
     address = models.CharField(null = False, blank = False)
     type = models.ForeignKey(ContactTypesModel, on_delete = models.RESTRICT)
-    client = models.ForeignKey(ClientsModel, on_delete = models.CASCADE) 
+    client = models.ForeignKey(ClientsModel, related_name = 'contacts', on_delete = models.CASCADE) 
     
     class Meta: 
         db_table = 'client_contacts'

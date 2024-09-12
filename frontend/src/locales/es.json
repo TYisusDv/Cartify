@@ -59,5 +59,6 @@
     "type": "Tipo",
     "users": "Usuarios",
     "select_an_option": "Selecciona una opción",
-    "add": "Agregar"
+    "add": "Agregar",
+    "details_client": "Detalles del cliente"
 }

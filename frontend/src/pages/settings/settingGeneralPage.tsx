@@ -41,7 +41,7 @@ const SettingGeneralPage: React.FC = () => {
         setSelectedLanguage(savedLanguage);
     }, []);
 
-    const handleThemeChange = (value: string) => {
+    const handleThemeChange = (value: any) => {
         document.documentElement.classList.remove('dark', 'light', 'theme');
 
         if (value === 'dark') {
@@ -58,7 +58,7 @@ const SettingGeneralPage: React.FC = () => {
         saveTheme(value);
     };
 
-    const handleLanguageChange = (value: string) => {
+    const handleLanguageChange = (value: any) => {
         setSelectedLanguage(value);
         saveLanguage(value);
         window.location.reload();
