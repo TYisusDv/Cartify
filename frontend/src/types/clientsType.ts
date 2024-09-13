@@ -1,4 +1,5 @@
 export interface Client {
+    id: number;
     identification_id: string;
     alias: string | null;
     type_id: number | null;
@@ -30,6 +31,7 @@ export interface Client {
 }
 
 export const initialClient: Client = {
+    id: 0,
     identification_id: '',
     occupation: null,
     alias: null,

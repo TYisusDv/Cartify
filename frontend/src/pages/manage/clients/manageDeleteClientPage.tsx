@@ -11,10 +11,10 @@ import useFormSubmit from '../../../hooks/useFormSubmit';
 
 interface ManageDeleteClientProps {
     addAlert: (alert: AlertType) => void;
-    client_id: string | undefined;
+    client_id: number;
     onClose: () => void;
     handleTableReload: () => void;
-    setSelected: (value: string | undefined) => void;
+    setSelected: (value: number) => void;
 }
 
 const ManageDeleteClientPage: React.FC<ManageDeleteClientProps> = ({ addAlert, client_id, onClose, handleTableReload, setSelected }) => {
@@ -65,7 +65,7 @@ const ManageDeleteClientPage: React.FC<ManageDeleteClientProps> = ({ addAlert, c
 
             addAlert({ id: uuidv4(), text: response_data.resp, type: 'primary', timeout: 3000 });
             handleTableReload();
-            setSelected(undefined)
+            setSelected(0)
             onClose();
         }
     };

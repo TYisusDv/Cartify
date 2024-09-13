@@ -62,9 +62,9 @@ class AddressesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AddressesModel
-        fields = '__all__'
+        fields = ['id', 'street', 'area', 'city']
 
-class AddAddressesSerializer(serializers.ModelSerializer):
+class AddEditAddressesSerializer(serializers.ModelSerializer):
     street = serializers.CharField(error_messages = {
         'required': 'The street is required.',
         'blank': 'The street cannot be blank.',
@@ -97,7 +97,7 @@ class AddAddressesSerializer(serializers.ModelSerializer):
         try: 
             return super().create(validated_data)
         except IntegrityError as e:
-            raise serializers.ValidationError(f'An ocurred has error! City or person not found. {e}')
+            raise serializers.ValidationError('An ocurred has error! City or person not found.')
     
     class Meta:
         model = AddressesModel
@@ -112,7 +112,7 @@ class PersonSerializer(serializers.ModelSerializer):
         model = PersonsModel
         fields = '__all__'
 
-class AddPersonSerializer(serializers.ModelSerializer):
+class AddEditPersonSerializer(serializers.ModelSerializer):
     identification_id = serializers.CharField(error_messages = {
         'required': 'The identification is required.',
         'blank': 'The identification cannot be blank.',
@@ -226,7 +226,32 @@ class AddPersonSerializer(serializers.ModelSerializer):
 
             return person_instance
         except IntegrityError as e:
-            raise serializers.ValidationError('An error occurred! Type identification or person not found.')
+            raise serializers.ValidationError('An error occurred! Type identification not found.')
+    
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            if attr == 'profile_picture':
+                if value:
+                    if instance.profile_picture:
+                        instance.profile_picture.delete(save = False)
+
+                    setattr(instance, attr, value)
+            elif attr == 'identification_pictures':
+                if value:  
+                    existing_pictures = IdentificationPictures.objects.filter(person=instance)
+                    for picture in existing_pictures:
+                        picture.image.delete(save=False)
+                    
+                    existing_pictures.delete()
+
+                    for picture in value:
+                        IdentificationPictures.objects.create(person=instance, image=picture)
+            else:
+                setattr(instance, attr, value)
+
+        instance.save()
+
+        return instance
     
     class Meta:
         model = PersonsModel
@@ -244,7 +269,7 @@ class ClientContactsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientContactsModel
-        fields = '__all__'
+        fields = ['id', 'relationship', 'fullname', 'phone', 'address', 'type']
 
 class AddClientContactSerializer(serializers.ModelSerializer):
     relationship = serializers.CharField(
@@ -305,7 +330,7 @@ class AddClientContactSerializer(serializers.ModelSerializer):
         try: 
             return super().create(validated_data)
         except IntegrityError as e:
-            raise serializers.ValidationError(f'An ocurred has error! Type or client not found. {e}')
+            raise serializers.ValidationError('An ocurred has error! Type or client not found.')
     
     class Meta:
         model = ClientContactsModel
@@ -329,7 +354,7 @@ class ClientsSerializer(serializers.ModelSerializer):
         model = ClientsModel
         fields = '__all__'
 
-class AddClientSerializer(serializers.ModelSerializer):
+class AddEditClientSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(error_messages = {
         'required': 'The client email is required.',
         'blank': 'The client email cannot be blank.',
@@ -376,7 +401,7 @@ class AddClientSerializer(serializers.ModelSerializer):
         try: 
             return super().create(validated_data)
         except IntegrityError as e:
-            raise serializers.ValidationError(f'An ocurred has error! Location or person not found. {e}')
+            raise serializers.ValidationError('An ocurred has error! Location, type or person not found.')
     
     class Meta:
         model = ClientsModel

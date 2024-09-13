@@ -1,7 +1,7 @@
 import React, { cloneElement, ReactElement, useEffect, useState } from "react";
 import { Search01Icon } from 'hugeicons-react';
 import { handleChange } from '../utils/formUtils';
-import { getTable } from '../services/tableService';
+import { getTable } from '../services/componentsService';
 import InputGroup from "./InputGroup";
 import useTranslations from "../hooks/useTranslations";
 

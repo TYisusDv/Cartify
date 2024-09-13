@@ -7,8 +7,8 @@ import Modal from '../../../components/Modal';
 
 interface ManageClientsTableProps {
     data?: Array<{ [key: string]: any }>;
-    selected: string | undefined;
-    setSelected: (value: string | undefined) => void;
+    selected: number;
+    setSelected: (value: number) => void;
     toggleModal: (modalType: 'add' | 'delete' | 'profile_picture', isOpen: boolean) => void;
     setModalProfilePicture: (url: string) => void;
 }

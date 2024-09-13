@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useRef } from 'react';
+import React, { useState, ChangeEvent, useRef, useEffect } from 'react';
 import apiService from '../services/apiService';
 import useClickOutside from '../hooks/useClickOutSide';
 
@@ -8,6 +8,7 @@ interface InputListProps {
     label: string;
     icon: React.ReactNode;
     onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    value?: string;
     type?: string;
     required?: boolean;
     endpoint: string;
@@ -24,10 +25,10 @@ interface ApiResponse {
     resp: Suggestion[];
 }
 
-const InputList: React.FC<InputListProps> = ({ id, name, label, icon, onChange, type = 'text', required = true, endpoint }) => {
+const InputList: React.FC<InputListProps> = ({ id, name, label, icon, onChange, value = '', type = 'text', required = true, endpoint }) => {
     const [hasText, setHasText] = useState(false);
     const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-    const [inputValue, setInputValue] = useState<string>('');
+    const [inputValue, setInputValue] = useState<string>(value);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -73,6 +74,11 @@ const InputList: React.FC<InputListProps> = ({ id, name, label, icon, onChange, 
         setShowSuggestions(false);
         onChange({ target: { name: name, value: suggestion.name } } as ChangeEvent<HTMLInputElement>);
     };
+
+    useEffect(() => {
+        setInputValue(value);
+        setHasText(value.trim() !== '');
+    }, [value]);
 
     useClickOutside(containerRef, () => setShowSuggestions(false));
 

@@ -70,13 +70,13 @@ const SettingGeneralPage: React.FC = () => {
                 <div className='flex items-center justify-between animate__animated animate__fadeIn animate__faster z-20'>
                     <h3 className='text-sm text-nowrap dark:text-gray-100'>{translations.theme}</h3>
                     <div className='w-full max-w-32'>
-                        <SelectGroup options={theme_options} value={selectedTheme} onChange={handleThemeChange} />
+                        <SelectGroup endpoint='manage/theme' name='theme' value={selectedTheme} onChange={handleThemeChange} />
                     </div>
                 </div>
                 <div className='flex items-center justify-between animate__animated animate__fadeIn animate__faster z-10'>
                     <h3 className='text-sm text-nowrap dark:text-gray-100'>{translations.language}</h3>
                     <div className='w-full max-w-32'>
-                        <SelectGroup options={language_options} value={selectedLanguage} onChange={handleLanguageChange} />
+                        <SelectGroup endpoint='manage/theme' name='language' value={selectedLanguage} onChange={handleLanguageChange} />
                     </div>
                 </div>
             </div>            

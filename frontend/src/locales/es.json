@@ -60,5 +60,7 @@
     "users": "Usuarios",
     "select_an_option": "Selecciona una opción",
     "add": "Agregar",
-    "details_client": "Detalles del cliente"
+    "details_client": "Detalles del cliente",
+    "edit_client": "Editar cliente",
+    "edit": "Editar"
 }

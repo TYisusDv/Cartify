@@ -11,11 +11,11 @@ import { Contact } from '../../../types/contactsType';
 
 interface ManageDetailsClientProps {
     addAlert: (alert: AlertType) => void;
-    client_id: string | undefined;
+    client_id: number;
     onClose: () => void;
     handleTableReload: () => void;
 }
-const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert, onClose, handleTableReload, client_id }) => {
+const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert, client_id, onClose, handleTableReload }) => {
     const { translations } = useTranslations();
     const [formValues, setFormValues] = useState<Client>(initialClient);
     const [activeTab, setActiveTab] = useState<string>('information');
@@ -41,7 +41,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                     'alias': response_data.resp?.person?.alias,
                     'occupation': response_data.resp?.person?.occupation,
                     'firstname': response_data.resp?.person?.firstname,
-                    'midlename': response_data.resp?.person?.midlename,
+                    'middlename': response_data.resp?.person?.middlename,
                     'lastname': response_data.resp?.person?.lastname,
                     'second_lastname': response_data.resp?.person?.second_lastname,
                     'email': response_data.resp?.email,
@@ -87,7 +87,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                         label={translations.location}
                         icon={<UserIdVerificationIcon className='icon' size={24} />}
                         onChange={handleChange(setFormValues)}
-                        value={formValues.location || ''}
+                        //value={formValues.location || ''}
                         required={false}
                         disabled={true}
                     />
@@ -330,7 +330,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                         label={translations.class_client}
                         icon={<Note04Icon className='icon' size={24} />}
                         onChange={handleChange(setFormValues)}
-                        value={formValues.type || ''}
+                        //value={formValues.type || ''}
                         required={false}
                         disabled={true}
                     />

@@ -1,12 +1,21 @@
 export interface Contact {
-    type_id: string;
-    type_label: string;
-    relationship: string;
-    fullname: string;
-    phone: string;
-    address: string;
-    type?: {
-        id: number;
-        name: string;
-    } | null;
+    relationship: string | null;
+    fullname: string | null;
+    phone: string | null;
+    address: string | null;
+    type: {
+        id: number | null;
+        name: string | null;
+    };
 }
+
+export const initialContact: Contact = {
+    relationship: null,
+    fullname: null,
+    phone: null,
+    address: null,
+    type: {
+        id: null,
+        name: null,
+    }
+};

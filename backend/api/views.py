@@ -5,7 +5,7 @@ from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer,
     TokenRefreshSerializer
 )
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.db import transaction
 from django.db.models import Q
@@ -192,6 +192,12 @@ class ManageClientsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
+    def get_object(self, pk) :
+        try:
+            return ClientsModel.objects.get(pk = pk)
+        except ClientsModel.DoesNotExist:
+            raise Http404('Client not found.')
+        
     def get(self, request):
         query = request.query_params.get('query', None)
         if query == 'table':
@@ -252,6 +258,7 @@ class ManageClientsAPIView(APIView):
     def post(self, request):
         with transaction.atomic():
             data = request.data.copy()
+
             contacts_json = request.POST.get('contacts', '[]')
             
             for key, value in data.items():
@@ -266,8 +273,7 @@ class ManageClientsAPIView(APIView):
                     'resp': 'Invalid JSON format for contacts.'
                 }, status = 400)
 
-
-            person_serializer = AddPersonSerializer(data = data)
+            person_serializer = AddEditPersonSerializer(data = data)
             if not person_serializer.is_valid():
                 transaction.set_rollback(True)
                 return JsonResponse({
@@ -287,7 +293,7 @@ class ManageClientsAPIView(APIView):
 
             data['city_id'] = city_instance.id
 
-            addresses_serializer = AddAddressesSerializer(data = data)
+            addresses_serializer = AddEditAddressesSerializer(data = data)
             if not addresses_serializer.is_valid():
                 transaction.set_rollback(True)
                 return JsonResponse({
@@ -297,7 +303,7 @@ class ManageClientsAPIView(APIView):
 
             addresses_serializer.save()
 
-            client_serializer = AddClientSerializer(data = data)
+            client_serializer = AddEditClientSerializer(data = data)
             if not client_serializer.is_valid():
                 transaction.set_rollback(True)
                 return JsonResponse({
@@ -324,6 +330,110 @@ class ManageClientsAPIView(APIView):
             return JsonResponse({
                 'success': True,
                 'resp': 'Added successfully.'
+            })
+
+    def put(self, request):
+        with transaction.atomic():
+            data = request.data.copy()
+            contacts_json = request.POST.get('contacts', '[]')
+            
+            for key, value in data.items():
+                if value == '':
+                    data[key] = None
+            
+            try:
+                contacts = json.loads(contacts_json)
+            except json.JSONDecodeError:
+                return JsonResponse({
+                    'success': False,
+                    'resp': 'Invalid JSON format for contacts.'
+                }, status = 400)
+
+            client_instance = self.get_object(int(data.get('id', 0)))
+            person_instance = client_instance.person
+            data['person_id'] = person_instance.id
+
+            person_serializer = AddEditPersonSerializer(person_instance, data = data)
+            if not person_serializer.is_valid():
+                transaction.set_rollback(True)
+                return JsonResponse({
+                    'success': False,
+                    'resp': person_serializer.errors
+                }, status = 400)
+
+            person_serializer.save()
+
+            country_id = data.get('country_id', None)
+            country_instance = CountriesModel.objects.get_or_create(id = country_id)[0]
+            state = data.get('state', None)
+            state_instance = StatesModel.objects.get_or_create(name = state.capitalize() if state else None, country = country_instance)[0]
+            city = data.get('city', None)
+            city_instance = CitiesModel.objects.get_or_create(name = city.capitalize() if city else None, state = state_instance)[0]
+
+            data['city_id'] = city_instance.id
+
+            first_address = AddressesModel.objects.filter(person = person_instance).first()
+            address_serializer = AddEditAddressesSerializer(first_address, data = data, partial = True)
+            if not address_serializer.is_valid():
+                transaction.set_rollback(True)
+                return JsonResponse({
+                    'success': False,
+                    'resp': address_serializer.errors
+                }, status=400)
+            
+            address_serializer.save()
+
+            client_serializer = AddEditClientSerializer(client_instance, data = data)
+            if not client_serializer.is_valid():
+                transaction.set_rollback(True)
+                return JsonResponse({
+                    'success': False,
+                    'resp': client_serializer.errors
+                }, status = 400)
+
+            client_serializer.save()  
+
+            existing_contacts = list(ClientContactsModel.objects.filter(client=client_instance))
+            new_contacts = contacts
+
+            existing_contact_ids = [contact.id for contact in existing_contacts]
+            new_contact_ids = [contact.get('id') for contact in new_contacts if contact.get('id')]
+
+            for existing_contact in existing_contacts:
+                if existing_contact.id not in new_contact_ids:
+                    existing_contact.delete()
+
+            for contact in new_contacts:
+                contact_id = contact.get('id', None)
+                contact['client_id'] = client_instance.id
+
+                if contact_id and contact_id in existing_contact_ids:
+                    existing_contact_instance = ClientContactsModel.objects.get(id = contact_id)
+                    contact_serializer = AddClientContactSerializer(existing_contact_instance, data = contact, partial = True)
+                    if not contact_serializer.is_valid():
+                        transaction.set_rollback(True)
+                        return JsonResponse({
+                            'success': False,
+                            'resp': contact_serializer.errors,
+                            'contact': contact
+                        }, status = 400)
+                    
+                    contact_serializer.save()
+                else:
+                    contact_serializer = AddClientContactSerializer(data = contact)
+                    if not contact_serializer.is_valid():
+                        transaction.set_rollback(True)
+                        return JsonResponse({
+                            'success': False,
+                            'resp': contact_serializer.errors,
+                            'contact': contact
+                        }, status = 400)
+                    
+                    contact_serializer.save()    
+
+            return JsonResponse({
+                'success': True,
+                'resp': 'Edited successfully.'
             })
     
     def delete(self, request):
