@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.core.validators import FileExtensionValidator
 from .models import *
+import json
 
 class LogInSerializer(serializers.ModelSerializer):
     username = serializers.CharField(error_messages = {
@@ -77,7 +78,7 @@ class AddEditAddressesSerializer(serializers.ModelSerializer):
         'blank': 'The area cannot be blank.',
         'null': 'The area cannot be blank.',
         'max_length': 'The area cannot exceed 50 characters.',
-    }, max_length = 50, allow_blank = True, allow_null = True)
+    }, required = False, max_length = 50, allow_blank = True, allow_null = True)
 
     city_id = serializers.IntegerField(error_messages = {
         'required': 'The city is required.',
@@ -92,6 +93,15 @@ class AddEditAddressesSerializer(serializers.ModelSerializer):
         'null': 'The person cannot be blank.',
         'invalid': 'The person is invalid.',
     })
+
+    def to_internal_value(self, data): 
+        if 'city' in data and isinstance(data['city'], dict) and 'id' in data['city']:
+            data['city_id'] = data['city']['id']
+
+        if 'person' in data and isinstance(data['person'], dict) and 'id' in data['person']:
+            data['person_id'] = data['person']['id']
+            
+        return super().to_internal_value(data)
     
     def create(self, validated_data):
         try: 
@@ -103,9 +113,16 @@ class AddEditAddressesSerializer(serializers.ModelSerializer):
         model = AddressesModel
         fields = ['street', 'area', 'city_id', 'person_id']
 
+
+class IdentificationPicturesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IdentificationPictures
+        fields = '__all__'
+
 #Person
 class PersonSerializer(serializers.ModelSerializer):
     addresses = AddressesSerializer(many = True, read_only = True)
+    identification_pictures = IdentificationPicturesSerializer(many = True, read_only = True)
     type_id = TypesIdsSerializer(read_only = True)
 
     class Meta:
@@ -120,7 +137,8 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
         'max_length': 'The identification cannot exceed 100 characters.',
     }, max_length = 100)
 
-    profile_picture = serializers.ImageField(error_messages = {
+    profile_picture = serializers.ImageField(
+        error_messages = {
             'required': 'The profile picture is required.',
             'blank': 'The profile picture cannot be blank.',
             'null': 'The profile picture cannot be blank.',
@@ -128,6 +146,7 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
         }, validators=[
             FileExtensionValidator(allowed_extensions = ['jpg', 'jpeg', 'png'])
         ], 
+        required = False,
         allow_null = True
     )
 
@@ -141,9 +160,9 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
             ], 
             allow_null = True
         ),
+        required = False,
         allow_empty = True,
         allow_null = True,
-        required = False
     )
 
     alias = serializers.CharField(error_messages = {
@@ -151,14 +170,14 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
         'blank': 'The alias cannot be blank.',
         'null': 'The alias cannot be blank.',
         'max_length': 'The alias cannot exceed 50 characters.',
-    }, max_length = 50,  allow_blank = True, allow_null = True)
+    }, required = False, max_length = 50,  allow_blank = True, allow_null = True)
 
     occupation = serializers.CharField(error_messages = {
         'required': 'The occupation is required.',
         'blank': 'The occupation cannot be blank.',
         'null': 'The occupation cannot be blank.',
         'max_length': 'The occupation cannot exceed 50 characters.',
-    }, max_length = 50, allow_blank = True, allow_null = True)
+    }, required = False, max_length = 50, allow_blank = True, allow_null = True)
 
     firstname = serializers.CharField(error_messages = {
         'required': 'The firstname is required.',
@@ -172,7 +191,7 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
         'blank': 'The middlename cannot be blank.',
         'null': 'The middlename cannot be blank.',
         'max_length': 'The middlename cannot exceed 50 characters.',
-    }, max_length = 50, allow_blank = True, allow_null = True)
+    }, required = False, max_length = 50, allow_blank = True, allow_null = True)
 
     lastname = serializers.CharField(error_messages = {
         'required': 'The lastname is required.',
@@ -182,39 +201,47 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
     }, max_length = 50)
 
     second_lastname = serializers.CharField(error_messages = {
-        'required': 'The second_lastname is required.',
-        'blank': 'The second_lastname cannot be blank.',
-        'null': 'The second_lastname cannot be blank.',
-        'max_length': 'The second_lastname cannot exceed 50 characters.',
-    }, max_length = 50, allow_blank = True, allow_null = True)
+        'required': 'The second lastname is required.',
+        'blank': 'The second lastname cannot be blank.',
+        'null': 'The second lastname cannot be blank.',
+        'max_length': 'The second lastname cannot exceed 50 characters.',
+    }, required = False, max_length = 50, allow_blank = True, allow_null = True)
 
     mobile = serializers.CharField(error_messages = {
         'required': 'The mobile is required.',
         'blank': 'The mobile cannot be blank.',
         'null': 'The mobile cannot be blank.',
         'max_length': 'The mobile cannot exceed 20 characters.',
-    }, max_length = 20, allow_blank = True, allow_null = True)
+    }, required = False, max_length = 20, allow_blank = True, allow_null = True)
 
     phone = serializers.CharField(error_messages = {
         'required': 'The phone is required.',
         'blank': 'The phone cannot be blank.',
         'null': 'The phone cannot be blank.',
         'max_length': 'The phone cannot exceed 20 characters.',
-    }, max_length = 20, allow_blank = True, allow_null = True)
+    }, required = False, max_length = 20, allow_blank = True, allow_null = True)
 
     birthdate = serializers.DateField(error_messages = {
         'required': 'The birthdate is required.',
         'blank': 'The birthdate cannot be blank.',
         'null': 'The birthdate cannot be blank.',
         'invalid': 'The birthdate is invalid.',
-    }, allow_null = True, required = False)
+    }, required = False, allow_null = True)
 
-    type_id_id = serializers.IntegerField(error_messages = {
-        'required': 'The type identification is required.',
-        'blank': 'The type identification cannot be blank.',
-        'null': 'The type identification cannot be blank.',
-        'invalid': 'The type identification is invalid.',
-    })
+    type_id_id = serializers.IntegerField(
+        error_messages = {
+            'required': 'The type identification is required.',
+            'blank': 'The type identification cannot be blank.',
+            'null': 'The type identification cannot be blank.',
+            'invalid': 'The type identification is invalid.',
+        }
+    )
+
+    def to_internal_value(self, data): 
+        if 'type_id' in data and isinstance(data['type_id'], dict) and 'id' in data['type_id']:
+            data['type_id_id'] = data['type_id']['id']
+            
+        return super().to_internal_value(data)
 
     def create(self, validated_data):
         try:
@@ -238,11 +265,11 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
                     setattr(instance, attr, value)
             elif attr == 'identification_pictures':
                 if value:  
-                    existing_pictures = IdentificationPictures.objects.filter(person=instance)
-                    for picture in existing_pictures:
-                        picture.image.delete(save=False)
+                    #existing_pictures = IdentificationPictures.objects.filter(person=instance)
+                    #for picture in existing_pictures:
+                    #    picture.image.delete(save=False)
                     
-                    existing_pictures.delete()
+                    #existing_pictures.delete()
 
                     for picture in value:
                         IdentificationPictures.objects.create(person=instance, image=picture)
@@ -325,6 +352,12 @@ class AddClientContactSerializer(serializers.ModelSerializer):
             'invalid': 'The client is invalid.',
         }
     )
+
+    def to_internal_value(self, data): 
+        if 'type' in data and isinstance(data['type'], dict) and 'id' in data['type']:
+            data['type_id'] = data['type']['id']
+            
+        return super().to_internal_value(data)
     
     def create(self, validated_data):
         try: 
@@ -356,39 +389,39 @@ class ClientsSerializer(serializers.ModelSerializer):
 
 class AddEditClientSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(error_messages = {
-        'required': 'The client email is required.',
-        'blank': 'The client email cannot be blank.',
-        'null': 'The client email cannot be blank.',
+        'required': 'The email is required.',
+        'blank': 'The email cannot be blank.',
+        'null': 'The email cannot be blank.',
         'max_length': 'The clientemail cannot exceed 50 characters.',
-    }, allow_blank = True, allow_null = True)
+    }, required = False, allow_blank = True, allow_null = True)
 
     allow_credit = serializers.BooleanField(error_messages = {
-        'required': 'The client allow credit is required.',
-        'blank': 'The client allow credit cannot be blank.',
-        'null': 'The client allow credit cannot be blank.',
-        'invalid': 'The client allow credit is invalid.',
+        'required': 'The allow credit is required.',
+        'blank': 'The allow credit cannot be blank.',
+        'null': 'The allow credit cannot be blank.',
+        'invalid': 'The allow credit is invalid.',
     }, default = True)
 
     note = serializers.CharField(error_messages = {
-        'required': 'The client note is required.',
-        'blank': 'The client note cannot be blank.',
-        'null': 'The client note cannot be blank.',
-        'max_length': 'The client note cannot exceed 100 characters.',
-    }, max_length = 100, allow_blank = True, allow_null = True)
+        'required': 'The note is required.',
+        'blank': 'The note cannot be blank.',
+        'null': 'The note cannot be blank.',
+        'max_length': 'The note cannot exceed 100 characters.',
+    }, required = False, max_length = 100, allow_blank = True, allow_null = True)
 
     location_id = serializers.IntegerField(error_messages = {
-        'required': 'The client location is required.',
-        'blank': 'The client location cannot be blank.',
-        'null': 'The client location cannot be blank.',
-        'invalid': 'The client location is invalid.',
+        'required': 'The location is required.',
+        'blank': 'The location cannot be blank.',
+        'null': 'The location cannot be blank.',
+        'invalid': 'The location is invalid.',
     })
 
     type_id = serializers.IntegerField(error_messages = {
-        'required': 'The client type is required.',
-        'blank': 'The client typet cannot be blank.',
-        'null': 'The client type cannot be blank.',
-        'invalid': 'The client type is invalid.',
-    }, allow_null = True)
+        'required': 'The type is required.',
+        'blank': 'The typet cannot be blank.',
+        'null': 'The type cannot be blank.',
+        'invalid': 'The type is invalid.',
+    }, required = False, allow_null = True)
 
     person_id = serializers.IntegerField(error_messages = {
         'required': 'The person is required.',
@@ -396,6 +429,26 @@ class AddEditClientSerializer(serializers.ModelSerializer):
         'null': 'The person cannot be blank.',
         'invalid': 'The person is invalid.',
     })
+
+    def to_internal_value(self, data):
+        type_json = data.get('type', '{}')
+        location_json = data.get('location', '{}')
+            
+        try:
+            data['location'] = json.loads(location_json)
+            data['type'] = json.loads(type_json)
+        except json.JSONDecodeError:
+            pass    
+        
+        if 'location' in data and isinstance(data['location'], dict) and 'id' in data['location']:
+            data['location_id'] = data['location']['id']
+            
+        if 'type' in data and isinstance(data['type'], dict) and 'id' in data['type']:
+            data['type_id'] = data['type']['id']
+        else:
+            data['type_id'] = None
+            
+        return super().to_internal_value(data)
     
     def create(self, validated_data):
         try: 

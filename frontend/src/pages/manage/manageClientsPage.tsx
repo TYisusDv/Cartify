@@ -14,6 +14,7 @@ import ManageDeleteClientPage from './clients/manageDeleteClientPage';
 import { URL_BACKEND } from '../../services/apiService';
 import ManageDetailsClientPage from './clients/manageDetailsClientPage';
 import ManageEditClientPage from './clients/manageEditClientPage';
+import ModalPhotos from '../../components/ModalPhotos';
 
 interface ManageClientsProps {
     addAlert: (alert: AlertType) => void;
@@ -117,16 +118,16 @@ const ManageClientsPage: React.FC<ManageClientsProps> = ({ addAlert }) => {
 
             {isModalOpen.details && (
                 <Modal title={translations.details_client} onClose={() => toggleModal('details', false)}>
-                    <ManageDetailsClientPage addAlert={addAlert} client_id={selected} onClose={() => toggleModal('details', false)} handleTableReload={handleTableReload} />
+                    <ManageDetailsClientPage addAlert={addAlert} client_id={selected} toggleModal={toggleModal} setModalProfilePicture={setModalProfilePicture} />
                 </Modal>
             )}
 
             {isModalOpen.profile_picture && (
-                <Modal title={translations.profile_picture_client} onClose={() => toggleModal('profile_picture', false)}>
+                <ModalPhotos title={translations.profile_picture_client} onClose={() => toggleModal('profile_picture', false)}>
                     <div className='flex w-full h-full justify-center'>
                         <img src={`${URL_BACKEND}${modalProfilePicture}`} className='h-[600px] w-full rounded-2xl' />
                     </div>
-                </Modal>
+                </ModalPhotos>
             )}            
         </DelayedSuspense>
     );

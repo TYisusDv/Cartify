@@ -4,16 +4,14 @@ import { handleChange, handleSelectChange } from '../../../utils/formUtils';
 import { AlertType } from '../../../types/alert';
 import { v4 as uuidv4 } from 'uuid';
 import { addClient } from '../../../services/clientsService';
-import { Client, initialClient } from '../../../types/clientsType';
+import { Client, ClientContact, Person } from '../../../types/modelType';
 import useTranslations from '../../../hooks/useTranslations';
 import InputGroup from '../../../components/InputGroup';
 import SelectGroup from '../../../components/SelectGroup';
 import useFormSubmit from '../../../hooks/useFormSubmit';
 import InputList from '../../../components/InputList';
 import Modal from '../../../components/Modal';
-import { Contact, initialContact } from '../../../types/contactsType';
 import useMedia from '../../../hooks/useMedia';
-import useClientData from '../../../hooks/useClientData';
 
 interface ManageAddClientProps {
     addAlert: (alert: AlertType) => void;
@@ -23,7 +21,7 @@ interface ManageAddClientProps {
 
 const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose, handleTableReload }) => {       
     const { translations } = useTranslations();
-    const [formValues, setFormValues] = useState<Client>(initialClient);
+    const [formValues, setFormValues] = useState<Client>({'allow_credit': true});
     const [activeTab, setActiveTab] = useState<string>('information');
     const {
         isVideoActive: isVideoActiveProfile,
@@ -47,9 +45,9 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
         canvasRef: canvasRefDocuments,
     } = useMedia({ addAlert });   
     const inputDocumentsPicture = useRef<HTMLInputElement | null>(null);   
-    const [contacts, setContacts] = useState<Contact[]>([]);
+    const [contacts, setContacts] = useState<ClientContact[]>([]);
     const [isModalOpen, setIsModalOpen] = useState({ contacts: false });
-    const [formContactValues, setFormContactValues] = useState<Contact>(initialContact);
+    const [formContactValues, setFormContactValues] = useState<ClientContact>({});
 
     const handleToggleVideoProfile = () => {
         setCapturedImagesProfile([]);
@@ -68,20 +66,6 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
             startVideoDocuments();
         }
     }
-
-    useEffect(() =>{
-        setFormValues(prevValues => ({
-            ...prevValues,
-            'profile_picture': capturedImagesProfile[0],
-        }));
-    }, [capturedImagesProfile]);
-
-    useEffect(() =>{
-        setFormValues(prevValues => ({
-            ...prevValues,
-            'identification_pictures': capturedImagesDocuments,
-        }));
-    }, [capturedImagesDocuments]);
 
     const deleteProfilePicture = () => {
         setCapturedImagesProfile([]);
@@ -111,7 +95,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
         setIsModalOpen(prev => ({ ...prev, [modalType]: isOpen }));
     };
 
-    const handleFileChange = (fieldName: keyof Client) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (objectField: keyof Client, nestedField?: keyof Person) => (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
@@ -123,9 +107,8 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                 event.target.value = '';
                 return;
             }
-
             
-            if (fieldName === 'profile_picture') {
+            if (objectField === 'person' && nestedField === 'profile_picture') {
                 const file = files[0];
                 stopVideoProfile();
                 setCapturedImagesProfile([]);
@@ -139,28 +122,42 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
 
     const handleAddClient = async () => {
         const formData = new FormData();
-
+    
         Object.entries(formValues).forEach(([key, value]) => {
             if (value instanceof FileList) {
                 Array.from(value).forEach((file, index) => {
                     formData.append(`${key}[${index}]`, file);
                 });
             } else if (value instanceof Array) {
-                Array.from(value).forEach((file, index) => {
-                    formData.append(`${key}[${index}]`, file);
+                value.forEach((item, index) => {
+                    if (typeof item === 'object') {
+                        formData.append(`${key}[${index}]`, JSON.stringify(item));
+                    } else {
+                        formData.append(`${key}[${index}]`, item);
+                    }
                 });
+            } else if (typeof value === 'object' && value !== null) {
+                formData.append(key, JSON.stringify(value));
             } else if (value !== null && value !== undefined) {
-                formData.append(key, value);
+                formData.append(key, value.toString());
             } else {
                 formData.append(key, '');
             }
         });
 
-        formData.append('contacts', JSON.stringify(contacts));
+        Array.from(capturedImagesProfile).forEach((file, index) => {
+            formData.append('profile_picture', file);
+        });
 
+        Array.from(capturedImagesDocuments).forEach((file, index) => {
+            formData.append(`identification_pictures[${index}]`, file);
+        });
+    
+        formData.append('contacts', JSON.stringify(contacts));
+    
         return await addClient(formData);
     };
-
+    
     const { handleSubmit, isLoading } = useFormSubmit(handleAddClient, addAlert);
 
     const onSubmit = async (e: React.FormEvent) => {
@@ -185,17 +182,6 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
 
         setContacts([...contacts, formContactValues]);
 
-        setFormContactValues({
-            relationship: null,
-            fullname: null,
-            phone: null,
-            address: null,
-            type: {
-                id: null,
-                name: null,
-            }
-        });
-
         toggleModal('contacts', false)
     };
 
@@ -218,7 +204,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                         <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
                             <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.location} <span className='text-red-500'>*</span></h3>
                             <div className='w-full'>
-                                <SelectGroup endpoint='manage/locations' name='location_id' onChange={handleSelectChange(setFormValues)} />
+                                <SelectGroup endpoint='manage/locations' name='location.id' onChange={handleSelectChange(setFormValues)} />
                             </div>
                         </div>
                         <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
@@ -226,14 +212,14 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                                 <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-10'>
                                     <h3 className='text-sm font-semibold  dark:text-gray-100 pl-1'>{translations.identification_type} <span className='text-red-500'>*</span></h3>
                                     <div className='min-w-40'>
-                                        <SelectGroup endpoint='manage/typesids' name='type_id_id' onChange={handleSelectChange(setFormValues)} />
+                                        <SelectGroup endpoint='manage/typesids' name='person.type_id.id' onChange={handleSelectChange(setFormValues)} />
                                     </div>
                                 </div>
                             </div>
                             <div className='col-span-1'>
                                 <InputGroup
                                     id='identification_id'
-                                    name='identification_id'
+                                    name='person.identification_id'
                                     label={translations.identification_id}
                                     icon={<UserIdVerificationIcon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -244,7 +230,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='col-span-1'>
                                 <InputGroup
                                     id='alias'
-                                    name='alias'
+                                    name='person.alias'
                                     label={translations.alias}
                                     icon={<UserQuestion02Icon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -254,7 +240,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='col-span-1'>
                                 <InputGroup
                                     id='occupation'
-                                    name='occupation'
+                                    name='person.occupation'
                                     label={translations.occupation}
                                     icon={<JobSearchIcon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -266,7 +252,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='col-span-1'>
                                 <InputGroup
                                     id='firstname'
-                                    name='firstname'
+                                    name='person.firstname'
                                     label={translations.firstname}
                                     icon={<UserCircleIcon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -275,7 +261,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='col-span-1'>
                                 <InputGroup
                                     id='middlename'
-                                    name='middlename'
+                                    name='person.middlename'
                                     label={translations.middlename}
                                     icon={<UserCircleIcon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -287,7 +273,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='col-span-1'>
                                 <InputGroup
                                     id='lastname'
-                                    name='lastname'
+                                    name='person.lastname'
                                     label={translations.lastname}
                                     icon={<UserAccountIcon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -296,7 +282,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='col-span-1'>
                                 <InputGroup
                                     id='second_lastname'
-                                    name='second_lastname'
+                                    name='person.second_lastname'
                                     label={translations.second_lastname}
                                     icon={<UserAccountIcon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -316,7 +302,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='col-span-1'>
                                 <InputGroup
                                     id='mobile'
-                                    name='mobile'
+                                    name='person.mobile'
                                     label={translations.mobile_number}
                                     icon={<SmartPhone01Icon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -326,7 +312,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='col-span-1'>
                                 <InputGroup
                                     id='phone'
-                                    name='phone'
+                                    name='person.phone'
                                     label={translations.phone_number}
                                     icon={<TelephoneIcon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -340,14 +326,14 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                                 <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-10 gap-2'>
                                     <h3 className='text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.country} <span className='text-red-500'>*</span></h3>
                                     <div className='w-full'>
-                                        <SelectGroup endpoint='manage/countries' name='country_id' onChange={handleSelectChange(setFormValues)} />
+                                        <SelectGroup endpoint='manage/countries' name='person.addresses[0].city.state.country.id' onChange={handleSelectChange(setFormValues)} />
                                     </div>
                                 </div>
                             </div>
                             <div className='col-span-1 z-50'>
                                 <InputList
                                     id='state'
-                                    name='state'
+                                    name='person.addresses[0].city.state.name'
                                     label={translations.address_state}
                                     icon={<MapsLocation01Icon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -359,7 +345,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='col-span-1'>
                                 <InputGroup
                                     id='street'
-                                    name='street'
+                                    name='person.addresses[0].street'
                                     label={translations.street}
                                     icon={<RoadLocation01Icon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -368,7 +354,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='col-span-1'>
                                 <InputGroup
                                     id='area'
-                                    name='area'
+                                    name='person.addresses[0].area'
                                     label={translations.address_area}
                                     icon={<MosqueLocationIcon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -378,7 +364,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='col-span-1'>
                                 <InputList
                                     id='city'
-                                    name='city'
+                                    name='person.addresses[0].city.name'
                                     label={translations.address_city}
                                     icon={<Location01Icon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -392,7 +378,8 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='col-span-1'>
                                 <InputGroup
                                     id='birthdate'
-                                    name='birthdate'
+                                    type='date'
+                                    name='person.birthdate'
                                     label={translations.birthdate}
                                     icon={<Calendar01Icon className='icon' size={24} />}
                                     onChange={handleChange(setFormValues)}
@@ -427,7 +414,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                                             name='profile_picture'
                                             accept='.jpg,.jpeg,.png'
                                             capture='user'
-                                            onChange={handleFileChange('profile_picture')}
+                                            onChange={handleFileChange('person', 'profile_picture')}
                                             className='w-full text-sm text-black dark:text-white file:border-0 file:cursor-pointer file:mr-2 file:px-4 file:py-1 file:bg-blue-600 file:rounded-xl file:text-white file:font-bold'
                                         />
                                     </div>
@@ -463,7 +450,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                                             name='identification_pictures'
                                             accept='.jpg,.jpeg,.png'
                                             multiple={true}
-                                            onChange={handleFileChange('identification_pictures')}
+                                            onChange={handleFileChange('person')}
                                             className='w-full text-sm text-black dark:text-white file:border-0 file:cursor-pointer file:mr-2 file:px-4 file:py-1 file:bg-blue-600 file:rounded-xl file:text-white file:font-bold'
                                         />
                                     </div>
@@ -491,18 +478,18 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                         <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
                             <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.class_client}</h3>
                             <div className='w-full'>
-                                <SelectGroup endpoint='manage/clienttypes' name='type_id' onChange={handleSelectChange(setFormValues)} />
+                                <SelectGroup endpoint='manage/clienttypes' name='type.id' onChange={handleSelectChange(setFormValues)} />
                             </div>
                         </div>
                         <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-10 h-14 pr-5'>
                             <h3 className='text-sm font-semibold dark:text-gray-100 pl-1'>{translations.allow_credit} <span className='text-red-500'>*</span></h3>
                             <div className='flex items-center gap-3'>
                                 <div className='flex items-center'>
-                                    <input id='allow_credit_1' type='radio' value='1' name='allow_credit' onChange={handleChange(setFormValues)} className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' checked={formValues.allow_credit === '1'} />
+                                    <input id='allow_credit_1' type='radio' value='1' name='allow_credit' onChange={handleChange(setFormValues)} className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' checked={formValues.allow_credit === true || formValues.allow_credit === '1'} />
                                     <label htmlFor='allow_credit_1' className='ms-2 text-sm font-medium text-gray-900 dark:text-gray-300'>Si</label>
                                 </div>
                                 <div className='flex items-center'>
-                                    <input id='allow_credit_2' type='radio' value='0' name='allow_credit' onChange={handleChange(setFormValues)} className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' checked={formValues.allow_credit === '0'} />
+                                    <input id='allow_credit_2' type='radio' value='0' name='allow_credit' onChange={handleChange(setFormValues)} className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' checked={formValues.allow_credit === false || formValues.allow_credit === '0'} />
                                     <label htmlFor='allow_credit_1' className='ms-2 text-sm font-medium text-gray-900 dark:text-gray-300'>No</label>
                                 </div>
                             </div>
@@ -535,7 +522,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                                     <tbody >
                                         {contacts.map((contact, index) => (
                                             <tr key={index} className='text-xs text-gray-800 bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/80'>
-                                                <td className='px-6 py-4'>{contact.type.name}</td>
+                                                <td className='px-6 py-4'>{contact.type?.name}</td>
                                                 <td className='px-6 py-4'>{contact.relationship}</td>
                                                 <td className='px-6 py-4'>{contact.fullname}</td>
                                                 <td className='px-6 py-4'>{contact.address}</td>
@@ -561,7 +548,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                             <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
                                 <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.type} <span className='text-red-500'>*</span></h3>
                                 <div className='w-full'>
-                                    <SelectGroup endpoint='manage/contacttypes' name='type_id' onChange={handleSelectChange(setFormContactValues)} />
+                                    <SelectGroup endpoint='manage/contacttypes' name='type.id' onChange={handleSelectChange(setFormContactValues)} />
                                 </div>
                             </div>
                             <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>

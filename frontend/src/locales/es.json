@@ -62,5 +62,7 @@
     "add": "Agregar",
     "details_client": "Detalles del cliente",
     "edit_client": "Editar cliente",
-    "edit": "Editar"
+    "edit": "Editar",
+    "delete_picture_sure": "¿Está seguro/a de que desea eliminar la foto?"
+
 }

@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { UserAccountIcon, UserCircleIcon, UserIdVerificationIcon } from 'hugeicons-react';
 import { handleChange } from '../../../utils/formUtils';
 import { AlertType } from '../../../types/alert';
-import { Client, initialClient } from '../../../types/clientsType';
 import { deleteClient, getClient } from '../../../services/clientsService';
 import { v4 as uuidv4 } from 'uuid';
 import useTranslations from '../../../hooks/useTranslations';
 import InputGroup from '../../../components/InputGroup';
 import useFormSubmit from '../../../hooks/useFormSubmit';
+import { Client } from '../../../types/modelType';
 
 interface ManageDeleteClientProps {
     addAlert: (alert: AlertType) => void;
@@ -19,7 +19,7 @@ interface ManageDeleteClientProps {
 
 const ManageDeleteClientPage: React.FC<ManageDeleteClientProps> = ({ addAlert, client_id, onClose, handleTableReload, setSelected }) => {
     const { translations } = useTranslations();
-    const [formValues, setFormValues] = useState<Client>(initialClient);
+    const [formValues, setFormValues] = useState<Client>({});
 
     useEffect(() => {
         const fetchClient = async () => {
@@ -34,9 +34,11 @@ const ManageDeleteClientPage: React.FC<ManageDeleteClientProps> = ({ addAlert, c
 
                 setFormValues({
                     ...formValues,
-                    identification_id: response_data.resp.person.identification_id,
-                    firstname: response_data.resp.person.firstname,
-                    lastname: response_data.resp.person.lastname
+                    person: {
+                        identification_id: response_data.resp.person.identification_id,
+                        firstname: response_data.resp.person.firstname,
+                        lastname: response_data.resp.person.lastname
+                    },
                 }); 
             } catch (error) {
                 addAlert({ id: uuidv4(), text: 'Error fetching client', type: 'danger', timeout: 3000 });
@@ -79,7 +81,7 @@ const ManageDeleteClientPage: React.FC<ManageDeleteClientProps> = ({ addAlert, c
                     label={translations.identification_id}
                     icon={<UserIdVerificationIcon className='icon' size={24} />}
                     onChange={handleChange(setFormValues)}
-                    value={formValues.identification_id || ''}
+                    value={formValues.person?.identification_id || ''}
                     disabled={true}
                 />
                 <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
@@ -90,7 +92,7 @@ const ManageDeleteClientPage: React.FC<ManageDeleteClientProps> = ({ addAlert, c
                             label={translations.firstname}
                             icon={<UserCircleIcon className='icon' size={24} />}
                             onChange={handleChange(setFormValues)}
-                            value={formValues.firstname || ''}
+                            value={formValues.person?.firstname || ''}
                             disabled={true}
                         />
                     </div>
@@ -101,7 +103,7 @@ const ManageDeleteClientPage: React.FC<ManageDeleteClientProps> = ({ addAlert, c
                             label={translations.lastname}
                             icon={<UserAccountIcon className='icon' size={24} />}
                             onChange={handleChange(setFormValues)}
-                            value={formValues.lastname || ''}
+                            value={formValues.person?.lastname || ''}
                             disabled={true}
                         />
                     </div>

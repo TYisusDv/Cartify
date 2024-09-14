@@ -72,7 +72,7 @@ class PersonsModel(models.Model):
             if os.path.isfile(self.profile_picture.path):
                 os.remove(self.profile_picture.path)
 
-        for identification_picture in self.identificationpictures_set.all():
+        for identification_picture in self.identification_pictures.all():
             if identification_picture.image:
                 if os.path.isfile(identification_picture.image.path):
                     os.remove(identification_picture.image.path)
@@ -94,7 +94,7 @@ class AddressesModel(models.Model):
         db_table = 'addresses'
 
 class IdentificationPictures(models.Model):
-    person = models.ForeignKey(PersonsModel, on_delete = models.CASCADE)
+    person = models.ForeignKey(PersonsModel, related_name = 'identification_pictures', on_delete = models.CASCADE)
     image = models.ImageField(upload_to = upload_to_identifications, null = True, blank = True)
 
     class Meta: 

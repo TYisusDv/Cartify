@@ -28,6 +28,10 @@ const InputGroup: React.FC<InputGroupProps> = ({ id, name, label, icon, onChange
         if(value != null && value != ''){
             setHasText(true);
         }
+
+        if(type === 'date'){
+            setHasText(true);
+        }
     }, [value]);
 
     return (
