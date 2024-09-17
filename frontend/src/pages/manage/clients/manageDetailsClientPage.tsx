@@ -48,7 +48,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
         };
 
         fetchClient();
-    }, []);
+    }, [addAlert, client_id]);
 
     return (
         <div>
@@ -375,7 +375,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                    <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
                         {identificationPictures.map((item, index) => (
                             <div className='col-span-1 flex justify-center p-2 border-2 rounded-xl dark:border-slate-600'>
-                                <img className='cursor-pointer rounded-lg h-32' key={index} src={`${URL_BACKEND}${item.image}`} onClick={() => {handleImage(item.image)}} />
+                                <img className='cursor-pointer rounded-lg h-32' key={index} src={`${URL_BACKEND}${item.image}`} alt='Document' onClick={() => {handleImage(item.image)}} />
                             </div>
                         ))}
                    </div>

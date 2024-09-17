@@ -199,7 +199,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
         };
 
         fetchClient();
-    }, []);
+    }, [addAlert, client_id]);
 
     return (
         <div>
@@ -575,7 +575,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                         <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
                             {identificationPictures.map((item, index) => (
                                 <div className='col-span-1 flex justify-center p-2 border-2 rounded-xl dark:border-slate-600'>
-                                    <img className='cursor-pointer rounded-lg h-32' key={index} src={`${URL_BACKEND}${item.image}`} onClick={() => toggleModal('delete_picture', true)}/>
+                                    <img className='cursor-pointer rounded-lg h-32' key={index} src={`${URL_BACKEND}${item.image}`} alt='Document' onClick={() => toggleModal('delete_picture', true)}/>
                                 </div>
                             ))}
                         </div>
@@ -594,7 +594,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                             <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
                                 <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.type} <span className='text-red-500'>*</span></h3>
                                 <div className='w-full'>
-                                    <SelectGroup endpoint='manage/contacttypes' name='type_id' onChange={handleSelectChange(setFormContactValues)} />
+                                    <SelectGroup endpoint='manage/contacttypes' name='type.id' onChange={handleSelectChange(setFormContactValues)} />
                                 </div>
                             </div>
                             <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>

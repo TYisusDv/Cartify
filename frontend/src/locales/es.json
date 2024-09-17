@@ -1,6 +1,7 @@
 {
     "actions": "Acciones",
     "add_client": "Agregar cliente",
+    "add_supplier": "Agregar proveedor",
     "add_contact": "Agregar contacto",
     "address_area": "Zona/Barrio/Distrito",
     "address_city": "Ciudad/Municipio",
@@ -15,6 +16,7 @@
     "dark": "Oscuro",
     "delete_client": "Eliminar cliente",
     "delete_client_sure": "¿Está seguro/a de que desea eliminar al cliente?",
+    "delete_supplier_sure": "¿Está seguro/a de que desea eliminar al proveedor?",
     "email": "Correo electrónico",
     "english": "Inglés",
     "error_404": "Página no encontrada",
@@ -34,6 +36,7 @@
     "logout": "Cerrar sesión",
     "manage_clients_info": "Administra clientes aquí. ¡Agrega, edita y elimina!",
     "manage_users_info": "Administra usuarios aquí. ¡Agrega, edita y otorga permisos según su rol!",
+    "manage_suppliers_info": "Administra proveedores aquí. ¡Agrega, edita y elimina!",
     "middlename": "Segundo nombre",
     "mobile_number": "Número de teléfono móvil",
     "no_data": "No hay datos disponibles",
@@ -61,8 +64,13 @@
     "select_an_option": "Selecciona una opción",
     "add": "Agregar",
     "details_client": "Detalles del cliente",
+    "details_supplier": "Detalles del proveedor",
     "edit_client": "Editar cliente",
     "edit": "Editar",
-    "delete_picture_sure": "¿Está seguro/a de que desea eliminar la foto?"
-
+    "edit_supplier": "Editar proveedores",
+    "delete": "Eliminar",
+    "delete_picture_sure": "¿Está seguro/a de que desea eliminar la foto?",
+    "name": "Nombre",
+    "company": "Empresa",
+    "advisor": "Asesor"
 }

@@ -23,18 +23,6 @@ class LogInSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'password']
 
-#Locations
-class LocationsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LocationsModel
-        fields = '__all__'
-
-#Types Ids
-class TypesIdsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TypesIdsModel
-        fields = '__all__'
-        
 #Countries
 class CountriesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,6 +43,18 @@ class CitiesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CitiesModel
+        fields = '__all__'
+
+#Types Ids
+class TypesIdsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TypesIdsModel
+        fields = '__all__'
+
+#Locations
+class LocationsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LocationsModel
         fields = '__all__'
 
 #Addresses
@@ -113,7 +113,7 @@ class AddEditAddressesSerializer(serializers.ModelSerializer):
         model = AddressesModel
         fields = ['street', 'area', 'city_id', 'person_id']
 
-
+#Identification pictures
 class IdentificationPicturesSerializer(serializers.ModelSerializer):
     class Meta:
         model = IdentificationPictures
@@ -367,8 +367,7 @@ class AddClientContactSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ClientContactsModel
-        fields = ['relationship', 'fullname', 'phone', 'address', 'type_id', 'client_id']
-
+        exclude = ['id']
 
 #Client types
 class ClientTypesSerializer(serializers.ModelSerializer):
@@ -458,7 +457,7 @@ class AddEditClientSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ClientsModel
-        fields = ['email', 'allow_credit', 'note', 'location_id', 'type_id', 'person_id']
+        exclude = ['id', 'date_reg']
 
 class DeleteClientSerializer(serializers.ModelSerializer):    
     id = serializers.IntegerField(error_messages = {
@@ -470,4 +469,97 @@ class DeleteClientSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ClientsModel
+        fields = ['id']
+
+#Suppliers
+class SuppliersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SuppliersModel
+        fields = '__all__'
+
+class AddEditSupplierSerializer(serializers.ModelSerializer):
+    company_name = serializers.CharField(error_messages = {
+        'required': 'The company name is required.',
+        'blank': 'The company name cannot be blank.',
+        'null': 'The company name cannot be blank.',
+        'max_length': 'The company name cannot exceed 100 characters.',
+    }, required = True, max_length = 100, allow_blank = False, allow_null = False)
+
+    company_identification = serializers.CharField(error_messages = {
+        'required': 'The company identification is required.',
+        'blank': 'The company identification cannot be blank.',
+        'null': 'The company identification cannot be blank.',
+        'max_length': 'The company identification cannot exceed 50 characters.',
+    }, required = False, max_length = 50, allow_blank = True, allow_null = True)
+
+    company_email = serializers.EmailField(error_messages = {
+        'required': 'The company email is required.',
+        'blank': 'The company email cannot be blank.',
+        'null': 'The company email cannot be blank.',
+        'max_length': 'The company email cannot exceed 254 characters.',
+    }, required = False, allow_blank = True, allow_null = True)
+
+    company_phone = serializers.CharField(error_messages = {
+        'required': 'The company phone is required.',
+        'blank': 'The company phone cannot be blank.',
+        'null': 'The company phone cannot be blank.',
+        'max_length': 'The company phone cannot exceed 20 characters.',
+    }, required = False, max_length = 20, allow_blank = True, allow_null = True)
+
+    company_phone_2 = serializers.CharField(error_messages = {
+        'required': 'The company phone 2 is required.',
+        'blank': 'The company phone 2 cannot be blank.',
+        'null': 'The company phone 2 cannot be blank.',
+        'max_length': 'The company phone 2 cannot exceed 20 characters.',
+    }, required = False, max_length = 20, allow_blank = True, allow_null = True)
+
+    company_address = serializers.CharField(error_messages = {
+        'required': 'The company address is required.',
+        'blank': 'The company address cannot be blank.',
+        'null': 'The company address cannot be blank.',
+        'max_length': 'The company address cannot exceed 254 characters.',
+    }, required = False, allow_blank = True, allow_null = True)
+
+    advisor_fullname = serializers.CharField(error_messages = {
+        'required': 'The advisor fullname is required.',
+        'blank': 'The advisor fullname cannot be blank.',
+        'null': 'The advisor fullname cannot be blank.',
+        'max_length': 'The advisor fullname cannot exceed 254 characters.',
+    }, required = False, allow_blank = True, allow_null = True)
+
+    company_email = serializers.EmailField(error_messages = {
+        'required': 'The advisor email is required.',
+        'blank': 'The advisor email cannot be blank.',
+        'null': 'The advisor email cannot be blank.',
+        'max_length': 'The advisor email cannot exceed 254 characters.',
+    }, required = False, allow_blank = True, allow_null = True)
+
+    advisor_phone = serializers.CharField(error_messages = {
+        'required': 'The advisor phone is required.',
+        'blank': 'The advisor phone cannot be blank.',
+        'null': 'The advisor phone cannot be blank.',
+        'max_length': 'The advisor phone cannot exceed 20 characters.',
+    }, required = False, max_length = 20, allow_blank = True, allow_null = True)
+
+    advisor_phone_2 = serializers.CharField(error_messages = {
+        'required': 'The advisor phone 2 is required.',
+        'blank': 'The advisor phone 2 cannot be blank.',
+        'null': 'The advisor phone 2 cannot be blank.',
+        'max_length': 'The advisor phone 2 cannot exceed 20 characters.',
+    }, required = False, max_length = 20, allow_blank = True, allow_null = True)    
+    
+    class Meta:
+        model = SuppliersModel
+        exclude = ['id']
+
+class GetSupplierSerializer(serializers.ModelSerializer):    
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The supplier is required.',
+        'blank': 'The supplier cannot be blank.',
+        'null': 'The supplier cannot be blank.',
+        'invalid': 'The supplier is invalid.',
+    })
+    
+    class Meta:
+        model = SuppliersModel
         fields = ['id']

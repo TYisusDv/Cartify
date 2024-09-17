@@ -92,3 +92,18 @@ export interface ClientContact {
     type?: ClientType;
     client?: Client;
 }
+
+//Suppliers
+export interface Supplier {
+    id?: number;
+    company_name?: string;
+    company_identification?: string;
+    company_email?: string;
+    company_phone?: string;
+    company_phone_2?: string;
+    company_address?: string;
+    advisor_fullname?: string;
+    advisor_email?: string;
+    advisor_phone?: string;
+    advisor_phone_2?: string;
+}

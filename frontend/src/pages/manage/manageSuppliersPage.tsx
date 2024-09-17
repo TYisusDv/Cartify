@@ -8,44 +8,34 @@ import DelayedSuspense from '../../components/DelayedSuspense';
 import SkeletonLoader from '../../components/SkeletonLoader';
 import Table from '../../components/Table';
 import Modal from '../../components/Modal';
-import ManageAddClientPage from './clients/manageAddClientPage';
-import ManageClientsTablePage from './clients/manageClientsTablePage';
-import ManageDeleteClientPage from './clients/manageDeleteClientPage';
-import { URL_BACKEND } from '../../services/apiService';
-import ManageDetailsClientPage from './clients/manageDetailsClientPage';
-import ManageEditClientPage from './clients/manageEditClientPage';
-import ModalPhotos from '../../components/ModalPhotos';
+import TablePage from './suppliers/TablePage';
+import CrudPage from './suppliers/CrudPage';
 
-interface ManageClientsProps {
+interface ManageSuppliersProps {
     addAlert: (alert: AlertType) => void;
 }
 
-const ManageClientsPage: React.FC<ManageClientsProps> = ({ addAlert }) => {
+const ManageSuppliersPage: React.FC<ManageSuppliersProps> = ({ addAlert }) => {
     const { translations } = useTranslations();
     const [selected, setSelected] = useState<number>(0);
-    const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, profile_picture: false, details: false });
+    const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, details: false });
     const [reloadTable, setReloadTable] = useState(0);
     const [countClients, setCountClients] = useState(0);
-    const [modalProfilePicture, setModalProfilePicture] = useState('');
 
     const handleTableReload = () => {
         setReloadTable(prev => prev + 1);
     };
 
-    const toggleModal = (modalType: 'add' | 'edit' | 'delete' | 'profile_picture' | 'details', isOpen: boolean) => {
+    const toggleModal = (modalType: 'add' | 'edit' | 'delete' | 'details', isOpen: boolean) => {
         setIsModalOpen(prev => ({ ...prev, [modalType]: isOpen }));
     };
 
     const table_header = [
-        { name: 'person.identification_picture', headerName: '' },
-        { name: 'person.alias', headerName: translations.alias },
-        { name: 'person.firstname', headerName: translations.firstname },
-        { name: 'person.middlename', headerName: translations.middlename },
-        { name: 'person.lastname', headerName: translations.lastname },
-        { name: 'person.second_lastname', headerName: translations.second_lastname },
-        { name: 'person.phone', headerName: translations.phone },
-        { name: 'person.birthdate', headerName: translations.birthdate },
-        { name: 'person.addresses[0].city.name', headerName: translations.address_city },
+        { name: 'company_identification', headerName: 'Company identification' },
+        { name: 'company_name', headerName: 'Company name' },
+        { name: 'company_email', headerName: 'Company email' },
+        { name: 'company_phone', headerName: 'Company phone' },
+        { name: 'company_address', headerName: 'Company address' },
     ];
 
     useEffect(() => {
@@ -72,8 +62,8 @@ const ManageClientsPage: React.FC<ManageClientsProps> = ({ addAlert }) => {
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
             <div className='flex items-center justify-between w-full p-8 animate__animated animate__fadeIn animate__faster'>
                 <div className='flex flex-col'>
-                    <h1 className='text-2xl font-bold dark:text-white'>{translations.clients}</h1>
-                    <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_clients_info}</span>
+                    <h1 className='text-2xl font-bold dark:text-white'>{translations.suppliers}</h1>
+                    <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_suppliers_info}</span>
                 </div>
                 <div className='flex gap-2'>
                     <button className='bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('delete', true)} disabled={selected === 0}><Delete02Icon /></button>
@@ -95,42 +85,34 @@ const ManageClientsPage: React.FC<ManageClientsProps> = ({ addAlert }) => {
                     </div>
                 </div>
                 <div className='w-full mt-6'>
-                    <Table endpoint='manage/clients' reloadTable={reloadTable} header={table_header} tbody={<ManageClientsTablePage selected={selected} setSelected={setSelected} toggleModal={toggleModal} setModalProfilePicture={setModalProfilePicture} />} />
+                    <Table endpoint='manage/suppliers' reloadTable={reloadTable} header={table_header} tbody={<TablePage selected={selected} setSelected={setSelected} />} />
                 </div>
             </div>
             {isModalOpen.add && (
-                <Modal title={translations.add_client} onClose={() => toggleModal('add', false)}>
-                    <ManageAddClientPage addAlert={addAlert} onClose={() => toggleModal('add', false)} handleTableReload={handleTableReload} />
+                <Modal title={translations.add_supplier} onClose={() => toggleModal('add', false)}>
+                    <CrudPage addAlert={addAlert} type='add' supplier_id={selected} onClose={() => toggleModal('add', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}
 
             {isModalOpen.edit && (
-                <Modal title={translations.edit_client} onClose={() => toggleModal('edit', false)}>
-                    <ManageEditClientPage addAlert={addAlert} client_id={selected} onClose={() => toggleModal('edit', false)} handleTableReload={handleTableReload} />
+                <Modal title={translations.edit_supplier} onClose={() => toggleModal('edit', false)}>
+                    <CrudPage addAlert={addAlert} type='edit' supplier_id={selected} onClose={() => toggleModal('edit', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}
 
             {isModalOpen.delete && (
-                <Modal title={translations.delete_client_sure} onClose={() => toggleModal('delete', false)}>
-                    <ManageDeleteClientPage addAlert={addAlert} client_id={selected} onClose={() => toggleModal('delete', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                <Modal title={translations.delete_supplier_sure} onClose={() => toggleModal('delete', false)}>
+                    <CrudPage addAlert={addAlert} type='delete' supplier_id={selected} onClose={() => toggleModal('delete', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}
 
             {isModalOpen.details && (
-                <Modal title={translations.details_client} onClose={() => toggleModal('details', false)}>
-                    <ManageDetailsClientPage addAlert={addAlert} client_id={selected} toggleModal={toggleModal} setModalProfilePicture={setModalProfilePicture} />
+                <Modal title={translations.details_supplier} onClose={() => toggleModal('details', false)}>
+                    <CrudPage addAlert={addAlert} type='details' supplier_id={selected} onClose={() => toggleModal('details', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
-            )}
-
-            {isModalOpen.profile_picture && (
-                <ModalPhotos title={translations.profile_picture_client} onClose={() => toggleModal('profile_picture', false)}>
-                    <div className='flex w-full h-full justify-center'>
-                        <img src={`${URL_BACKEND}${modalProfilePicture}`} alt='Profile' className='h-[600px] w-full rounded-2xl' />
-                    </div>
-                </ModalPhotos>
-            )}            
+            )}          
         </DelayedSuspense>
     );
 };
 
-export default ManageClientsPage;
+export default ManageSuppliersPage;

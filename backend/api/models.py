@@ -51,7 +51,6 @@ class CitiesModel(models.Model):
     class Meta: 
         db_table = 'cities'
 
-
 class PersonsModel(models.Model):
     id = models.AutoField(primary_key = True)
     identification_id = models.CharField(max_length = 100, null = False, blank = False)
@@ -139,3 +138,18 @@ class ClientContactsModel(models.Model):
     class Meta: 
         db_table = 'client_contacts'
 
+class SuppliersModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    company_name = models.CharField(max_length = 100, null = False, blank = False)
+    company_identification = models.CharField(max_length = 50, null = True, blank = True)
+    company_email = models.EmailField(null = True, blank = True)
+    company_phone = models.CharField(max_length = 20, null = True, blank = True)
+    company_phone_2 = models.CharField(max_length = 20, null = True, blank = True)
+    company_address = models.CharField(null = True, blank = True)
+    advisor_fullname = models.CharField(null = True, blank = True)
+    advisor_email = models.EmailField(null = True, blank = True)
+    advisor_phone = models.CharField(max_length = 20, null = True, blank = True)
+    advisor_phone_2 = models.CharField(max_length = 20, null = True, blank = True)
+    
+    class Meta: 
+        db_table = 'suppliers'

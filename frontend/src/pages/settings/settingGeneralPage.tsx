@@ -5,6 +5,7 @@ import { getLanguage, saveLanguage } from '../../utils/LanguageUtils';
 import useTranslations from '../../hooks/useTranslations';
 import DelayedSuspense from '../../components/DelayedSuspense';
 import SelectGroup from '../../components/SelectGroup';
+import { handleSelectChange } from '../../utils/formUtils';
 
 const SettingGeneralPage: React.FC = () => {
     const { translations } = useTranslations();
@@ -20,49 +21,25 @@ const SettingGeneralPage: React.FC = () => {
         { value: 'es', label: translations.spanish },
     ];
 
-    const [selectedTheme, setSelectedTheme] = useState<string>('system');
-    const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
+    const [valuesTheme, setValuesTheme] = useState({ theme: getTheme() });
+    const [valuesLanguages, setValuesLanguages] = useState({ language: getLanguage() });
 
     useEffect(() => {
-        const savedTheme = getTheme() || 'system';
-        const savedLanguage = getLanguage() || 'en';
-
-        if (savedTheme === 'dark') {
-            document.documentElement.classList.add('theme', 'dark');
-        } else if (savedTheme === 'light') {
-            document.documentElement.classList.add('theme', 'light');
-        } else {
-            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.documentElement.classList.add('dark');
-            }
-        }
-
-        setSelectedTheme(savedTheme);
-        setSelectedLanguage(savedLanguage);
-    }, []);
-
-    const handleThemeChange = (value: any) => {
         document.documentElement.classList.remove('dark', 'light', 'theme');
 
-        if (value === 'dark') {
+        if (valuesTheme.theme === 'dark') {
             document.documentElement.classList.add('theme', 'dark');
-        } else if (value === 'light') {
+        } else if (valuesTheme.theme === 'light') {
             document.documentElement.classList.add('theme', 'light');
         } else {
             if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 document.documentElement.classList.add('dark');
             }
-        }
+        }        
 
-        setSelectedTheme(value);
-        saveTheme(value);
-    };
-
-    const handleLanguageChange = (value: any) => {
-        setSelectedLanguage(value);
-        saveLanguage(value);
-        window.location.reload();
-    };
+        saveTheme(valuesTheme.theme || 'system');
+        saveLanguage(valuesLanguages.language || 'en');
+    }, [valuesTheme, valuesLanguages]);
 
     return (
         <DelayedSuspense fallback={<div className='flex w-full pl-24'><Loading03Icon size={20} className='animate-spin dark:text-white' /></div>} delay={300}>
@@ -70,13 +47,13 @@ const SettingGeneralPage: React.FC = () => {
                 <div className='flex items-center justify-between animate__animated animate__fadeIn animate__faster z-20'>
                     <h3 className='text-sm text-nowrap dark:text-gray-100'>{translations.theme}</h3>
                     <div className='w-full max-w-32'>
-                        <SelectGroup endpoint='manage/theme' name='theme' value={selectedTheme} onChange={handleThemeChange} />
+                        <SelectGroup myOptions={theme_options} name='theme' value={valuesTheme.theme} onChange={handleSelectChange(setValuesTheme)} />
                     </div>
                 </div>
                 <div className='flex items-center justify-between animate__animated animate__fadeIn animate__faster z-10'>
                     <h3 className='text-sm text-nowrap dark:text-gray-100'>{translations.language}</h3>
                     <div className='w-full max-w-32'>
-                        <SelectGroup endpoint='manage/theme' name='language' value={selectedLanguage} onChange={handleLanguageChange} />
+                        <SelectGroup myOptions={language_options} name='language' value={valuesLanguages.language} onChange={handleSelectChange(setValuesLanguages)} />
                     </div>
                 </div>
             </div>            

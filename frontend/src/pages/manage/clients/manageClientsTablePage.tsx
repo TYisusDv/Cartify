@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Location01Icon, TelephoneIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import { calculateAge } from '../../../utils/ageUtils';
 import { URL_BACKEND } from '../../../services/apiService';
-import Modal from '../../../components/Modal';
 
 interface ManageClientsTableProps {
     data?: Array<{ [key: string]: any }>;
@@ -27,7 +26,7 @@ const ManageClientsTablePage: React.FC<ManageClientsTableProps> = ({ data, selec
                 data.map((row, index) => (
                     <tr key={index} className={`text-sm text-gray-800 bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/80 ${selected === row.id ? 'bg-gray-200/80 dark:bg-slate-700/60' : ''}`} onClick={() => setSelected(row.id)}>
                         <td className='flex items-center w-full pl-6 py-4'>
-                            {row.person.profile_picture ? <img src={`${URL_BACKEND}${row.person.profile_picture}`} className='cursor-pointer rounded-full w-12 h-12 min-w-12 min-h-12' onClick={() => {handleImage(row.person.profile_picture)}} /> : '-'}
+                            {row.person.profile_picture ? <img src={`${URL_BACKEND}${row.person.profile_picture}`} alt='Profile' className='cursor-pointer rounded-full w-12 h-12 min-w-12 min-h-12' onClick={() => {handleImage(row.person.profile_picture)}} /> : '-'}
                         </td>
                         <td className='px-6 py-4'>
                             {row.person.alias || '-'}

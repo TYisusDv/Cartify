@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from .serializers import *
 from .models import *
-import json
+from .utils import *
 
 class LoginAPIView(APIView):
     permission_classes = [AllowAny]
@@ -152,21 +152,6 @@ class ManageTypesIdsAPIView(APIView):
         if query == 'list':
             results = TypesIdsModel.objects.filter(status = True)
             serialized = TypesIdsSerializer(results, many = True)
-            
-            return JsonResponse({
-                'success': True,
-                'resp': serialized.data
-            })
-
-class ManageContactTypesAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-  
-    def get(self, request):
-        query = request.query_params.get('query', None)
-        if query == 'list':
-            results = ContactTypesModel.objects.filter()
-            serialized = ContactTypesSerializer(results, many = True)
             
             return JsonResponse({
                 'success': True,
@@ -484,8 +469,125 @@ class ManageClientsAPIView(APIView):
                     'resp': 'Client not found.'
                 }, status = 404)
 
-def parse_json(request, key, default):
-    try:
-        return json.loads(request.POST.get(key, default))
-    except json.JSONDecodeError:
-        raise ValueError(f'Invalid JSON format for {key}.')
+class ManageContactTypesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+  
+    def get(self, request):
+        query = request.query_params.get('query', None)
+        if query == 'list':
+            results = ContactTypesModel.objects.filter()
+            serialized = ContactTypesSerializer(results, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+
+class ManageSuppliersAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self, pk) :
+        try:
+            return SuppliersModel.objects.get(pk = pk)
+        except SuppliersModel.DoesNotExist:
+            raise Http404('Supplier not found.')
+
+    def get(self, request):
+        data = request.query_params
+        query = data.get('query', None)
+
+        if query == 'table':
+            search_query = request.query_params.get('search', '')
+            page_number = request.query_params.get('page', 1)
+            order_by = request.query_params.get('order_by', 'id')
+            order = request.query_params.get('order', 'desc')
+            show = request.query_params.get('show', 10)
+            
+            if order_by == 'actions':
+                order_by = 'id'
+
+            model = SuppliersModel.objects.filter(
+                Q(id__icontains = search_query)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = SuppliersSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            supplier_id = data.get('id', None)
+
+            supplier_serializer = GetSupplierSerializer(data = data)  
+            if not supplier_serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': supplier_serializer.errors
+                }, status = 400)    
+                    
+            supplier_instance = self.get_object(pk = supplier_id)
+            supplier_serialized = SuppliersSerializer(supplier_instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': supplier_serialized.data
+            }) 
+        
+        elif query == 'count':
+            total = SuppliersModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+
+        supplier_serializer = AddEditSupplierSerializer(data = data)
+        if not supplier_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': supplier_serializer.errors}, status = 400)
+
+        supplier_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        supplier_id = data.get('id', None)
+
+        supplier_serializer = GetSupplierSerializer(data = data)  
+        if not supplier_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': supplier_serializer.errors
+            }, status = 400)    
+                
+        supplier_instance = self.get_object(pk = supplier_id)           
+        supplier_instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)

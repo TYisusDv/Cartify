@@ -13,9 +13,11 @@ interface PanelPageProps {
 
 const HomePage = React.lazy(() => import('../pages/homePage'));
 const AuthLogoutPage = React.lazy(() => import('../pages/auth/authLogoutPage'));
-const ManageUsersPage = React.lazy(() => import('../pages/manage/manageUsersPage'));
-const ManageClientsPage = React.lazy(() => import('../pages/manage/manageClientsPage'));
+const ManageUsersPage = React.lazy(() => import('./manage/manageUsersPage'));
+const ManageClientsPage = React.lazy(() => import('./manage/manageClientsPage'));
+const ManageSuppliersPage = React.lazy(() => import('./manage/manageSuppliersPage'));
 const SettingGeneralPage = React.lazy(() => import('../pages/settings/settingGeneralPage'));
+
 
 const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
   const { translations } = useTranslations();
@@ -80,6 +82,7 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
             <Route path='/home' element={<HomePage />} />
             <Route path='/manage/users' element={<ManageUsersPage />} />
             <Route path='/manage/clients' element={<ManageClientsPage addAlert={addAlert} />} />
+            <Route path='/manage/suppliers' element={<ManageSuppliersPage addAlert={addAlert} />} />
             <Route path='/auth/logout' element={<AuthLogoutPage />} />
             <Route path='*' element={<ErrorPage code={404} detail={translations.error_404} />} />
           </Routes>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AlertType } from './types/alert';
 import { isAuthenticated } from './utils/authUtils';
@@ -13,18 +13,18 @@ const PanelPage = React.lazy(() => import('./pages/panelPage'));
 function App() {
   const [alerts, setAlerts] = useState<AlertType[]>([]);
 
-  const addAlert = (alert: AlertType) => {
+  const addAlert = useCallback((alert: AlertType) => {
     setAlerts(prevAlerts => [
       ...prevAlerts,
       { id: alert.id, text: alert.text, timeout: alert.timeout, type: alert.type }
     ]);
-  };
+  }, []);
 
   const removeAlert = (id: string) => {
     setAlerts(prevAlerts => prevAlerts.filter(alert => alert.id !== id));
   };
 
-  const applyTheme = (theme: string) => {
+  const applyTheme = useCallback((theme: string) => {
     document.documentElement.classList.remove('dark', 'light', 'theme');
 
     if (theme === 'dark') {
@@ -34,7 +34,7 @@ function App() {
     } else {
       applySystemTheme();
     }
-  };
+  }, []);
 
   const applySystemTheme = () => {
     if (!document.documentElement.classList.contains('theme')) {
