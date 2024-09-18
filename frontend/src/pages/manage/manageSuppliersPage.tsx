@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Add01Icon, Delete02Icon, EyeIcon, LocationUser04Icon, PencilEdit02Icon } from 'hugeicons-react';
+import { getCountSuppliers } from '../../services/suppliersService';
+import { Add01Icon, Delete02Icon, DistributionIcon, EyeIcon, PencilEdit02Icon } from 'hugeicons-react';
 import { AlertType } from '../../types/alert';
 import { v4 as uuidv4 } from 'uuid';
-import { getCountClients } from '../../services/clientsService';
 import useTranslations from '../../hooks/useTranslations';
 import DelayedSuspense from '../../components/DelayedSuspense';
 import SkeletonLoader from '../../components/SkeletonLoader';
@@ -41,7 +41,7 @@ const ManageSuppliersPage: React.FC<ManageSuppliersProps> = ({ addAlert }) => {
     useEffect(() => {
         const fetchCountClients = async () => {
             try {
-                const response = await getCountClients();
+                const response = await getCountSuppliers();
                 const response_data = response.data;
 
                 if (!response_data.success) {
@@ -76,7 +76,7 @@ const ManageSuppliersPage: React.FC<ManageSuppliersProps> = ({ addAlert }) => {
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t-2 border-b-2 border-gray-100 py-6 dark:border-slate-600'>
                     <div className='col-span-1 flex items-center gap-3 pb-5 border-gray-100 lg:p-0 dark:border-slate-600'>
                         <div className='flex justify-center items-center h-12 w-12 bg-gray-200 rounded-full dark:bg-slate-600 dark:text-white'>
-                            <LocationUser04Icon />
+                            <DistributionIcon />
                         </div>
                         <div>
                             <h2 className='text-sm u font-semibold text-gray-600 dark:text-slate-400'>Total</h2>

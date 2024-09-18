@@ -11,8 +11,22 @@ export const getSupplier = async (supplier_id: number) => {
   return response;
 };
 
+export const getCountSuppliers = async () => {
+  const response = await apiService.get('/manage/suppliers', {
+    params: {
+      query: 'count',
+    }
+  });
+  return response;
+};
+
 export const addSupplier = async (form: Supplier) => {
   const response = await apiService.post('/manage/suppliers', form);
+  return response;
+};
+
+export const editSupplier = async (form: Supplier) => {
+  const response = await apiService.put('/manage/suppliers', form);
   return response;
 };
 

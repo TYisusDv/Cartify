@@ -571,6 +571,28 @@ class ManageSuppliersAPIView(APIView):
         supplier_serializer.save()
 
         return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        supplier_id = data.get('id', None)
+
+        supplier_serializer = GetSupplierSerializer(data = data)  
+        if not supplier_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': supplier_serializer.errors
+            }, status = 400)    
+                
+        supplier_instance = self.get_object(pk = supplier_id)     
+
+        supplier_serializer = AddEditSupplierSerializer(supplier_instance, data = data)
+        if not supplier_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': supplier_serializer.errors}, status = 400)
+
+        supplier_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
     
     def delete(self, request):
         data = request.query_params

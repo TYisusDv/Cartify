@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { AlertType } from '../../../types/alert';
 import { handleChange } from '../../../utils/formUtils';
 import { Supplier } from '../../../types/modelType';
-import { addSupplier, deleteSupplier, getSupplier } from '../../../services/suppliersService';
+import { addSupplier, deleteSupplier, editSupplier, getSupplier } from '../../../services/suppliersService';
 import { Mail01Icon, RoadLocation01Icon, SmartPhone01Icon, TelephoneIcon, UserCircleIcon, UserIdVerificationIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import useFormSubmit from '../../../hooks/useFormSubmit';
@@ -20,7 +20,7 @@ interface CrudPageProps {
 
 const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReload, setSelected, type, supplier_id }) => {
     const { translations } = useTranslations();
-    const [formValues, setFormValues] = useState<Supplier>({});
+    const [formValues, setFormValues] = useState<Supplier>({id: supplier_id});
     const [activeTab, setActiveTab] = useState<'company' | 'advisor'>('company');
     const [colorPage, setColorPage] = useState<string>('blue');
 
@@ -52,10 +52,11 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
 
             fetchGet();
         }
-    }, [type]);
+    }, [type, addAlert, supplier_id]);
 
     const handleForm = async () => {
         if (type === 'add') return addSupplier(formValues);
+        if (type === 'edit') return editSupplier(formValues);
         if (type === 'delete') return deleteSupplier(supplier_id);
     };
 
@@ -64,15 +65,18 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const response = await handleSubmit(formValues);
-
-        if (response?.data.success) {
-            addAlert({ id: uuidv4(), text: response.data.resp, type: 'primary', timeout: 3000 });
+        
+        if(response){
+            if (!response?.data?.success) {
+                addAlert({ id: uuidv4(), text: response?.data?.resp, type: 'danger', timeout: 3000 });
+                return;
+            }
+            
+            addAlert({ id: uuidv4(), text: response?.data?.resp, type: 'primary', timeout: 3000 });
             onClose();
             handleTableReload();
             setSelected(0);
-        } else {
-            addAlert({ id: uuidv4(), text: response?.data.resp || 'Error', type: 'danger', timeout: 3000 });
-        }
+        }        
     };
 
     return (
