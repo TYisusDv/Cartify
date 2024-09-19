@@ -15,4 +15,7 @@ urlpatterns = [
     path('manage/clients', ManageClientsAPIView.as_view(), name='manage-clients'),
     path('manage/contacttypes', ManageContactTypesAPIView.as_view(), name='manage-contacttypes'),
     path('manage/suppliers', ManageSuppliersAPIView.as_view(), name='manage-suppliers'),
+    path('manage/taxes', ManageTaxesAPIView.as_view(), name='manage-taxes'),
+    path('manage/product/brands', ManageProductBrandsAPIView.as_view(), name='manage-product-brands'),
+    path('manage/product/categories', ManageProductCategoriesAPIView.as_view(), name='manage-product-categories'),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

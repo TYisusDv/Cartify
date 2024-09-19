@@ -12,15 +12,15 @@ import InputGroup from '../../../components/InputGroup';
 interface CrudPageProps {
     addAlert: (alert: AlertType) => void;
     onClose: () => void;
-    handleTableReload: () => void;
-    setSelected: (value: number) => void;
+    handleTableReload?: () => void;
+    setSelected?: (value: number) => void;
     type: string;
-    supplier_id: number;
+    selected_id?: number;
 }
 
-const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReload, setSelected, type, supplier_id }) => {
+const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReload, setSelected, type, selected_id }) => {
     const { translations } = useTranslations();
-    const [formValues, setFormValues] = useState<Supplier>({id: supplier_id});
+    const [formValues, setFormValues] = useState<Supplier>({id: selected_id});
     const [activeTab, setActiveTab] = useState<'company' | 'advisor'>('company');
     const [colorPage, setColorPage] = useState<string>('blue');
 
@@ -33,10 +33,10 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
         };
         setColorPage(colorMapping[type]);
 
-        if(type === 'details' || type === 'delete' || type === 'edit'){
+        if((type === 'details' || type === 'delete' || type === 'edit') && selected_id){
             const fetchGet = async () => {
                 try {
-                    const response = await getSupplier(supplier_id);
+                    const response = await getSupplier(selected_id);
                     const response_data = response.data;
 
                     if (!response_data.success) {
@@ -52,12 +52,12 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
 
             fetchGet();
         }
-    }, [type, addAlert, supplier_id]);
+    }, [type, addAlert, selected_id]);
 
     const handleForm = async () => {
         if (type === 'add') return addSupplier(formValues);
         if (type === 'edit') return editSupplier(formValues);
-        if (type === 'delete') return deleteSupplier(supplier_id);
+        if (type === 'delete' && selected_id) return deleteSupplier(selected_id);
     };
 
     const { handleSubmit, isLoading } = useFormSubmit(handleForm, addAlert);
@@ -74,8 +74,8 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
             
             addAlert({ id: uuidv4(), text: response?.data?.resp, type: 'primary', timeout: 3000 });
             onClose();
-            handleTableReload();
-            setSelected(0);
+            if(handleTableReload) handleTableReload();
+            if(setSelected) setSelected(0);
         }        
     };
 
@@ -228,7 +228,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                     <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>
                         <div className='col-span-1 md:col-end-3 w-full'>
                         {(type === 'delete' || type === 'edit' || type === 'add') && (
-                            <button type="submit" className={`btn btn-${colorPage} h-12`} disabled={isLoading}>
+                            <button type="submit" className={`btn btn-${colorPage} max-w-48 h-12 float-end`} disabled={isLoading}>
                                 {translations[type]}
                             </button>
                         )}

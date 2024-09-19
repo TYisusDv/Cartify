@@ -2,18 +2,19 @@ import React, { useState, ChangeEvent, useEffect } from 'react';
 
 interface InputGroupProps {
     id: string;
+    className?: string;
     name: string;
     label: string;
     icon: React.ReactNode;
     onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-    value?: string;
+    value?: string | number;
     type?: string;
     color?: string;
     required?: boolean;
     disabled?: boolean;
 }
 
-const InputGroup: React.FC<InputGroupProps> = ({ id, name, label, icon, onChange, value, type = 'text', color = 'blue', required = true, disabled = false }) => {
+const InputGroup: React.FC<InputGroupProps> = ({ id, className, name, label, icon, onChange, value, type = 'text', color = 'blue', required = true, disabled = false }) => {
     const [hasText, setHasText] = useState(false);
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -36,7 +37,7 @@ const InputGroup: React.FC<InputGroupProps> = ({ id, name, label, icon, onChange
     }, [value, type]);
 
     return (
-        <div className={`input-group input-group-${color} ${hasText ? 'has-text' : ''}`}>
+        <div className={`input-group input-group-${color} ${hasText ? 'has-text' : ''} ${className}`}>
             <label className='label' htmlFor={id}>{label} { required ? <span className='text-red-500'>*</span> : ''}</label>
             <input
                 id={id}

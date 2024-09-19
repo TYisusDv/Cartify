@@ -483,7 +483,7 @@ class AddEditSupplierSerializer(serializers.ModelSerializer):
         'blank': 'The company name cannot be blank.',
         'null': 'The company name cannot be blank.',
         'max_length': 'The company name cannot exceed 100 characters.',
-    }, required = True, max_length = 100, allow_blank = False, allow_null = False)
+    }, max_length = 100, allow_blank = False, allow_null = False)
 
     company_identification = serializers.CharField(error_messages = {
         'required': 'The company identification is required.',
@@ -562,4 +562,122 @@ class GetSupplierSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = SuppliersModel
+        fields = ['id']
+
+#Taxes
+class TaxesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaxesModel
+        fields = '__all__'
+
+class AddEditTaxSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(error_messages = {
+        'required': 'The name is required.',
+        'blank': 'The name cannot be blank.',
+        'null': 'The name cannot be blank.',
+        'max_length': 'The name cannot exceed 254 characters.',
+    }, allow_blank = False, allow_null = False)
+
+    value = serializers.FloatField(error_messages = {
+        'required': 'The value is required.',
+        'blank': 'The value cannot be blank.',
+        'null': 'The value cannot be blank.',
+        'invalid': 'The value is invalid.',
+    }, required = False)
+
+    status = serializers.BooleanField(error_messages = {
+        'required': 'The status is required.',
+        'blank': 'The status cannot be blank.',
+        'null': 'The status cannot be blank.',
+        'invalid': 'The status is invalid.',
+    }, required = False)
+    
+    class Meta:
+        model = TaxesModel
+        exclude = ['id']
+
+class GetTaxSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The tax is required.',
+        'blank': 'The tax cannot be blank.',
+        'null': 'The tax cannot be blank.',
+        'invalid': 'The tax is invalid.',
+    })
+    
+    class Meta:
+        model = TaxesModel
+        fields = ['id']
+        
+#Product brands
+class ProductBrandsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductBrandsModel
+        fields = '__all__'
+
+class AddEditProductBrandSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(error_messages = {
+        'required': 'The name is required.',
+        'blank': 'The name cannot be blank.',
+        'null': 'The name cannot be blank.',
+        'max_length': 'The name cannot exceed 254 characters.',
+    }, allow_blank = False, allow_null = False)
+
+    status = serializers.BooleanField(error_messages = {
+        'required': 'The status is required.',
+        'blank': 'The status cannot be blank.',
+        'null': 'The status cannot be blank.',
+        'invalid': 'The status is invalid.',
+    }, required = False)
+    
+    class Meta:
+        model = ProductBrandsModel
+        exclude = ['id']
+
+class GetProductBrandSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The product brand is required.',
+        'blank': 'The product brand cannot be blank.',
+        'null': 'The product brand cannot be blank.',
+        'invalid': 'The product brand is invalid.',
+    })
+    
+    class Meta:
+        model = ProductBrandsModel
+        fields = ['id']
+        
+#Product categories
+class ProductCategoriesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductCategoriesModel
+        fields = '__all__'
+
+class AddEditProductCategorySerializer(serializers.ModelSerializer):
+    name = serializers.CharField(error_messages = {
+        'required': 'The name is required.',
+        'blank': 'The name cannot be blank.',
+        'null': 'The name cannot be blank.',
+        'max_length': 'The name cannot exceed 254 characters.',
+    }, allow_blank = False, allow_null = False)   
+
+    status = serializers.BooleanField(error_messages = {
+        'required': 'The status is required.',
+        'blank': 'The status cannot be blank.',
+        'null': 'The status cannot be blank.',
+        'invalid': 'The status is invalid.',
+    }, required = False)
+    
+    class Meta:
+        model = ProductCategoriesModel
+        exclude = ['id']
+
+class GetProductCategorySerializer(serializers.ModelSerializer):    
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The product category is required.',
+        'blank': 'The product category cannot be blank.',
+        'null': 'The product category cannot be blank.',
+        'invalid': 'The product category is invalid.',
+    })
+    
+    class Meta:
+        model = ProductCategoriesModel
         fields = ['id']

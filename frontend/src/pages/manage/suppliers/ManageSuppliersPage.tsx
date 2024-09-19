@@ -1,26 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { getCountSuppliers } from '../../services/suppliersService';
+import { getCountSuppliers } from '../../../services/suppliersService';
 import { Add01Icon, Delete02Icon, DistributionIcon, EyeIcon, PencilEdit02Icon } from 'hugeicons-react';
-import { AlertType } from '../../types/alert';
+import { AlertType } from '../../../types/alert';
 import { v4 as uuidv4 } from 'uuid';
-import useTranslations from '../../hooks/useTranslations';
-import DelayedSuspense from '../../components/DelayedSuspense';
-import SkeletonLoader from '../../components/SkeletonLoader';
-import Table from '../../components/Table';
-import Modal from '../../components/Modal';
-import TablePage from './suppliers/TablePage';
-import CrudPage from './suppliers/CrudPage';
+import useTranslations from '../../../hooks/useTranslations';
+import DelayedSuspense from '../../../components/DelayedSuspense';
+import SkeletonLoader from '../../../components/SkeletonLoader';
+import Table from '../../../components/Table';
+import Modal from '../../../components/Modal';
+import TablePage from './TablePage';
+import CrudPage from './CrudPage';
 
-interface ManageSuppliersProps {
+interface ManageSuppliersPageProps {
     addAlert: (alert: AlertType) => void;
 }
 
-const ManageSuppliersPage: React.FC<ManageSuppliersProps> = ({ addAlert }) => {
+const ManageSuppliersPage: React.FC<ManageSuppliersPageProps> = ({ addAlert }) => {
     const { translations } = useTranslations();
     const [selected, setSelected] = useState<number>(0);
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, details: false });
     const [reloadTable, setReloadTable] = useState(0);
-    const [countClients, setCountClients] = useState(0);
+    const [countData, setCountData] = useState(0);
 
     const handleTableReload = () => {
         setReloadTable(prev => prev + 1);
@@ -39,7 +39,7 @@ const ManageSuppliersPage: React.FC<ManageSuppliersProps> = ({ addAlert }) => {
     ];
 
     useEffect(() => {
-        const fetchCountClients = async () => {
+        const fetchCount = async () => {
             try {
                 const response = await getCountSuppliers();
                 const response_data = response.data;
@@ -49,13 +49,13 @@ const ManageSuppliersPage: React.FC<ManageSuppliersProps> = ({ addAlert }) => {
                     return;
                 }
 
-                setCountClients(response_data.resp.total);
+                setCountData(response_data.resp.total);
             } catch (error) {
-                addAlert({ id: uuidv4(), text: 'Error fetching count clients', type: 'danger', timeout: 3000 });
+                addAlert({ id: uuidv4(), text: 'Error fetching count', type: 'danger', timeout: 3000 });
             }
         };
 
-        fetchCountClients();
+        fetchCount();
     }, [reloadTable, addAlert]);
 
     return (
@@ -80,7 +80,7 @@ const ManageSuppliersPage: React.FC<ManageSuppliersProps> = ({ addAlert }) => {
                         </div>
                         <div>
                             <h2 className='text-sm u font-semibold text-gray-600 dark:text-slate-400'>Total</h2>
-                            <h3 className='text-lg font-bold dark:text-white'>{countClients}</h3>
+                            <h3 className='text-lg font-bold dark:text-white'>{countData}</h3>
                         </div>
                     </div>
                 </div>
@@ -90,25 +90,25 @@ const ManageSuppliersPage: React.FC<ManageSuppliersProps> = ({ addAlert }) => {
             </div>
             {isModalOpen.add && (
                 <Modal title={translations.add_supplier} onClose={() => toggleModal('add', false)}>
-                    <CrudPage addAlert={addAlert} type='add' supplier_id={selected} onClose={() => toggleModal('add', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                    <CrudPage addAlert={addAlert} type='add' selected_id={selected} onClose={() => toggleModal('add', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}
 
             {isModalOpen.edit && (
                 <Modal title={translations.edit_supplier} onClose={() => toggleModal('edit', false)}>
-                    <CrudPage addAlert={addAlert} type='edit' supplier_id={selected} onClose={() => toggleModal('edit', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                    <CrudPage addAlert={addAlert} type='edit' selected_id={selected} onClose={() => toggleModal('edit', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}
 
             {isModalOpen.delete && (
                 <Modal title={translations.delete_supplier_sure} onClose={() => toggleModal('delete', false)}>
-                    <CrudPage addAlert={addAlert} type='delete' supplier_id={selected} onClose={() => toggleModal('delete', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                    <CrudPage addAlert={addAlert} type='delete' selected_id={selected} onClose={() => toggleModal('delete', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}
 
             {isModalOpen.details && (
                 <Modal title={translations.details_supplier} onClose={() => toggleModal('details', false)}>
-                    <CrudPage addAlert={addAlert} type='details' supplier_id={selected} onClose={() => toggleModal('details', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                    <CrudPage addAlert={addAlert} type='details' selected_id={selected} onClose={() => toggleModal('details', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}          
         </DelayedSuspense>

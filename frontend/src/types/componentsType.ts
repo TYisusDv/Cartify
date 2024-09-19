@@ -4,4 +4,5 @@ export interface TableType {
 
 export interface SelectGroupType {
     query: string;
+    search: string;
 }

@@ -94,7 +94,7 @@ class AddressesModel(models.Model):
 
 class IdentificationPictures(models.Model):
     person = models.ForeignKey(PersonsModel, related_name = 'identification_pictures', on_delete = models.CASCADE)
-    image = models.ImageField(upload_to = upload_to_identifications, null = True, blank = True)
+    image = models.ImageField(upload_to = upload_to_identifications, null = True, blank = False)
 
     class Meta: 
         db_table = 'identification_pictures'
@@ -141,15 +141,60 @@ class ClientContactsModel(models.Model):
 class SuppliersModel(models.Model):
     id = models.AutoField(primary_key = True)
     company_name = models.CharField(max_length = 100, null = False, blank = False)
-    company_identification = models.CharField(max_length = 50, null = True, blank = True)
-    company_email = models.EmailField(null = True, blank = True)
-    company_phone = models.CharField(max_length = 20, null = True, blank = True)
-    company_phone_2 = models.CharField(max_length = 20, null = True, blank = True)
-    company_address = models.CharField(null = True, blank = True)
-    advisor_fullname = models.CharField(null = True, blank = True)
-    advisor_email = models.EmailField(null = True, blank = True)
-    advisor_phone = models.CharField(max_length = 20, null = True, blank = True)
-    advisor_phone_2 = models.CharField(max_length = 20, null = True, blank = True)
+    company_identification = models.CharField(max_length = 50, null = True, blank = False)
+    company_email = models.EmailField(null = True, blank = False)
+    company_phone = models.CharField(max_length = 20, null = True, blank = False)
+    company_phone_2 = models.CharField(max_length = 20, null = True, blank = False)
+    company_address = models.CharField(null = True, blank = False)
+    advisor_fullname = models.CharField(null = True, blank = False)
+    advisor_email = models.EmailField(null = True, blank = False)
+    advisor_phone = models.CharField(max_length = 20, null = True, blank = False)
+    advisor_phone_2 = models.CharField(max_length = 20, null = True, blank = False)
     
     class Meta: 
         db_table = 'suppliers'
+
+class ProductBrandsModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    name = models.CharField(null = False, blank = False)
+    status = models.BooleanField(default = True, null = False, blank = False)
+    
+    class Meta: 
+        db_table = 'product_brands'
+
+class ProductCategoriesModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    name = models.CharField(null = False, blank = False)
+    status = models.BooleanField(default = True, null = False, blank = False)
+    
+    class Meta: 
+        db_table = 'product_categories'
+
+class TaxesModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    name = models.CharField(null = False, blank = False)
+    value = models.FloatField(default = 0, null = False, blank = False)
+    status = models.BooleanField(default = True, null = False, blank = False)
+    
+    class Meta: 
+        db_table = 'taxes'
+
+class ProductsModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    barcode = models.CharField(max_length = 50, null = True, blank = False)
+    name = models.CharField(null = False, blank = False)
+    model = models.CharField(max_length = 50, null = True, blank = False)
+    note = models.CharField(max_length = 100, null = True, blank = False)
+    cost_price = models.FloatField(default = 0, null = False, blank = False)
+    cash_profit = models.FloatField(default = 0, null = False, blank = False)
+    cash_price = models.FloatField(default = 0, null = False, blank = False)
+    credit_price = models.FloatField(default = 0, null = False, blank = False)
+    credit_profit = models.FloatField(default = 0, null = False, blank = False)
+    min_stock = models.IntegerField(default = 0, null = False, blank = False)
+    category = models.ForeignKey(ProductCategoriesModel, null = True, blank = False, on_delete = models.RESTRICT)
+    brand = models.ForeignKey(ProductBrandsModel, null = True, blank = False, on_delete = models.RESTRICT)
+    supplier = models.ForeignKey(SuppliersModel, null = True, blank = False, on_delete = models.RESTRICT) 
+    tax = models.ForeignKey(TaxesModel, null = True, on_delete = models.RESTRICT)   
+    
+    class Meta: 
+        db_table = 'products'

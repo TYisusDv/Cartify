@@ -1,26 +1,26 @@
 import React, { useEffect, useState } from 'react';
+import { URL_BACKEND } from '../../../services/apiService';
 import { Add01Icon, Delete02Icon, EyeIcon, LocationUser04Icon, PencilEdit02Icon } from 'hugeicons-react';
-import { AlertType } from '../../types/alert';
+import { AlertType } from '../../../types/alert';
 import { v4 as uuidv4 } from 'uuid';
-import { getCountClients } from '../../services/clientsService';
-import useTranslations from '../../hooks/useTranslations';
-import DelayedSuspense from '../../components/DelayedSuspense';
-import SkeletonLoader from '../../components/SkeletonLoader';
-import Table from '../../components/Table';
-import Modal from '../../components/Modal';
-import ManageAddClientPage from './clients/manageAddClientPage';
-import ManageClientsTablePage from './clients/manageClientsTablePage';
-import ManageDeleteClientPage from './clients/manageDeleteClientPage';
-import { URL_BACKEND } from '../../services/apiService';
-import ManageDetailsClientPage from './clients/manageDetailsClientPage';
-import ManageEditClientPage from './clients/manageEditClientPage';
-import ModalPhotos from '../../components/ModalPhotos';
+import { getCountClients } from '../../../services/clientsService';
+import useTranslations from '../../../hooks/useTranslations';
+import DelayedSuspense from '../../../components/DelayedSuspense';
+import SkeletonLoader from '../../../components/SkeletonLoader';
+import Table from '../../../components/Table';
+import Modal from '../../../components/Modal';
+import ManageAddClientPage from './manageAddClientPage';
+import ManageClientsTablePage from './manageClientsTablePage';
+import ManageDeleteClientPage from './manageDeleteClientPage';
+import ManageDetailsClientPage from './manageDetailsClientPage';
+import ManageEditClientPage from './manageEditClientPage';
+import ModalPhotos from '../../../components/ModalPhotos';
 
-interface ManageClientsProps {
+interface ManageClientsPageProps {
     addAlert: (alert: AlertType) => void;
 }
 
-const ManageClientsPage: React.FC<ManageClientsProps> = ({ addAlert }) => {
+const ManageClientsPage: React.FC<ManageClientsPageProps> = ({ addAlert }) => {
     const { translations } = useTranslations();
     const [selected, setSelected] = useState<number>(0);
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, profile_picture: false, details: false });

@@ -1,11 +1,12 @@
 import React, { Suspense, useState } from 'react';
 import { Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
 import { AlertType } from '../types/alert';
-import { Analytics02Icon, BarCode02Icon, DashboardSquare01Icon, DistributionIcon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, UserGroupIcon } from 'hugeicons-react';
+import { Analytics02Icon, BarCode02Icon, BrandfetchIcon, DashboardSquare01Icon, DistributionIcon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserGroupIcon } from 'hugeicons-react';
 import useTranslations from '../hooks/useTranslations';
 import SkeletonLoader from '../components/SkeletonLoader';
 import ErrorPage from './errorPage';
 import Modal from '../components/Modal';
+import DropdownMenu from '../components/DropdownMenu';
 
 interface PanelPageProps {
   addAlert: (alert: AlertType) => void;
@@ -14,10 +15,13 @@ interface PanelPageProps {
 const HomePage = React.lazy(() => import('../pages/homePage'));
 const AuthLogoutPage = React.lazy(() => import('../pages/auth/authLogoutPage'));
 const ManageUsersPage = React.lazy(() => import('./manage/manageUsersPage'));
-const ManageClientsPage = React.lazy(() => import('./manage/manageClientsPage'));
-const ManageSuppliersPage = React.lazy(() => import('./manage/manageSuppliersPage'));
+const ManageClientsPage = React.lazy(() => import('./manage/clients/manageClientsPage'));
+const ManageTaxesPage = React.lazy(() => import('./manage/taxes/ManageTaxesPage'));
+const ManageSuppliersPage = React.lazy(() => import('./manage/suppliers/ManageSuppliersPage'));
+const ManageProductsPage = React.lazy(() => import('./manage/product/ManageProductsPage'));
+const ManageProductBrandsPage = React.lazy(() => import('./manage/product/brands/ManageProductBrandsPage'));
+const ManageProductCategoriesPage = React.lazy(() => import('./manage/product/categories/ManageProductCategoriesPage'));
 const SettingGeneralPage = React.lazy(() => import('../pages/settings/settingGeneralPage'));
-
 
 const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
   const { translations } = useTranslations();
@@ -60,7 +64,14 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
           <li><Link to='/manage/users' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/users')}`}><UserGroupIcon />  {translations.users}</Link></li>
           <li><Link to='/manage/clients' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/clients')}`}><LocationUser04Icon />  {translations.clients}</Link></li>
           <li><Link to='/manage/locations' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/locations')}`}><StoreLocation02Icon />  {translations.locations}</Link></li>
-          <li><Link to='/manage/products' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/products')}`}><BarCode02Icon />  {translations.products}</Link></li>
+          <li><Link to='/manage/taxes' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/taxes')}`}><TaxesIcon />  {translations.taxes}</Link></li>
+          <li>           
+            <DropdownMenu label={translations.products} icon={<BarCode02Icon className='w-7' />}>
+                <li><Link to='/manage/products' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/products')}`}><BarCode02Icon size={20} /> {translations.products}</Link></li>
+                <li><Link to='/manage/product/brands' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/product/brands')}`}><BrandfetchIcon size={20} /> {translations.brands}</Link></li>
+                <li><Link to='/manage/product/categories' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/product/categories')}`}><Layers01Icon size={20} /> {translations.categories}</Link></li>
+            </DropdownMenu>
+          </li>
           <li><Link to='/manage/suppliers' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/suppliers')}`}><DistributionIcon />  {translations.suppliers}</Link></li>
           <li><Link to='/manage/sales' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/sales')}`}><ShoppingBasketSecure03Icon />  {translations.sales}</Link></li>
         </ul>
@@ -82,7 +93,11 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
             <Route path='/home' element={<HomePage />} />
             <Route path='/manage/users' element={<ManageUsersPage />} />
             <Route path='/manage/clients' element={<ManageClientsPage addAlert={addAlert} />} />
+            <Route path='/manage/taxes' element={<ManageTaxesPage addAlert={addAlert} />} />
             <Route path='/manage/suppliers' element={<ManageSuppliersPage addAlert={addAlert} />} />
+            <Route path='/manage/products' element={<ManageProductsPage addAlert={addAlert} />} />
+            <Route path='/manage/product/brands' element={<ManageProductBrandsPage addAlert={addAlert} />} />
+            <Route path='/manage/product/categories' element={<ManageProductCategoriesPage addAlert={addAlert} />} />
             <Route path='/auth/logout' element={<AuthLogoutPage />} />
             <Route path='*' element={<ErrorPage code={404} detail={translations.error_404} />} />
           </Routes>

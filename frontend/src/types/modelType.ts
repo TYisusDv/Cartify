@@ -107,3 +107,44 @@ export interface Supplier {
     advisor_phone?: string;
     advisor_phone_2?: string;
 }
+
+//Product brand
+export interface ProductBrand {
+    id?: number;
+    name?: string;
+    status?: boolean | '0' | '1';
+}
+
+//Product category
+export interface ProductCategory {
+    id?: number;
+    name?: string;
+    status?: boolean | '0' | '1';
+}
+
+//Tax
+export interface Tax {
+    id?: number;
+    name?: string;
+    value?: number;
+    status?: boolean | '0' | '1';
+}
+
+//Product
+export interface Product {
+    id?: number;
+    barcode?: string;
+    name?: string;
+    model?: string;
+    note?: string;
+    cost_price?: number;
+    cash_profit?: number;
+    cash_price?: number;
+    credit_profit?: number;
+    credit_price?: number;
+    min_stock?: number;
+    category?: ProductCategory;
+    brand?: ProductBrand;
+    supplier?: Supplier;
+    tax?: Tax;
+}

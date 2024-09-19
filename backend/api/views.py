@@ -14,6 +14,7 @@ from .serializers import *
 from .models import *
 from .utils import *
 
+#Login
 class LoginAPIView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
@@ -53,6 +54,7 @@ class LoginAPIView(APIView):
             }
         })
 
+#Auth refresh
 class AuthRefreshAPIView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
@@ -71,108 +73,135 @@ class AuthRefreshAPIView(APIView):
             }
         })
 
+#Countries
 class ManageCountriesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
   
     def get(self, request):
         query = request.query_params.get('query', None)
+        search = request.query_params.get('search', '')
+        
         if query == 'list':
-            search_query = request.query_params.get('search', '')
-
-            results = CountriesModel.objects.filter(
-                Q(id__icontains = search_query)
-            )
-            serialized = CountriesSerializer(results, many = True)
+            model = CountriesModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = CountriesSerializer(model, many = True)
             
             return JsonResponse({
                 'success': True,
                 'resp': serialized.data
             })
 
+#States
 class ManageStatesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
   
     def get(self, request):
         query = request.query_params.get('query', None)
+        search = request.query_params.get('search', '')
+        
         if query == 'list':
-            search_query = request.query_params.get('search', '')
-
-            results = StatesModel.objects.filter(
-                Q(name__icontains = search_query)
-            )
-            serialized = StatesSerializer(results, many = True)
+            model = StatesModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = StatesSerializer(model, many = True)
             
             return JsonResponse({
                 'success': True,
                 'resp': serialized.data
             })
-    
+
+#Cities
 class ManageCitiesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
   
     def get(self, request):
         query = request.query_params.get('query', None)
+        search = request.query_params.get('search', '')
+        
         if query == 'list':
-            search_query = request.query_params.get('search', '')
-
-            results = CitiesModel.objects.filter(
-                Q(name__icontains = search_query)
-            )
-            serialized = CitiesSerializer(results, many = True)
+            model = CitiesModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = CitiesSerializer(model, many = True)
             
             return JsonResponse({
                 'success': True,
                 'resp': serialized.data
             })
 
+#Locations
 class ManageLocationsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
   
     def get(self, request):
         query = request.query_params.get('query', None)
+        search = request.query_params.get('search', '')
+        
         if query == 'list':
-            results = LocationsModel.objects.filter(status = True)
-            serialized = LocationsSerializer(results, many = True)
+            model = LocationsModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search),
+                status = True
+            )[:10]
+            serialized = LocationsSerializer(model, many = True)
             
             return JsonResponse({
                 'success': True,
                 'resp': serialized.data
             })
 
+#Types ids
 class ManageTypesIdsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
   
     def get(self, request):
         query = request.query_params.get('query', None)
-        if query == 'list':
-            results = TypesIdsModel.objects.filter(status = True)
-            serialized = TypesIdsSerializer(results, many = True)
-            
-            return JsonResponse({
-                'success': True,
-                'resp': serialized.data
-            })
+        search = request.query_params.get('search', '')
         
-class ManageClientTypesAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-  
-    def get(self, request):
-        query = request.query_params.get('query', None)
         if query == 'list':
-            results = ClientTypesModel.objects.filter()
-            serialized = ClientTypesSerializer(results, many = True)
+            model = TypesIdsModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search),
+                status = True
+            )[:10]
+            serialized = TypesIdsSerializer(model, many = True)
             
             return JsonResponse({
                 'success': True,
                 'resp': serialized.data
             })
 
+#Client types    
+class ManageClientTypesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+  
+    def get(self, request):
+        query = request.query_params.get('query', None)
+        search = request.query_params.get('search', '')
+        
+        if query == 'list':
+            model = ClientTypesModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = ClientTypesSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+
+#Clients
 class ManageClientsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -185,18 +214,18 @@ class ManageClientsAPIView(APIView):
         
     def get(self, request):
         query = request.query_params.get('query', None)
-        if query == 'table':
-            search_query = request.query_params.get('search', '')
-            page_number = request.query_params.get('page', 1)
-            order_by = request.query_params.get('order_by', 'id')
-            order = request.query_params.get('order', 'desc')
-            show = request.query_params.get('show', 10)
-            
+        search = request.query_params.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+        
+        if query == 'table':           
             if order_by == 'actions':
                 order_by = 'id'
 
             model = ClientsModel.objects.filter(
-                Q(id__icontains = search_query)
+                Q(id__icontains = search)
             ).select_related('person').prefetch_related('person__addresses')
 
             if order == 'desc':
@@ -469,21 +498,28 @@ class ManageClientsAPIView(APIView):
                     'resp': 'Client not found.'
                 }, status = 404)
 
+#Product contact types
 class ManageContactTypesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
   
     def get(self, request):
         query = request.query_params.get('query', None)
+        search = request.query_params.get('search', '')
+        
         if query == 'list':
-            results = ContactTypesModel.objects.filter()
-            serialized = ContactTypesSerializer(results, many = True)
+            model = ContactTypesModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = ContactTypesSerializer(model, many = True)
             
             return JsonResponse({
                 'success': True,
                 'resp': serialized.data
             })
 
+#Suppliers
 class ManageSuppliersAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -497,19 +533,18 @@ class ManageSuppliersAPIView(APIView):
     def get(self, request):
         data = request.query_params
         query = data.get('query', None)
+        search = request.query_params.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
 
-        if query == 'table':
-            search_query = request.query_params.get('search', '')
-            page_number = request.query_params.get('page', 1)
-            order_by = request.query_params.get('order_by', 'id')
-            order = request.query_params.get('order', 'desc')
-            show = request.query_params.get('show', 10)
-            
+        if query == 'table':           
             if order_by == 'actions':
                 order_by = 'id'
 
             model = SuppliersModel.objects.filter(
-                Q(id__icontains = search_query)
+                Q(id__icontains = search)
             )
 
             if order == 'desc':
@@ -545,6 +580,18 @@ class ManageSuppliersAPIView(APIView):
                 'success': True,
                 'resp': supplier_serialized.data
             }) 
+        
+        elif query == 'list':
+            model = SuppliersModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(company_name__icontains = search)
+            )[:10]
+            serialized = SuppliersSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
         
         elif query == 'count':
             total = SuppliersModel.objects.count()            
@@ -608,6 +655,435 @@ class ManageSuppliersAPIView(APIView):
                 
         supplier_instance = self.get_object(pk = supplier_id)           
         supplier_instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
+
+#Taxes
+class ManageTaxesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self, pk) :
+        try:
+            return TaxesModel.objects.get(pk = pk)
+        except TaxesModel.DoesNotExist:
+            raise Http404('Tax not found.')
+
+    def get(self, request):
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':
+            if order_by == 'actions':
+                order_by = 'id'
+
+            model = TaxesModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = TaxesSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            tax_id = data.get('id', None)
+
+            tax_serializer = GetTaxSerializer(data = data)  
+            if not tax_serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': tax_serializer.errors
+                }, status = 400)    
+                    
+            tax_instance = self.get_object(pk = tax_id)
+            tax_serialized = TaxesSerializer(tax_instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': tax_serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = TaxesModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search),
+                status = True
+            )[:10]
+            serialized = TaxesSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = TaxesModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+
+        tax_serializer = AddEditTaxSerializer(data = data)
+        if not tax_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': tax_serializer.errors}, status = 400)
+
+        tax_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        tax_id = data.get('id', None)
+
+        tax_serializer = GetTaxSerializer(data = data)  
+        if not tax_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': tax_serializer.errors
+            }, status = 400)    
+                
+        tax_instance = self.get_object(pk = tax_id)     
+
+        tax_serializer = AddEditTaxSerializer(tax_instance, data = data)
+        if not tax_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': tax_serializer.errors}, status = 400)
+
+        tax_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        tax_id = data.get('id', None)
+
+        tax_serializer = GetTaxSerializer(data = data)  
+        if not tax_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': tax_serializer.errors
+            }, status = 400)    
+                
+        tax_instance = self.get_object(pk = tax_id)           
+        tax_instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
+
+#Product brands
+class ManageProductBrandsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self, pk) :
+        try:
+            return ProductBrandsModel.objects.get(pk = pk)
+        except ProductBrandsModel.DoesNotExist:
+            raise Http404('Product brand not found.')
+
+    def get(self, request):
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':
+            if order_by == 'actions':
+                order_by = 'id'
+
+            model = ProductBrandsModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = ProductBrandsSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            product_brand_id = data.get('id', None)
+
+            product_brand_serializer = GetProductBrandSerializer(data = data)  
+            if not product_brand_serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': product_brand_serializer.errors
+                }, status = 400)    
+                    
+            product_brand_instance = self.get_object(pk = product_brand_id)
+            product_brand_serialized = ProductBrandsSerializer(product_brand_instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': product_brand_serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = ProductBrandsModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search),
+                status = True
+            )[:10]
+            serialized = ProductBrandsSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = ProductBrandsModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+
+        product_brand_serializer = AddEditProductBrandSerializer(data = data)
+        if not product_brand_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': product_brand_serializer.errors}, status = 400)
+
+        product_brand_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        product_brand_id = data.get('id', None)
+
+        product_brand_serializer = GetProductBrandSerializer(data = data)  
+        if not product_brand_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': product_brand_serializer.errors
+            }, status = 400)    
+                
+        product_brand_instance = self.get_object(pk = product_brand_id)     
+
+        product_brand_serializer = AddEditProductBrandSerializer(product_brand_instance, data = data)
+        if not product_brand_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': product_brand_serializer.errors}, status = 400)
+
+        product_brand_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        product_brand_id = data.get('id', None)
+
+        product_brand_serializer = GetProductBrandSerializer(data = data)  
+        if not product_brand_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': product_brand_serializer.errors
+            }, status = 400)    
+                
+        product_brand_instance = self.get_object(pk = product_brand_id)           
+        product_brand_instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
+
+#Product categories
+class ManageProductCategoriesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self, pk) :
+        try:
+            return ProductCategoriesModel.objects.get(pk = pk)
+        except ProductCategoriesModel.DoesNotExist:
+            raise Http404('Product category not found.')
+
+    def get(self, request):
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':           
+            if order_by == 'actions':
+                order_by = 'id'
+
+            model = ProductCategoriesModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = ProductCategoriesSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            product_category_id = data.get('id', None)
+
+            product_category_serializer = GetProductCategorySerializer(data = data)  
+            if not product_category_serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': product_category_serializer.errors
+                }, status = 400)    
+                    
+            product_category_instance = self.get_object(pk = product_category_id)
+            product_category_serialized = ProductCategoriesSerializer(product_category_instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': product_category_serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = ProductCategoriesModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search),
+                status = True
+            )[:10]
+            serialized = ProductCategoriesSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = ProductCategoriesModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+
+        product_category_serializer = AddEditProductCategorySerializer(data = data)
+        if not product_category_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': product_category_serializer.errors}, status = 400)
+
+        product_category_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        product_category_id = data.get('id', None)
+
+        product_category_serializer = GetProductCategorySerializer(data = data)  
+        if not product_category_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': product_category_serializer.errors
+            }, status = 400)    
+                
+        product_category_instance = self.get_object(pk = product_category_id)     
+
+        product_category_serializer = AddEditProductCategorySerializer(product_category_instance, data = data)
+        if not product_category_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': product_category_serializer.errors}, status = 400)
+
+        product_category_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        product_category_id = data.get('id', None)
+
+        product_category_serializer = GetProductCategorySerializer(data = data)  
+        if not product_category_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': product_category_serializer.errors
+            }, status = 400)    
+                
+        product_category_instance = self.get_object(pk = product_category_id)           
+        product_category_instance.delete()
         
         return JsonResponse({
             'success': True,
