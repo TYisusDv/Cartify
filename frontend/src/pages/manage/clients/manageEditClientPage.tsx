@@ -241,7 +241,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.identification_id'
                                     label={translations.identification_id}
                                     icon={<UserIdVerificationIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     value={formValues.person?.identification_id || ''}
                                 />
                             </div>
@@ -253,7 +253,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.alias'
                                     label={translations.alias}
                                     icon={<UserQuestion02Icon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.person?.alias || ''}
                                 />
@@ -264,7 +264,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.occupation'
                                     label={translations.occupation}
                                     icon={<JobSearchIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.person?.occupation || ''}
                                 />
@@ -277,7 +277,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.firstname'
                                     label={translations.firstname}
                                     icon={<UserCircleIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     value={formValues.person?.firstname || ''}
                                 />
                             </div>
@@ -287,7 +287,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.middlename'
                                     label={translations.middlename}
                                     icon={<UserCircleIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.person?.middlename || ''}
                                 />
@@ -300,7 +300,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.lastname'
                                     label={translations.lastname}
                                     icon={<UserAccountIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     value={formValues.person?.lastname || ''}
                                 />
                             </div>
@@ -310,7 +310,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.second_lastname'
                                     label={translations.second_lastname}
                                     icon={<UserAccountIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.person?.second_lastname || ''}
                                 />
@@ -321,7 +321,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                             name='email'
                             label={translations.email}
                             icon={<Mail01Icon className='icon' size={24} />}
-                            onChange={handleChange(setFormValues)}
+                            onChange={handleChange({ setFormValues })}
                             required={false}
                             value={formValues.email || ''}
                         />
@@ -332,7 +332,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.mobile'
                                     label={translations.mobile_number}
                                     icon={<SmartPhone01Icon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.person?.mobile || ''}
                                 />
@@ -343,7 +343,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.phone'
                                     label={translations.phone_number}
                                     icon={<TelephoneIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.person?.phone || ''}
                                 />
@@ -367,7 +367,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.addresses[0].city.state.name'
                                     label={translations.address_state}
                                     icon={<MapsLocation01Icon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     endpoint='manage/states'
                                     value={formValues.person?.addresses?.[0]?.city?.state?.name} 
                                 />
@@ -380,7 +380,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.addresses[0].street'
                                     label={translations.street}
                                     icon={<RoadLocation01Icon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     value={formValues.person?.addresses?.[0]?.street} 
                                 />
                             </div>
@@ -390,7 +390,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.addresses[0].area'
                                     label={translations.address_area}
                                     icon={<MosqueLocationIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.person?.addresses?.[0]?.area} 
                                 />
@@ -401,7 +401,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.addresses[0].city.name'
                                     label={translations.address_city}
                                     icon={<Location01Icon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     endpoint='manage/cities'
                                     value={formValues.person?.addresses?.[0]?.city?.name} 
                                 />
@@ -417,7 +417,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='person.birthdate'
                                     label={translations.birthdate}
                                     icon={<Calendar01Icon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.person?.birthdate || ''}
                                 />
@@ -428,7 +428,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                     name='note'
                                     label={translations.note}
                                     icon={<Note04Icon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.note || ''}
                                 />
@@ -522,11 +522,11 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                             <h3 className='text-sm font-semibold dark:text-gray-100 pl-1'>{translations.allow_credit} <span className='text-red-500'>*</span></h3>
                             <div className='flex items-center gap-3'>
                                 <div className='flex items-center'>
-                                    <input id='allow_credit_1' type='radio' value='1' name='allow_credit' onChange={handleChange(setFormValues)} className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' checked={formValues.allow_credit === true || formValues.allow_credit === '1'} />
+                                    <input id='allow_credit_1' type='radio' value='1' name='allow_credit' onChange={handleChange({ setFormValues })} className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' checked={formValues.allow_credit === true || formValues.allow_credit === '1'} />
                                     <label htmlFor='allow_credit_1' className='ms-2 text-sm font-medium text-gray-900 dark:text-gray-300'>Si</label>
                                 </div>
                                 <div className='flex items-center'>
-                                    <input id='allow_credit_2' type='radio' value='0' name='allow_credit' onChange={handleChange(setFormValues)} className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' checked={formValues.allow_credit === false || formValues.allow_credit === '0'} />
+                                    <input id='allow_credit_2' type='radio' value='0' name='allow_credit' onChange={handleChange({ setFormValues })} className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' checked={formValues.allow_credit === false || formValues.allow_credit === '0'} />
                                     <label htmlFor='allow_credit_1' className='ms-2 text-sm font-medium text-gray-900 dark:text-gray-300'>No</label>
                                 </div>
                             </div>
@@ -604,7 +604,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                         name='relationship'
                                         label={translations.relationship}
                                         icon={<UserQuestion02Icon className='icon' size={24} />}
-                                        onChange={handleChange(setFormContactValues)}
+                                        onChange={handleChange({ setFormValues: setFormContactValues })}
                                         required={true}
                                     />
                                 </div>
@@ -614,7 +614,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                         name='fullname'
                                         label={translations.fullname}
                                         icon={<UserCircleIcon className='icon' size={24} />}
-                                        onChange={handleChange(setFormContactValues)}
+                                        onChange={handleChange({ setFormValues: setFormContactValues })}
                                         required={true}
                                     />
                                 </div>
@@ -626,7 +626,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                         name='phone'
                                         label={translations.phone_number}
                                         icon={<TelephoneIcon className='icon' size={24} />}
-                                        onChange={handleChange(setFormContactValues)}
+                                        onChange={handleChange({ setFormValues: setFormContactValues })}
                                         required={true}
                                     />
                                 </div>
@@ -636,7 +636,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                         name='address'
                                         label={translations.street}
                                         icon={<RoadLocation01Icon className='icon' size={24} />}
-                                        onChange={handleChange(setFormContactValues)}
+                                        onChange={handleChange({ setFormValues: setFormContactValues })}
                                         required={true}
                                     />
                                 </div>

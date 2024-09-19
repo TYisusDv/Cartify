@@ -64,7 +64,7 @@ const ManageUsersPage: React.FC = () => {
                                 name='search'
                                 label='Search' 
                                 icon={<Search01Icon className='icon' size={20} />} 
-                                onChange={handleChange(setFormValues)} 
+                                onChange={handleChange({ setFormValues })} 
                             />
                         </div>
                     </div>

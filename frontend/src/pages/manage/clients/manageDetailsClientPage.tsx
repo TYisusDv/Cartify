@@ -73,7 +73,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                         name='location_name'
                         label={translations.location}
                         icon={<UserIdVerificationIcon className='icon' size={24} />}
-                        onChange={handleChange(setFormValues)}
+                        onChange={handleChange({ setFormValues })}
                         value={formValues.location?.name || ''}
                         required={false}
                         disabled={true}
@@ -85,7 +85,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='identification_type'
                                 label={translations.identification_type}
                                 icon={<UserIdVerificationIcon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.type?.name || ''}
                                 required={false}
                                 disabled={true}
@@ -97,7 +97,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='identification_id'
                                 label={translations.identification_id}
                                 icon={<UserIdVerificationIcon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.identification_id || ''}
                                 required={false}
                                 disabled={true}
@@ -111,7 +111,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='alias'
                                 label={translations.alias}
                                 icon={<UserQuestion02Icon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.alias || ''}
                                 required={false}
                                 disabled={true}
@@ -123,7 +123,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='occupation'
                                 label={translations.occupation}
                                 icon={<JobSearchIcon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.occupation || ''}
                                 required={false}
                                 disabled={true}
@@ -137,7 +137,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='firstname'
                                 label={translations.firstname}
                                 icon={<UserCircleIcon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.firstname || ''}
                                 required={false}
                                 disabled={true}
@@ -149,7 +149,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='middlename'
                                 label={translations.middlename}
                                 icon={<UserCircleIcon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.middlename || ''}
                                 required={false}
                                 disabled={true}
@@ -163,7 +163,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='lastname'
                                 label={translations.lastname}
                                 icon={<UserAccountIcon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.lastname || ''}
                                 required={false}
                                 disabled={true}
@@ -175,7 +175,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='second_lastname'
                                 label={translations.second_lastname}
                                 icon={<UserAccountIcon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.second_lastname || ''}
                                 required={false}
                                 disabled={true}
@@ -187,7 +187,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                         name='email'
                         label={translations.email}
                         icon={<Mail01Icon className='icon' size={24} />}
-                        onChange={handleChange(setFormValues)}
+                        onChange={handleChange({ setFormValues })}
                         value={formValues.email || ''}
                         required={false}
                         disabled={true}
@@ -199,7 +199,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='mobile'
                                 label={translations.mobile_number}
                                 icon={<SmartPhone01Icon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.mobile || ''}
                                 required={false}
                                 disabled={true}
@@ -211,7 +211,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='phone'
                                 label={translations.phone_number}
                                 icon={<TelephoneIcon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.phone || ''}
                                 required={false}
                                 disabled={true}
@@ -226,7 +226,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='country'
                                 label={translations.country}
                                 icon={<TelephoneIcon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.addresses?.[0]?.city?.state?.country?.name}  
                                 required={false}
                                 disabled={true}
@@ -238,7 +238,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='address_state'
                                 label={translations.address_state}
                                 icon={<MosqueLocationIcon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.addresses?.[0]?.city?.state?.name} 
                                 required={false}
                                 disabled={true}
@@ -252,7 +252,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='street'
                                 label={translations.street}
                                 icon={<RoadLocation01Icon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.addresses?.[0]?.street} 
                                 required={false}
                                 disabled={true}
@@ -264,7 +264,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='area'
                                 label={translations.address_area}
                                 icon={<MosqueLocationIcon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.addresses?.[0]?.area} 
                                 required={false}
                                 disabled={true}
@@ -276,7 +276,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='address_city'
                                 label={translations.address_city}
                                 icon={<MosqueLocationIcon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.addresses?.[0]?.city?.name} 
                                 required={false}
                                 disabled={true}
@@ -292,7 +292,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='birthdate'
                                 label={translations.birthdate}
                                 icon={<Calendar01Icon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.person?.birthdate || ''}
                                 required={false}
                                 disabled={true}
@@ -304,7 +304,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                                 name='note'
                                 label={translations.note}
                                 icon={<Note04Icon className='icon' size={24} />}
-                                onChange={handleChange(setFormValues)}
+                                onChange={handleChange({ setFormValues })}
                                 value={formValues.note || ''}
                                 required={false}
                                 disabled={true}
@@ -316,7 +316,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                         name='class_client'
                         label={translations.class_client}
                         icon={<Note04Icon className='icon' size={24} />}
-                        onChange={handleChange(setFormValues)}
+                        onChange={handleChange({ setFormValues })}
                         value={formValues.type?.name || ''}
                         required={false}
                         disabled={true}
@@ -325,11 +325,11 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                         <h3 className='text-sm font-semibold dark:text-gray-100 pl-1'>{translations.allow_credit}</h3>
                         <div className='flex items-center gap-3'>
                             <div className='flex items-center'>
-                                <input id='allow_credit_1' type='radio' value='1' name='allow_credit' onChange={handleChange(setFormValues)} disabled className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' checked={formValues.allow_credit === true || formValues.allow_credit === '1'} />
+                                <input id='allow_credit_1' type='radio' value='1' name='allow_credit' onChange={handleChange({ setFormValues })} disabled className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' checked={formValues.allow_credit === true || formValues.allow_credit === '1'} />
                                 <label htmlFor='allow_credit_1' className='ms-2 text-sm font-medium text-gray-900 dark:text-gray-300'>Si</label>
                             </div>
                             <div className='flex items-center'>
-                                <input id='allow_credit_2' type='radio' value='0' name='allow_credit' onChange={handleChange(setFormValues)} disabled className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' checked={formValues.allow_credit === false || formValues.allow_credit === '0'} />
+                                <input id='allow_credit_2' type='radio' value='0' name='allow_credit' onChange={handleChange({ setFormValues })} disabled className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600' checked={formValues.allow_credit === false || formValues.allow_credit === '0'} />
                                 <label htmlFor='allow_credit_1' className='ms-2 text-sm font-medium text-gray-900 dark:text-gray-300'>No</label>
                             </div>
                         </div>

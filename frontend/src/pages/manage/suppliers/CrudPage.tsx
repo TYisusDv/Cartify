@@ -102,7 +102,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     name='company_name'
                                     label={translations.name}
                                     icon={<UserCircleIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     value={formValues.company_name || ''}
                                     color={colorPage}
                                     disabled={type === 'details' || type === 'delete' ? true : false}
@@ -114,7 +114,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     name='company_identification'
                                     label='NIT'
                                     icon={<UserIdVerificationIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.company_identification || ''}
                                     color={colorPage}
@@ -127,7 +127,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             name='company_email'
                             label={translations.email}
                             icon={<Mail01Icon className='icon' size={24} />}
-                            onChange={handleChange(setFormValues)}
+                            onChange={handleChange({ setFormValues })}
                             required={false}
                             value={formValues.company_email || ''}
                             color={colorPage}
@@ -140,7 +140,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     name='company_phone'
                                     label={`${translations.phone_number} #1`}
                                     icon={<SmartPhone01Icon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.company_phone || ''}
                                     color={colorPage}
@@ -153,7 +153,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     name='company_phone_2'
                                     label={`${translations.phone_number} #2`}
                                     icon={<TelephoneIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.company_phone_2 || ''}
                                     color={colorPage}
@@ -166,7 +166,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             name='company_address'
                             label={translations.street}
                             icon={<RoadLocation01Icon className='icon' size={24} />}
-                            onChange={handleChange(setFormValues)}
+                            onChange={handleChange({ setFormValues })}
                             required={false}
                             value={formValues.company_address || ''}
                             color={colorPage}
@@ -179,7 +179,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             name='advisor_fullname'
                             label={translations.name}
                             icon={<UserCircleIcon className='icon' size={24} />}
-                            onChange={handleChange(setFormValues)}
+                            onChange={handleChange({ setFormValues })}
                             required={false}
                             value={formValues.advisor_fullname || ''}
                             color={colorPage}
@@ -190,7 +190,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             name='advisor_email'
                             label={translations.email}
                             icon={<Mail01Icon className='icon' size={24} />}
-                            onChange={handleChange(setFormValues)}
+                            onChange={handleChange({ setFormValues })}
                             required={false}
                             value={formValues.advisor_email || ''}
                             color={colorPage}
@@ -203,7 +203,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     name='advisor_phone'
                                     label={`${translations.phone_number} #1`}
                                     icon={<SmartPhone01Icon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.advisor_phone || ''}
                                     color={colorPage}
@@ -216,7 +216,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     name='advisor_phone_2'
                                     label={`${translations.phone_number} #2`}
                                     icon={<TelephoneIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.advisor_phone_2 || ''}
                                     color={colorPage}

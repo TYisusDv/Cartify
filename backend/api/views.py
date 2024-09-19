@@ -1089,3 +1089,146 @@ class ManageProductCategoriesAPIView(APIView):
             'success': True,
             'resp': 'Deleted successfully.'
         }, status = 200)
+
+#Products
+class ManageProductsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self, pk) :
+        try:
+            return ProductsModel.objects.get(pk = pk)
+        except ProductsModel.DoesNotExist:
+            raise Http404('Product not found.')
+
+    def get(self, request):
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':           
+            if order_by == 'actions':
+                order_by = 'id'
+
+            model = ProductsModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = ProductsSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            product_id = data.get('id', None)
+
+            product_serializer = GetProductSerializer(data = data)  
+            if not product_serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': product_serializer.errors
+                }, status = 400)    
+                    
+            product_instance = self.get_object(pk = product_id)
+            product_serialized = ProductsSerializer(product_instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': product_serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = ProductsModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search),
+                status = True
+            )[:10]
+            serialized = ProductsSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = ProductsModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+
+        product_serializer = AddEditProductSerializer(data = data)
+        if not product_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': product_serializer.errors}, status = 400)
+
+        product_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        product_id = data.get('id', None)
+
+        product_serializer = GetProductSerializer(data = data)  
+        if not product_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': product_serializer.errors
+            }, status = 400)    
+                
+        product_instance = self.get_object(pk = product_id)     
+
+        product_serializer = AddEditProductSerializer(product_instance, data = data)
+        if not product_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': product_serializer.errors}, status = 400)
+
+        product_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        product_id = data.get('id', None)
+
+        product_serializer = GetProductSerializer(data = data)  
+        if not product_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': product_serializer.errors
+            }, status = 400)    
+                
+        product_instance = self.get_object(pk = product_id)           
+        product_instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)

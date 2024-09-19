@@ -80,7 +80,7 @@ const ManageDeleteClientPage: React.FC<ManageDeleteClientProps> = ({ addAlert, c
                     name='identification_id'
                     label={translations.identification_id}
                     icon={<UserIdVerificationIcon className='icon' size={24} />}
-                    onChange={handleChange(setFormValues)}
+                    onChange={handleChange({ setFormValues })}
                     value={formValues.person?.identification_id || ''}
                     disabled={true}
                 />
@@ -91,7 +91,7 @@ const ManageDeleteClientPage: React.FC<ManageDeleteClientProps> = ({ addAlert, c
                             name='firstname'
                             label={translations.firstname}
                             icon={<UserCircleIcon className='icon' size={24} />}
-                            onChange={handleChange(setFormValues)}
+                            onChange={handleChange({ setFormValues })}
                             value={formValues.person?.firstname || ''}
                             disabled={true}
                         />
@@ -102,7 +102,7 @@ const ManageDeleteClientPage: React.FC<ManageDeleteClientProps> = ({ addAlert, c
                             name='lastname'
                             label={translations.lastname}
                             icon={<UserAccountIcon className='icon' size={24} />}
-                            onChange={handleChange(setFormValues)}
+                            onChange={handleChange({ setFormValues })}
                             value={formValues.person?.lastname || ''}
                             disabled={true}
                         />

@@ -18,4 +18,5 @@ urlpatterns = [
     path('manage/taxes', ManageTaxesAPIView.as_view(), name='manage-taxes'),
     path('manage/product/brands', ManageProductBrandsAPIView.as_view(), name='manage-product-brands'),
     path('manage/product/categories', ManageProductCategoriesAPIView.as_view(), name='manage-product-categories'),
+    path('manage/products', ManageProductsAPIView.as_view(), name='manage-products'),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

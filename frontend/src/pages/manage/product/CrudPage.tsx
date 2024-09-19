@@ -3,8 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { AlertType } from '../../../types/alert';
 import { handleChange, handleSelectChange } from '../../../utils/formUtils';
 import { Product } from '../../../types/modelType';
-import { addSupplier, deleteSupplier, editSupplier, getSupplier } from '../../../services/suppliersService';
-import { Add01Icon, BarCode02Icon, DollarCircleIcon, InformationCircleIcon, PercentCircleIcon, ProductLoadingIcon } from 'hugeicons-react';
+import { addProduct, deleteProduct, editProduct, getProduct } from '../../../services/productsService';
+import { getTax } from '../../../services/taxesService';
+import { Add01Icon, BarCode02Icon, DollarCircleIcon, InformationCircleIcon, Note04Icon, PercentCircleIcon, ProductLoadingIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import useFormSubmit from '../../../hooks/useFormSubmit';
 import InputGroup from '../../../components/InputGroup';
@@ -22,9 +23,10 @@ interface CrudPageProps {
 
 const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, handleTableReload, setSelected, type, selected_id }) => {
     const { translations } = useTranslations();
-    const [formValues, setFormValues] = useState<Product>({ id: selected_id });
+    const [formValues, setFormValues] = useState<Product>({ id: selected_id, cost_price: 0, cash_profit: 0, cash_price: 0, credit_profit: 0, credit_price: 0 });
     const [activeTab, setActiveTab] = useState<'home' | 'advisor'>('home');
     const [colorPage, setColorPage] = useState<string>('blue');
+    const [updateFlag, setUpdateFlag] = useState(false);
 
     useEffect(() => {
         const colorMapping: { [key in CrudPageProps['type']]: string } = {
@@ -38,7 +40,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
         if (type === 'details' || type === 'delete' || type === 'edit') {
             const fetchGet = async () => {
                 try {
-                    const response = await getSupplier(selected_id);
+                    const response = await getProduct(selected_id);
                     const response_data = response.data;
 
                     if (!response_data.success) {
@@ -48,7 +50,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
 
                     setFormValues(response_data?.resp);
                 } catch (error) {
-                    addAlert({ id: uuidv4(), text: 'Error fetching supplier', type: 'danger', timeout: 3000 });
+                    addAlert({ id: uuidv4(), text: 'Error fetching product', type: 'danger', timeout: 3000 });
                 }
             };
 
@@ -57,9 +59,9 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
     }, [type, addAlert, selected_id]);
 
     const handleForm = async () => {
-        if (type === 'add') return addSupplier(formValues);
-        if (type === 'edit') return editSupplier(formValues);
-        if (type === 'delete') return deleteSupplier(selected_id);
+        if (type === 'add') return addProduct(formValues);
+        if (type === 'edit') return editProduct(formValues);
+        if (type === 'delete') return deleteProduct(selected_id);
     };
 
     const { handleSubmit, isLoading } = useFormSubmit(handleForm, addAlert);
@@ -82,6 +84,114 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
         }
     };
 
+    useEffect(() => {
+        const fetchGet = async () => {
+            if (formValues.tax?.id && formValues.tax?.id.toString() !== '0') {
+                try {
+                    const response = await getTax(formValues.tax.id);
+                    const response_data = response.data;
+
+                    if (!response_data.success) {
+                        addAlert({ id: uuidv4(), text: response_data.message, type: 'danger', timeout: 3000 });
+                        return;
+                    }
+
+                    setFormValues(prev => ({
+                        ...prev,
+                        tax: response_data?.resp
+                    }));
+                } catch (error) { }
+            } else {
+                setFormValues(prev => ({
+                    ...prev,
+                    tax: {
+                        id: 0,
+                        name: '',
+                        value: 0
+                    }
+                }));
+            }
+
+            setUpdateFlag(true);
+        };
+
+        fetchGet();
+    }, [formValues.tax?.id]);
+
+    useEffect(() => {
+        if (!updateFlag) return;
+
+        const costPrice = formValues.cost_price || 0;
+        const cashProfit = formValues.cash_profit || 0;
+        const tax = formValues.tax?.value || 0;
+
+        if (costPrice > 0 && cashProfit >= 0) {
+            const newCashPrice = costPrice * (1 + cashProfit / 100) * (1 + tax / 100);
+            setFormValues(prev => ({
+                ...prev,
+                cash_price: parseFloat(newCashPrice.toFixed(2))
+            }));
+        }
+
+        setUpdateFlag(false);
+    }, [formValues.cost_price, formValues.cash_profit, formValues.tax?.value]);
+
+    useEffect(() => {
+        if (!updateFlag) return;
+
+        const costPrice = formValues.cost_price || 0;
+        const cashPrice = formValues.cash_price || 0;
+        const tax = formValues.tax?.value || 0;
+
+        if (costPrice > 0 && cashPrice > 0) {
+            const effectiveCashPrice = cashPrice / (1 + tax / 100);
+            const newCashProfit = ((effectiveCashPrice - costPrice) / costPrice) * 100;
+            setFormValues(prev => ({
+                ...prev,
+                cash_profit: parseFloat(newCashProfit.toFixed(2))
+            }));
+        }
+
+        setUpdateFlag(false);
+    }, [formValues.cost_price, formValues.cash_price]);
+
+    useEffect(() => {
+        if (!updateFlag) return;
+
+        const costPrice = formValues.cost_price || 0;
+        const creditProfit = formValues.credit_profit || 0;
+        const tax = formValues.tax?.value || 0;
+
+        if (costPrice > 0 && creditProfit >= 0) {
+            const newCreditPrice = costPrice * (1 + creditProfit / 100) * (1 + tax / 100);
+            setFormValues(prev => ({
+                ...prev,
+                credit_price: parseFloat(newCreditPrice.toFixed(2))
+            }));
+        }
+
+        setUpdateFlag(false);
+    }, [formValues.cost_price, formValues.credit_profit, formValues.tax?.value]);
+
+    useEffect(() => {
+        if (!updateFlag) return;
+
+        const costPrice = formValues.cost_price || 0;
+        const creditPrice = formValues.credit_price || 0;
+        const tax = formValues.tax?.value || 0;
+
+        if (costPrice > 0 && creditPrice > 0) {
+            const effectiveCreditPrice = creditPrice / (1 + tax / 100);
+            const newCreditProfit = ((effectiveCreditPrice - costPrice) / costPrice) * 100;
+            setFormValues(prev => ({
+                ...prev,
+                credit_profit: parseFloat(newCreditProfit.toFixed(2))
+            }));
+        }
+
+        setUpdateFlag(false);
+    }, [formValues.cost_price, formValues.credit_price]);
+
     return (
         <div>
             <div className="flex space-x-2 overflow-x-auto">
@@ -103,7 +213,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                             name='barcode'
                             label={translations.barcode}
                             icon={<BarCode02Icon className='icon' size={24} />}
-                            onChange={handleChange(setFormValues)}
+                            onChange={handleChange({ setFormValues })}
                             required={false}
                             value={formValues.barcode || ''}
                             color={colorPage}
@@ -116,7 +226,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     name='name'
                                     label={translations.name}
                                     icon={<ProductLoadingIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     value={formValues.name || ''}
                                     color={colorPage}
                                     disabled={type === 'details' || type === 'delete' ? true : false}
@@ -128,7 +238,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     name='model'
                                     label={translations.model}
                                     icon={<InformationCircleIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues })}
                                     required={false}
                                     value={formValues.model || ''}
                                     color={colorPage}
@@ -143,7 +253,13 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full gap-2'>
                                         <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.brand}</h3>
                                         <div className='w-full'>
-                                            <SelectGroup endpoint='manage/product/brands' name='brand.id' onChange={handleSelectChange(setFormValues)} />
+                                            <SelectGroup 
+                                                endpoint='manage/product/brands' 
+                                                name='brand.id' 
+                                                onChange={handleSelectChange(setFormValues)} 
+                                                value={formValues.brand?.id || 0}
+                                                disabled={type === 'details' || type === 'delete' ? true : false}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -154,7 +270,13 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full gap-2'>
                                         <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.category}</h3>
                                         <div className='w-full'>
-                                            <SelectGroup endpoint='manage/product/categories' name='category.id' onChange={handleSelectChange(setFormValues)} />
+                                            <SelectGroup 
+                                                endpoint='manage/product/categories' 
+                                                name='category.id' 
+                                                onChange={handleSelectChange(setFormValues)} 
+                                                value={formValues.category?.id || 0}
+                                                disabled={type === 'details' || type === 'delete' ? true : false}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -165,10 +287,28 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                             <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full gap-2'>
                                 <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.supplier}</h3>
                                 <div className='w-full'>
-                                    <SelectGroup endpoint='manage/suppliers' label='company_name' name='supplier.id' onChange={handleSelectChange(setFormValues)} />
+                                    <SelectGroup 
+                                        endpoint='manage/suppliers' 
+                                        label='company_name' 
+                                        name='supplier.id' 
+                                        onChange={handleSelectChange(setFormValues)} 
+                                        value={formValues.supplier?.id || 0}
+                                        disabled={type === 'details' || type === 'delete' ? true : false}
+                                    />
                                 </div>
                             </div>
                         </div>
+                        <InputGroup
+                            id='note'
+                            name='note'
+                            label={translations.note}
+                            icon={<Note04Icon className='icon' size={24} />}
+                            onChange={handleChange({ setFormValues })}
+                            required={false}
+                            value={formValues.note || ''}
+                            color={colorPage}
+                            disabled={type === 'details' || type === 'delete' ? true : false}
+                        />
                         <hr className='border dark:border-slate-600 mx-2 my-2' />
                         <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                             <div className='col-span-1 z-[7]'>
@@ -177,7 +317,14 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full gap-2'>
                                         <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.tax}</h3>
                                         <div className='w-full'>
-                                            <SelectGroup endpoint='manage/taxes' label_per='value' name='tax.id' onChange={handleSelectChange(setFormValues)} />
+                                            <SelectGroup 
+                                                endpoint='manage/taxes' 
+                                                label_per='value' 
+                                                name='tax.id' 
+                                                onChange={handleSelectChange(setFormValues)}
+                                                value={formValues.tax?.id || 0}
+                                                disabled={type === 'details' || type === 'delete' ? true : false} 
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -189,9 +336,9 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     name='cost_price'
                                     label={translations.cost_price}
                                     icon={<DollarCircleIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues, setUpdateFlag })}
                                     required={false}
-                                    value={formValues.cost_price || ''}
+                                    value={formValues.cost_price}
                                     color={colorPage}
                                     disabled={type === 'details' || type === 'delete' ? true : false}
                                 />
@@ -204,9 +351,9 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     name='cash_profit'
                                     label={translations.profit}
                                     icon={<PercentCircleIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues, setUpdateFlag })}
                                     required={false}
-                                    value={formValues.cash_profit || ''}
+                                    value={formValues.cash_profit}
                                     type='number'
                                     color={colorPage}
                                     disabled={type === 'details' || type === 'delete' ? true : false}
@@ -218,9 +365,9 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     name='cash_price'
                                     label={translations.cash_price}
                                     icon={<DollarCircleIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues, setUpdateFlag })}
                                     required={false}
-                                    value={formValues.cash_price || ''}
+                                    value={formValues.cash_price}
                                     type='number'
                                     color={colorPage}
                                     disabled={type === 'details' || type === 'delete' ? true : false}
@@ -234,9 +381,9 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     name='credit_profit'
                                     label={translations.profit}
                                     icon={<PercentCircleIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues, setUpdateFlag })}
                                     required={false}
-                                    value={formValues.credit_profit || ''}
+                                    value={formValues.credit_profit}
                                     type='number'
                                     color={colorPage}
                                     disabled={type === 'details' || type === 'delete' ? true : false}
@@ -248,9 +395,9 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     name='credit_price'
                                     label={translations.credit_price}
                                     icon={<DollarCircleIcon className='icon' size={24} />}
-                                    onChange={handleChange(setFormValues)}
+                                    onChange={handleChange({ setFormValues, setUpdateFlag })}
                                     required={false}
-                                    value={formValues.credit_price || ''}
+                                    value={formValues.credit_price}
                                     type='number'
                                     color={colorPage}
                                     disabled={type === 'details' || type === 'delete' ? true : false}

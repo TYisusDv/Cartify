@@ -1,6 +1,11 @@
 import React from 'react';
 
-export const handleChange = <T extends Record<string, any>>(setFormValues: React.Dispatch<React.SetStateAction<T>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+type HandleChangeOptions<T> = {
+  setFormValues: React.Dispatch<React.SetStateAction<T>>;
+  setUpdateFlag?: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export const handleChange = <T extends Record<string, any>>({ setFormValues, setUpdateFlag}: HandleChangeOptions<T>) => (e: React.ChangeEvent<HTMLInputElement>) => {
   const { name, type, checked, value } = e.target;
 
   setFormValues(prevState => {
@@ -38,6 +43,10 @@ export const handleChange = <T extends Record<string, any>>(setFormValues: React
 
     return updatedState;
   });
+
+  if (setUpdateFlag) {
+    setUpdateFlag(true);
+  }
 };
 
 export const handleSelectChange = <T extends Record<string, any>>(setFormValues: React.Dispatch<React.SetStateAction<T>>) => (e: React.ChangeEvent<HTMLSelectElement>) => {

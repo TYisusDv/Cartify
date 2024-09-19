@@ -107,7 +107,12 @@ class AddEditAddressesSerializer(serializers.ModelSerializer):
         try: 
             return super().create(validated_data)
         except IntegrityError as e:
-            raise serializers.ValidationError('An ocurred has error! City or person not found.')
+            if 'city' in str(e):
+                raise serializers.ValidationError('An ocurred has error! City not found.')
+            elif 'person' in str(e):
+                raise serializers.ValidationError('An ocurred has error! Person not found.')
+            else:
+                raise serializers.ValidationError('An unknown error occurred.')
     
     class Meta:
         model = AddressesModel
@@ -363,7 +368,12 @@ class AddClientContactSerializer(serializers.ModelSerializer):
         try: 
             return super().create(validated_data)
         except IntegrityError as e:
-            raise serializers.ValidationError('An ocurred has error! Type or client not found.')
+            if 'type' in str(e):
+                raise serializers.ValidationError('An ocurred has error! Type not found.')
+            elif 'client' in str(e):
+                raise serializers.ValidationError('An ocurred has error! Client not found.')
+            else:
+                raise serializers.ValidationError('An unknown error occurred.')
     
     class Meta:
         model = ClientContactsModel
@@ -453,7 +463,14 @@ class AddEditClientSerializer(serializers.ModelSerializer):
         try: 
             return super().create(validated_data)
         except IntegrityError as e:
-            raise serializers.ValidationError('An ocurred has error! Location, type or person not found.')
+            if 'location' in str(e):
+                raise serializers.ValidationError('An ocurred has error! Location not found.')
+            elif 'type' in str(e):
+                raise serializers.ValidationError('An ocurred has error! Type not found.')
+            elif 'person' in str(e):
+                raise serializers.ValidationError('An ocurred has error! person not found.')
+            else:
+                raise serializers.ValidationError('An unknown error occurred.')
     
     class Meta:
         model = ClientsModel
@@ -680,4 +697,172 @@ class GetProductCategorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ProductCategoriesModel
+        fields = ['id']
+
+#Products
+class ProductsSerializer(serializers.ModelSerializer):
+    category = ProductCategoriesSerializer(read_only = True)
+    brand = ProductBrandsSerializer(read_only = True)
+    supplier = SuppliersSerializer(read_only = True)
+    tax = TaxesSerializer(read_only = True)
+
+    class Meta:
+        model = ProductsModel
+        fields = '__all__'
+
+class AddEditProductSerializer(serializers.ModelSerializer):
+    barcode = serializers.CharField(error_messages = {
+        'required': 'The barcode is required.',
+        'blank': 'The barcode cannot be blank.',
+        'null': 'The barcode cannot be blank.',
+        'max_length': 'The barcode cannot exceed 50 characters.',
+    }, required= False, max_length = 50, allow_blank = True, allow_null = True)
+
+    name = serializers.CharField(error_messages = {
+        'required': 'The name is required.',
+        'blank': 'The name cannot be blank.',
+        'null': 'The name cannot be blank.',
+        'max_length': 'The name cannot exceed 254 characters.',
+    }, allow_blank = False, allow_null = False)
+
+    model = serializers.CharField(error_messages = {
+        'required': 'The model is required.',
+        'blank': 'The model cannot be blank.',
+        'null': 'The model cannot be blank.',
+        'max_length': 'The model cannot exceed 50 characters.',
+    }, required= False, max_length = 50, allow_blank = True, allow_null = True)
+
+    note = serializers.CharField(error_messages = {
+        'required': 'The note is required.',
+        'blank': 'The note cannot be blank.',
+        'null': 'The note cannot be blank.',
+        'max_length': 'The note cannot exceed 100 characters.',
+    }, required= False, max_length = 100, allow_blank = True, allow_null = True)
+
+    cost_price = serializers.FloatField(error_messages = {
+        'required': 'The cost price is required.',
+        'blank': 'The cost price cannot be blank.',
+        'null': 'The cost price cannot be blank.',
+        'invalid': 'The cost price is invalid.',
+    }, required = False)
+
+    cash_profit = serializers.FloatField(error_messages = {
+        'required': 'The cash profit is required.',
+        'blank': 'The cash profit cannot be blank.',
+        'null': 'The cash profit cannot be blank.',
+        'invalid': 'The cash profit is invalid.',
+    }, required = False)
+
+    cash_price = serializers.FloatField(error_messages = {
+        'required': 'The cash price is required.',
+        'blank': 'The cash price cannot be blank.',
+        'null': 'The cash price cannot be blank.',
+        'invalid': 'The cash price is invalid.',
+    }, required = False)
+
+    credit_profit = serializers.FloatField(error_messages = {
+        'required': 'The credit profit is required.',
+        'blank': 'The credit profit cannot be blank.',
+        'null': 'The credit profit cannot be blank.',
+        'invalid': 'The credit profit is invalid.',
+    }, required = False)
+
+    credit_price = serializers.FloatField(error_messages = {
+        'required': 'The credit price is required.',
+        'blank': 'The credit price cannot be blank.',
+        'null': 'The credit price cannot be blank.',
+        'invalid': 'The credit price is invalid.',
+    }, required = False)
+
+    min_stock = serializers.IntegerField(error_messages = {
+        'required': 'The min stock is required.',
+        'blank': 'The min stock cannot be blank.',
+        'null': 'The min stock cannot be blank.',
+        'invalid': 'The min stock is invalid.',
+    }, required = False)
+
+    category_id = serializers.IntegerField(error_messages = {
+        'required': 'The category is required.',
+        'blank': 'The category cannot be blank.',
+        'null': 'The category cannot be blank.',
+        'invalid': 'The category is invalid.',
+    }, required = False, allow_null = True)
+
+    brand_id = serializers.IntegerField(error_messages = {
+        'required': 'The brand is required.',
+        'blank': 'The brand cannot be blank.',
+        'null': 'The brand cannot be blank.',
+        'invalid': 'The brand is invalid.',
+    }, required = False, allow_null = True)
+
+    supplier_id = serializers.IntegerField(error_messages = {
+        'required': 'The supplier is required.',
+        'blank': 'The supplier cannot be blank.',
+        'null': 'The supplier cannot be blank.',
+        'invalid': 'The supplier is invalid.',
+    }, required = False, allow_null = True)
+
+    tax_id = serializers.IntegerField(error_messages = {
+        'required': 'The tax is required.',
+        'blank': 'The tax cannot be blank.',
+        'null': 'The tax cannot be blank.',
+        'invalid': 'The tax is invalid.',
+    }, required = False, allow_null = True)
+
+    def to_internal_value(self, data):
+        if 'category' in data and isinstance(data['category'], dict) and 'id' in data['category']:
+            data['category_id'] = data['category']['id']
+        
+        if 'brand' in data and isinstance(data['brand'], dict) and 'id' in data['brand']:
+            data['brand_id'] = data['brand']['id']
+
+        if 'supplier' in data and isinstance(data['supplier'], dict) and 'id' in data['supplier']:
+            data['supplier_id'] = data['supplier']['id']
+
+        if 'tax' in data and isinstance(data['tax'], dict) and 'id' in data['tax']:
+            data['tax_id'] = data['tax']['id']
+        
+        if data.get('category_id') in [0, '0']:
+            data['category_id'] = None
+        
+        if data.get('brand_id') in [0, '0']:
+            data['brand_id'] = None
+        
+        if data.get('supplier_id') in [0, '0']:
+            data['supplier_id'] = None
+        
+        if data.get('tax_id') in [0, '0']:
+            data['tax_id'] = None
+
+        return super().to_internal_value(data)
+    
+    def create(self, validated_data):
+        try: 
+            return super().create(validated_data)
+        except IntegrityError as e:
+            if 'category' in str(e):
+                raise serializers.ValidationError('An ocurred has error! Category not found.')
+            elif 'brand' in str(e):
+                raise serializers.ValidationError('An ocurred has error! Brand not found.')
+            elif 'supplier' in str(e):
+                raise serializers.ValidationError('An ocurred has error! Supplier not found.')
+            elif 'tax' in str(e):
+                raise serializers.ValidationError('An ocurred has error! Tax not found.')
+            else:
+                raise serializers.ValidationError('An unknown error occurred.')
+    
+    class Meta:
+        model = ProductsModel
+        exclude = ['id', 'category', 'brand', 'supplier', 'tax']
+
+class GetProductSerializer(serializers.ModelSerializer):    
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The product category is required.',
+        'blank': 'The product category cannot be blank.',
+        'null': 'The product category cannot be blank.',
+        'invalid': 'The product category is invalid.',
+    })
+    
+    class Meta:
+        model = ProductsModel
         fields = ['id']

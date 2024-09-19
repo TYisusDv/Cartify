@@ -188,13 +188,13 @@ class ProductsModel(models.Model):
     cost_price = models.FloatField(default = 0, null = False, blank = False)
     cash_profit = models.FloatField(default = 0, null = False, blank = False)
     cash_price = models.FloatField(default = 0, null = False, blank = False)
-    credit_price = models.FloatField(default = 0, null = False, blank = False)
     credit_profit = models.FloatField(default = 0, null = False, blank = False)
+    credit_price = models.FloatField(default = 0, null = False, blank = False)
     min_stock = models.IntegerField(default = 0, null = False, blank = False)
     category = models.ForeignKey(ProductCategoriesModel, null = True, blank = False, on_delete = models.RESTRICT)
     brand = models.ForeignKey(ProductBrandsModel, null = True, blank = False, on_delete = models.RESTRICT)
     supplier = models.ForeignKey(SuppliersModel, null = True, blank = False, on_delete = models.RESTRICT) 
-    tax = models.ForeignKey(TaxesModel, null = True, on_delete = models.RESTRICT)   
+    tax = models.ForeignKey(TaxesModel, null = True, blank = False, on_delete = models.RESTRICT) 
     
     class Meta: 
         db_table = 'products'

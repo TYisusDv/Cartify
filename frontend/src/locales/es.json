@@ -81,6 +81,7 @@
     "add_product": "Agregar producto",
     "edit_product": "Editar producto",
     "delete_product": "Eliminar producto",
+    "details_product": "Detalles del producto",
     "barcode": "Codigo de barras",
     "model": "Modelo",
     "category": "Categoria",

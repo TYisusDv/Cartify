@@ -89,7 +89,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             name='name'
                             label={translations.name}
                             icon={<ProfileIcon className='icon' size={24} />}
-                            onChange={handleChange(setFormValues)}
+                            onChange={handleChange({ setFormValues })}
                             value={formValues.name || ''}
                             color={colorPage}
                             disabled={type === 'details' || type === 'delete' ? true : false}
@@ -101,7 +101,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             name='value'
                             label={translations.value_per}
                             icon={<PercentCircleIcon className='icon' size={24} />}
-                            onChange={handleChange(setFormValues)}
+                            onChange={handleChange({ setFormValues })}
                             value={formValues.value}
                             color={colorPage}
                             required={false}
@@ -117,7 +117,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             disabled={type === 'details' || type === 'delete' ? true : false}
                             className='sr-only peer'
                             name='status'
-                            onChange={handleChange(setFormValues)}
+                            onChange={handleChange({ setFormValues })}
                             checked={formValues.status ? true : false}
                         />
                         <div className={`relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-0 peer-focus:ring-transparent rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[""] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 ${colorPage === 'blue' ? 'peer-checked:bg-blue-500' : colorPage === 'orange' ? 'peer-checked:bg-orange-500' : colorPage === 'red' ? 'peer-checked:bg-red-500' : colorPage === 'yellow' ? 'peer-checked:bg-yellow-500' : 'peer-checked:bg-blue-500'}`}>

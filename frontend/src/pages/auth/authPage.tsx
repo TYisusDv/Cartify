@@ -60,7 +60,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ addAlert }) => {
                     name='username'
                     label='Username' 
                     icon={<UserAccountIcon className='icon text-gray-700' size={28} />} 
-                    onChange={handleChange(setFormValues)} 
+                    onChange={handleChange({ setFormValues })} 
                   />
                 </div>
                 <div className='col-span-1'>
@@ -70,7 +70,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ addAlert }) => {
                     label='Password' 
                     type='password'
                     icon={<LockPasswordIcon className='icon text-gray-700' size={28} />} 
-                    onChange={handleChange(setFormValues)}
+                    onChange={handleChange({ setFormValues })}
                   />
                 </div>
               </div>

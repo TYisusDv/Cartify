@@ -66,7 +66,7 @@ const Table: React.FC<TableProps> = ({ endpoint, header, tbody, reloadTable }) =
                         name='search'
                         label={translations.search}
                         icon={<Search01Icon className='icon' size={20} />}
-                        onChange={handleChange(setFormValues)}
+                        onChange={handleChange({ setFormValues })}
                         required={false}
                     />
                 </div>
