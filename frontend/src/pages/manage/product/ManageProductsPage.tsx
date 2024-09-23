@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getCountProducts } from '../../../services/productsService';
+import { URL_BACKEND } from '../../../services/apiService';
 import { Add01Icon, BarCode02Icon, Delete02Icon, EyeIcon, PencilEdit02Icon, ViewOffSlashIcon } from 'hugeicons-react';
 import { AlertType } from '../../../types/alert';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,7 +16,6 @@ import CategoriesCrudPage from './categories/CrudPage';
 import SuppliersCrudPage from '../suppliers/CrudPage';
 import FiltersPage from './filtersPage';
 import ModalPhotos from '../../../components/ModalPhotos';
-import { URL_BACKEND } from '../../../services/apiService';
 
 interface ManageProductsPageProps {
     addAlert: (alert: AlertType) => void;
@@ -38,6 +38,7 @@ const ManageProductsPage: React.FC<ManageProductsPageProps> = ({ addAlert }) => 
     };
 
     const table_header = [
+        { name: 'image', headerName: '' },
         { name: 'name', headerName: translations.name },
         { name: 'model', headerName: translations.model },
         { name: 'brand.name', headerName: translations.brand },
@@ -120,7 +121,9 @@ const ManageProductsPage: React.FC<ManageProductsPageProps> = ({ addAlert }) => 
                         tbody={
                             <TablePage 
                                 selected={selected} 
-                                setSelected={setSelected} 
+                                toggleModal={toggleModal}
+                                setSelected={setSelected}
+                                setImageUrl={setImageUrl}
                             />
                         } 
                         filters={<FiltersPage />}
