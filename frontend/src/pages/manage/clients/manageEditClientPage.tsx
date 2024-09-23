@@ -48,9 +48,9 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
     } = useMedia({ addAlert });
     const inputDocumentsPicture = useRef<HTMLInputElement | null>(null);
     const [contacts, setContacts] = useState<ClientContact[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState({ contacts: false, delete_picture: false });
+    const [isModalOpen, setIsModalOpen] = useState({ contacts: false, delete_image: false });
     const [formContactValues, setFormContactValues] = useState<ClientContact>({});
-    const [identificationPictures, setIdentificationPictures] = useState<{ image: string }[]>([]);
+    const [identificationImages, setIdentificationImages] = useState<{ image: string }[]>([]);
 
     const handleToggleVideoProfile = () => {
         setCapturedImagesProfile([]);
@@ -84,7 +84,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
         }
     }
 
-    const toggleModal = (modalType: 'contacts' | 'delete_picture', isOpen: boolean) => {
+    const toggleModal = (modalType: 'contacts' | 'delete_image', isOpen: boolean) => {
         setIsModalOpen(prev => ({ ...prev, [modalType]: isOpen }));
     };
 
@@ -101,7 +101,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                 return;
             }
 
-            if (objectField === 'person' && nestedField === 'profile_picture') {
+            if (objectField === 'person' && nestedField === 'profile_image') {
                 const file = files[0];
                 stopVideoProfile();
                 setCapturedImagesProfile([]);
@@ -139,11 +139,11 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
         });
 
         Array.from(capturedImagesProfile).forEach((file, index) => {
-            formData.append('profile_picture', file);
+            formData.append('profile_image', file);
         });
 
         Array.from(capturedImagesDocuments).forEach((file, index) => {
-            formData.append(`identification_pictures[${index}]`, file);
+            formData.append(`identification_images[${index}]`, file);
         });
     
         formData.append('contacts', JSON.stringify(contacts));
@@ -192,7 +192,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                 setFormValues(response_data?.resp);
 
                 setContacts(response_data.resp?.contacts);
-                setIdentificationPictures(response_data.resp?.person?.identification_pictures);
+                setIdentificationImages(response_data.resp?.person?.identification_images);
             } catch (error) {
                 addAlert({ id: uuidv4(), text: 'Error fetching contact types', type: 'danger', timeout: 3000 });
             }
@@ -220,7 +220,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
             <div className='mt-4'>
                 <form autoComplete='off' onSubmit={onSubmit}>
                     <div className={`flex flex-col gap-2 w-full tab-item ${'information' === activeTab ? 'block' : 'hidden'}`}>
-                        <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
+                        <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
                             <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.location} <span className='text-red-500'>*</span></h3>
                             <div className='w-full'>
                                 <SelectGroup endpoint='manage/locations' name='location.id' value={formValues.location?.id} onChange={handleSelectChange(setFormValues)} />
@@ -228,7 +228,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                         </div>
                         <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                             <div className='col-span-1 z-10'>
-                                <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-10'>
+                                <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-10'>
                                     <h3 className='text-sm font-semibold  dark:text-gray-100 pl-1'>{translations.identification_type} <span className='text-red-500'>*</span></h3>
                                     <div className='min-w-40'>
                                         <SelectGroup endpoint='manage/typesids' name='person.type_id.id' value={formValues.person?.type_id?.id} onChange={handleSelectChange(setFormValues)} />
@@ -352,7 +352,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                         <hr className='border dark:border-slate-600 mx-2 my-2' />
                         <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                             <div className='col-span-1 z-10'>
-                                <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-10 gap-2'>
+                                <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-10 gap-2'>
                                     <h3 className='text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.country} <span className='text-red-500'>*</span></h3>
                                     <div className='w-full'>
                                         <SelectGroup endpoint='manage/countries' name='person.addresses[0].city.state.country.id'
@@ -441,17 +441,17 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                         <button type='button' className='btn h-full px-3' onClick={handleToggleVideoProfile}><ComputerVideoIcon /></button>
                                     </div>
                                     <div className='flex flex-col border-2 border-gray-200 rounded-2xl p-3 dark:border-slate-600 w-full gap-2'>
-                                        <label htmlFor='profile_picture' className='text-sm font-semibold dark:text-gray-100'>
-                                            {translations.profile_picture_client}
+                                        <label htmlFor='profile_image' className='text-sm font-semibold dark:text-gray-100'>
+                                            {translations.profile_image_client}
                                         </label>
                                         <input
                                             ref={inputProfilePicture}
                                             type='file'
-                                            id='profile_picture'
-                                            name='profile_picture'
+                                            id='profile_image'
+                                            name='profile_image'
                                             accept='.jpg,.jpeg,.png'
                                             capture='user'
-                                            onChange={handleFileChange('person', 'profile_picture')}
+                                            onChange={handleFileChange('person', 'profile_image')}
                                             className='w-full text-sm text-black dark:text-white file:border-0 file:cursor-pointer file:mr-2 file:px-4 file:py-1 file:bg-blue-600 file:rounded-xl file:text-white file:font-bold'
                                         />
                                     </div>
@@ -477,14 +477,14 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                         <button type='button' className='btn h-full px-3' onClick={handleToggleVideoDocuments}><ComputerVideoIcon /></button>
                                     </div>
                                     <div className='flex flex-col border-2 border-gray-200 rounded-2xl p-3 dark:border-slate-600 w-full gap-2'>
-                                        <label htmlFor='profile_picture' className='text-sm font-semibold dark:text-gray-100'>
-                                            {translations.identification_pictures_client}
+                                        <label htmlFor='profile_image' className='text-sm font-semibold dark:text-gray-100'>
+                                            {translations.identification_images_client}
                                         </label>
                                         <input
                                             ref={inputDocumentsPicture}
                                             type='file'
-                                            id='identification_pictures'
-                                            name='identification_pictures'
+                                            id='identification_images'
+                                            name='identification_images'
                                             accept='.jpg,.jpeg,.png'
                                             multiple={true}
                                             onChange={handleFileChange('person')}
@@ -512,13 +512,13 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                                 </div>
                             </div>
                         </div>
-                        <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
+                        <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
                             <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.class_client}</h3>
                             <div className='w-full'>
                                 <SelectGroup endpoint='manage/clienttypes' name='type.id' value={formValues.type?.id} onChange={handleSelectChange(setFormValues)} />
                             </div>
                         </div>
-                        <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-10 h-14 pr-5'>
+                        <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-10 h-14 pr-5'>
                             <h3 className='text-sm font-semibold dark:text-gray-100 pl-1'>{translations.allow_credit} <span className='text-red-500'>*</span></h3>
                             <div className='flex items-center gap-3'>
                                 <div className='flex items-center'>
@@ -573,9 +573,9 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                     </div>
                     <div className={`flex flex-col gap-2 w-full tab-item ${'documents' === activeTab ? 'block' : 'hidden'}`}>
                         <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
-                            {identificationPictures.map((item, index) => (
+                            {identificationImages.map((item, index) => (
                                 <div className='col-span-1 flex justify-center p-2 border-2 rounded-xl dark:border-slate-600'>
-                                    <img className='cursor-pointer rounded-lg h-32' key={index} src={`${URL_BACKEND}${item.image}`} alt='Document' onClick={() => toggleModal('delete_picture', true)}/>
+                                    <img className='cursor-pointer rounded-lg h-32' key={index} src={`${URL_BACKEND}${item.image}`} alt='Document' onClick={() => toggleModal('delete_image', true)}/>
                                 </div>
                             ))}
                         </div>
@@ -591,7 +591,7 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                 <Modal title={translations.add_contact} onClose={() => toggleModal('contacts', false)}>
                     <form autoComplete='off' onSubmit={handleContactSubmit}>
                         <div className='flex flex-col gap-2 w-full tab-item'>
-                            <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
+                            <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
                                 <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.type} <span className='text-red-500'>*</span></h3>
                                 <div className='w-full'>
                                     <SelectGroup endpoint='manage/contacttypes' name='type.id' onChange={handleSelectChange(setFormContactValues)} />
@@ -650,8 +650,8 @@ const ManageEditClientPage: React.FC<ManageEditClientProps> = ({ addAlert, clien
                     </form>
                 </Modal>
             )}
-            {isModalOpen.delete_picture && (
-                <Modal title={translations.delete_picture_sure} onClose={() => toggleModal('delete_picture', false)}>
+            {isModalOpen.delete_image && (
+                <Modal title={translations.delete_image_sure} onClose={() => toggleModal('delete_image', false)}>
                     <form autoComplete='off' onSubmit={handleContactSubmit}>                        
                         <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>
                             <div className='col-span-1 md:col-end-3 w-full'>

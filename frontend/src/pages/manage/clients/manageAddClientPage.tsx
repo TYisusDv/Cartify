@@ -75,7 +75,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
 
         setFormValues(prevFormValues => ({
             ...prevFormValues,
-            'profile_picture': null,
+            'profile_image': null,
         }));
     }
 
@@ -87,7 +87,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
 
         setFormValues(prevFormValues => ({
             ...prevFormValues,
-            'identification_pictures': [],
+            'identification_images': [],
         }));
     }
 
@@ -108,7 +108,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                 return;
             }
             
-            if (objectField === 'person' && nestedField === 'profile_picture') {
+            if (objectField === 'person' && nestedField === 'profile_image') {
                 const file = files[0];
                 stopVideoProfile();
                 setCapturedImagesProfile([]);
@@ -146,11 +146,11 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
         });
 
         Array.from(capturedImagesProfile).forEach((file, index) => {
-            formData.append('profile_picture', file);
+            formData.append('profile_image', file);
         });
 
         Array.from(capturedImagesDocuments).forEach((file, index) => {
-            formData.append(`identification_pictures[${index}]`, file);
+            formData.append(`identification_images[${index}]`, file);
         });
     
         formData.append('contacts', JSON.stringify(contacts));
@@ -201,7 +201,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
             <div className='mt-4'>
                 <form autoComplete='off' onSubmit={onSubmit}>
                     <div className={`flex flex-col gap-2 w-full tab-item ${'information' === activeTab ? 'block' : 'hidden'}`}>
-                        <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
+                        <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
                             <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.location} <span className='text-red-500'>*</span></h3>
                             <div className='w-full'>
                                 <SelectGroup endpoint='manage/locations' name='location.id' onChange={handleSelectChange(setFormValues)} />
@@ -209,7 +209,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                         </div>
                         <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                             <div className='col-span-1 z-10'>
-                                <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-10'>
+                                <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-10'>
                                     <h3 className='text-sm font-semibold  dark:text-gray-100 pl-1'>{translations.identification_type} <span className='text-red-500'>*</span></h3>
                                     <div className='min-w-40'>
                                         <SelectGroup endpoint='manage/typesids' name='person.type_id.id' onChange={handleSelectChange(setFormValues)} />
@@ -323,7 +323,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                         <hr className='border dark:border-slate-600 mx-2 my-2' />
                         <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                             <div className='col-span-1 z-10'>
-                                <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-10 gap-2'>
+                                <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-10 gap-2'>
                                     <h3 className='text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.country} <span className='text-red-500'>*</span></h3>
                                     <div className='w-full'>
                                         <SelectGroup endpoint='manage/countries' name='person.addresses[0].city.state.country.id' onChange={handleSelectChange(setFormValues)} />
@@ -404,17 +404,17 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                                         <button type='button' className='btn h-full px-3' onClick={handleToggleVideoProfile}><ComputerVideoIcon /></button>
                                     </div>
                                     <div className='flex flex-col border-2 border-gray-200 rounded-2xl p-3 dark:border-slate-600 w-full gap-2'>
-                                        <label htmlFor='profile_picture' className='text-sm font-semibold dark:text-gray-100'>
-                                            {translations.profile_picture_client}
+                                        <label htmlFor='profile_image' className='text-sm font-semibold dark:text-gray-100'>
+                                            {translations.profile_image_client}
                                         </label>
                                         <input
                                             ref={inputProfilePicture}
                                             type='file'
-                                            id='profile_picture'
-                                            name='profile_picture'
+                                            id='profile_image'
+                                            name='profile_image'
                                             accept='.jpg,.jpeg,.png'
                                             capture='user'
-                                            onChange={handleFileChange('person', 'profile_picture')}
+                                            onChange={handleFileChange('person', 'profile_image')}
                                             className='w-full text-sm text-black dark:text-white file:border-0 file:cursor-pointer file:mr-2 file:px-4 file:py-1 file:bg-blue-600 file:rounded-xl file:text-white file:font-bold'
                                         />
                                     </div>
@@ -440,14 +440,14 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                                         <button type='button' className='btn h-full px-3' onClick={handleToggleVideoDocuments}><ComputerVideoIcon /></button>
                                     </div>
                                     <div className='flex flex-col border-2 border-gray-200 rounded-2xl p-3 dark:border-slate-600 w-full gap-2'>
-                                        <label htmlFor='profile_picture' className='text-sm font-semibold dark:text-gray-100'>
-                                            {translations.identification_pictures_client}
+                                        <label htmlFor='profile_image' className='text-sm font-semibold dark:text-gray-100'>
+                                            {translations.identification_images_client}
                                         </label>
                                         <input
                                             ref={inputDocumentsPicture}
                                             type='file'
-                                            id='identification_pictures'
-                                            name='identification_pictures'
+                                            id='identification_images'
+                                            name='identification_images'
                                             accept='.jpg,.jpeg,.png'
                                             multiple={true}
                                             onChange={handleFileChange('person')}
@@ -475,13 +475,13 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                                 </div>
                             </div>
                         </div>
-                        <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
+                        <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
                             <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.class_client}</h3>
                             <div className='w-full'>
                                 <SelectGroup endpoint='manage/clienttypes' name='type.id' onChange={handleSelectChange(setFormValues)} />
                             </div>
                         </div>
-                        <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-10 h-14 pr-5'>
+                        <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-10 h-14 pr-5'>
                             <h3 className='text-sm font-semibold dark:text-gray-100 pl-1'>{translations.allow_credit} <span className='text-red-500'>*</span></h3>
                             <div className='flex items-center gap-3'>
                                 <div className='flex items-center'>
@@ -545,7 +545,7 @@ const ManageAddClientPage: React.FC<ManageAddClientProps> = ({ addAlert, onClose
                 <Modal title={translations.add_contact} onClose={() => toggleModal('contacts', false)}>
                     <form autoComplete='off' onSubmit={handleContactSubmit}>
                         <div className='flex flex-col gap-2 w-full tab-item'>
-                            <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
+                            <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-20 gap-2'>
                                 <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.type} <span className='text-red-500'>*</span></h3>
                                 <div className='w-full'>
                                     <SelectGroup endpoint='manage/contacttypes' name='type.id' onChange={handleSelectChange(setFormContactValues)} />

@@ -11,7 +11,7 @@ export const getProduct = async (selected_id: number) => {
   return response;
 };
 
-export const getCountProductes = async () => {
+export const getCountProducts = async () => {
   const response = await apiService.get('/manage/products', {
     params: {
       query: 'count',

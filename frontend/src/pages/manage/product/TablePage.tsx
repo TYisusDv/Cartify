@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrandfetchIcon, DollarCircleIcon, Layers01Icon, ProfileIcon } from 'hugeicons-react';
+import { BrandfetchIcon, DollarCircleIcon, EyeIcon, Layers01Icon, ProfileIcon, ViewOffSlashIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 
 interface TablePageProps {
@@ -36,12 +36,20 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                         </td>
                         <td className='px-6 py-6'>
                             <span className='flex items-center gap-[1px]'><DollarCircleIcon size={18} /> {row.credit_price || '-'}</span>
-                        </td>                       
+                        </td>  
+                        <td className='px-6 py-4'>
+                            {
+                            row.status ? 
+                                <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-blue-600 text-white rounded-xl'><EyeIcon size={22} /> {translations.visible}</span>
+                            :
+                                <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-red-600 text-white rounded-xl'><ViewOffSlashIcon size={22} /> {translations.hidden}</span>
+                            }
+                        </td>                     
                     </tr>
                 ))
             ) : (
                 <tr>
-                    <td colSpan={3} className='px-6 py-6 text-center dark:text-white'>{translations.no_data}</td>
+                    <td colSpan={8} className='px-6 py-6 text-center dark:text-white'>{translations.no_data}</td>
                 </tr>
             )}
         </tbody>

@@ -1,6 +1,6 @@
-# CarSync
+# Cartify
 
-**CarSync** is a Point of Sale (POS) system with inventory management tailored for a car oil shop. The system is built to streamline sales, track inventory, and manage client data efficiently.
+**Cartify** is a Point of Sale (POS) system with inventory management tailored for a car oil shop. The system is built to streamline sales, track inventory, and manage client data efficiently.
 
 ## Features
 
@@ -28,8 +28,8 @@
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/tyisusdv/carsync.git
-   cd carsync
+   git clone https://github.com/tyisusdv/cartify.git
+   cd cartify
 
 2. **Build docker compose**:
    ```bash

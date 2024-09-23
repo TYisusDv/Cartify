@@ -148,8 +148,7 @@ class ManageLocationsAPIView(APIView):
         if query == 'list':
             model = LocationsModel.objects.filter(
                 Q(id__icontains = search) |
-                Q(name__icontains = search),
-                status = True
+                Q(name__icontains = search)
             )[:10]
             serialized = LocationsSerializer(model, many = True)
             
@@ -170,8 +169,7 @@ class ManageTypesIdsAPIView(APIView):
         if query == 'list':
             model = TypesIdsModel.objects.filter(
                 Q(id__icontains = search) |
-                Q(name__icontains = search),
-                status = True
+                Q(name__icontains = search)
             )[:10]
             serialized = TypesIdsSerializer(model, many = True)
             
@@ -216,7 +214,7 @@ class ManageClientsAPIView(APIView):
         query = request.query_params.get('query', None)
         search = request.query_params.get('search', '')
         page_number = request.query_params.get('page', 1)
-        order_by = request.query_params.get('order_by', 'id')
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
         
@@ -246,7 +244,7 @@ class ManageClientsAPIView(APIView):
 
         elif query == 'get':
             client_id = request.query_params.get('id', None)
-            client = ClientsModel.objects.select_related('person').prefetch_related('person__identification_pictures').prefetch_related('contacts').get(pk = client_id)
+            client = ClientsModel.objects.select_related('person').prefetch_related('person__identification_images').prefetch_related('contacts').get(pk = client_id)
             serialized = ClientsSerializer(client)
             
             return JsonResponse({
@@ -280,8 +278,8 @@ class ManageClientsAPIView(APIView):
                 return JsonResponse({'success': False, 'resp': str(e)}, status=400)
 
             person.update({
-                'profile_picture': request.FILES.get('profile_picture'),
-                'identification_pictures': [request.FILES[key] for key in request.FILES if key.startswith('identification_pictures[')]
+                'profile_image': request.FILES.get('profile_image'),
+                'identification_images': [request.FILES[key] for key in request.FILES if key.startswith('identification_images[')]
             })
 
             person_serializer = AddEditPersonSerializer(data=person)
@@ -368,8 +366,8 @@ class ManageClientsAPIView(APIView):
                 return JsonResponse({'success': False, 'resp': str(e)}, status = 400)
 
             person.update({
-                'profile_picture': request.FILES.get('profile_picture'),
-                'identification_pictures': [request.FILES[key] for key in request.FILES if key.startswith('identification_pictures[')]
+                'profile_image': request.FILES.get('profile_image'),
+                'identification_images': [request.FILES[key] for key in request.FILES if key.startswith('identification_images[')]
             })
 
             person_serializer = AddEditPersonSerializer(person_instance, data = person)
@@ -535,7 +533,7 @@ class ManageSuppliersAPIView(APIView):
         query = data.get('query', None)
         search = request.query_params.get('search', '')
         page_number = request.query_params.get('page', 1)
-        order_by = request.query_params.get('order_by', 'id')
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
 
@@ -677,7 +675,7 @@ class ManageTaxesAPIView(APIView):
         query = data.get('query', None)
         search = data.get('search', '')
         page_number = request.query_params.get('page', 1)
-        order_by = request.query_params.get('order_by', 'id')
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
 
@@ -726,8 +724,7 @@ class ManageTaxesAPIView(APIView):
         elif query == 'list':
             model = TaxesModel.objects.filter(
                 Q(id__icontains = search) |
-                Q(name__icontains = search),
-                status = True
+                Q(name__icontains = search)
             )[:10]
             serialized = TaxesSerializer(model, many = True)
             
@@ -820,7 +817,7 @@ class ManageProductBrandsAPIView(APIView):
         query = data.get('query', None)
         search = data.get('search', '')
         page_number = request.query_params.get('page', 1)
-        order_by = request.query_params.get('order_by', 'id')
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
 
@@ -869,8 +866,7 @@ class ManageProductBrandsAPIView(APIView):
         elif query == 'list':
             model = ProductBrandsModel.objects.filter(
                 Q(id__icontains = search) |
-                Q(name__icontains = search),
-                status = True
+                Q(name__icontains = search)
             )[:10]
             serialized = ProductBrandsSerializer(model, many = True)
             
@@ -963,7 +959,7 @@ class ManageProductCategoriesAPIView(APIView):
         query = data.get('query', None)
         search = data.get('search', '')
         page_number = request.query_params.get('page', 1)
-        order_by = request.query_params.get('order_by', 'id')
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
 
@@ -1012,8 +1008,7 @@ class ManageProductCategoriesAPIView(APIView):
         elif query == 'list':
             model = ProductCategoriesModel.objects.filter(
                 Q(id__icontains = search) |
-                Q(name__icontains = search),
-                status = True
+                Q(name__icontains = search)
             )[:10]
             serialized = ProductCategoriesSerializer(model, many = True)
             
@@ -1106,17 +1101,28 @@ class ManageProductsAPIView(APIView):
         query = data.get('query', None)
         search = data.get('search', '')
         page_number = request.query_params.get('page', 1)
-        order_by = request.query_params.get('order_by', 'id')
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
 
-        if query == 'table':           
+        if query == 'table':   
+            brand_id = request.query_params.get('brand[id]', None)
+            category_id = request.query_params.get('category[id]', None)
+
             if order_by == 'actions':
                 order_by = 'id'
 
             model = ProductsModel.objects.filter(
-                Q(id__icontains = search)
+                Q(id__icontains = search) |
+                Q(name__icontains = search) |
+                Q(model__icontains = search)
             )
+
+            if brand_id not in [None,  0, '0']:
+                model = model.filter(brand_id = brand_id)
+
+            if category_id not in [None,  0, '0']:
+                model = model.filter(category_id = category_id)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -1155,8 +1161,7 @@ class ManageProductsAPIView(APIView):
         elif query == 'list':
             model = ProductsModel.objects.filter(
                 Q(id__icontains = search) |
-                Q(name__icontains = search),
-                status = True
+                Q(name__icontains = search)
             )[:10]
             serialized = ProductsSerializer(model, many = True)
             
@@ -1166,12 +1171,16 @@ class ManageProductsAPIView(APIView):
             })
         
         elif query == 'count':
-            total = ProductsModel.objects.count()            
+            total = ProductsModel.objects.count()
+            visible = ProductsModel.objects.filter(status = 1).count()
+            hidden = ProductsModel.objects.filter(status = 0).count()  
             
             return JsonResponse({
                 'success': True,
                 'resp': {
-                    'total': total
+                    'total': total,
+                    'visible': visible,
+                    'hidden': hidden
                 }
             })      
 

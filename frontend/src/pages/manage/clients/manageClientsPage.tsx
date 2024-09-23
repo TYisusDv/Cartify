@@ -23,7 +23,7 @@ interface ManageClientsPageProps {
 const ManageClientsPage: React.FC<ManageClientsPageProps> = ({ addAlert }) => {
     const { translations } = useTranslations();
     const [selected, setSelected] = useState<number>(0);
-    const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, profile_picture: false, details: false });
+    const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, profile_image: false, details: false });
     const [reloadTable, setReloadTable] = useState(0);
     const [countClients, setCountClients] = useState(0);
     const [modalProfilePicture, setModalProfilePicture] = useState('');
@@ -32,12 +32,12 @@ const ManageClientsPage: React.FC<ManageClientsPageProps> = ({ addAlert }) => {
         setReloadTable(prev => prev + 1);
     };
 
-    const toggleModal = (modalType: 'add' | 'edit' | 'delete' | 'profile_picture' | 'details', isOpen: boolean) => {
+    const toggleModal = (modalType: 'add' | 'edit' | 'delete' | 'profile_image' | 'details', isOpen: boolean) => {
         setIsModalOpen(prev => ({ ...prev, [modalType]: isOpen }));
     };
 
     const table_header = [
-        { name: 'person.identification_picture', headerName: '' },
+        { name: 'person.identification_image', headerName: '' },
         { name: 'person.alias', headerName: translations.alias },
         { name: 'person.firstname', headerName: translations.firstname },
         { name: 'person.middlename', headerName: translations.middlename },
@@ -122,8 +122,8 @@ const ManageClientsPage: React.FC<ManageClientsPageProps> = ({ addAlert }) => {
                 </Modal>
             )}
 
-            {isModalOpen.profile_picture && (
-                <ModalPhotos title={translations.profile_picture_client} onClose={() => toggleModal('profile_picture', false)}>
+            {isModalOpen.profile_image && (
+                <ModalPhotos title={translations.profile_image_client} onClose={() => toggleModal('profile_image', false)}>
                     <div className='flex w-full h-full justify-center'>
                         <img src={`${URL_BACKEND}${modalProfilePicture}`} alt='Profile' className='h-[600px] w-full rounded-2xl' />
                     </div>

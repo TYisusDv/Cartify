@@ -1,10 +1,25 @@
 from rest_framework import serializers
+from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.core.validators import FileExtensionValidator
 from .models import *
-import json
+import json, base64
 
+#Serializer Base64ImageField
+class Base64ImageField(serializers.ImageField):
+    """Field to handle images in base64 format."""
+    
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+            file = ContentFile(base64.b64decode(imgstr), name=f'temp.{ext}')
+            return super().to_internal_value(file) 
+
+        return super().to_internal_value(data)
+    
+#Auth login
 class LogInSerializer(serializers.ModelSerializer):
     username = serializers.CharField(error_messages = {
         'required': 'The username is required. Please provide a valid username.',
@@ -103,31 +118,20 @@ class AddEditAddressesSerializer(serializers.ModelSerializer):
             
         return super().to_internal_value(data)
     
-    def create(self, validated_data):
-        try: 
-            return super().create(validated_data)
-        except IntegrityError as e:
-            if 'city' in str(e):
-                raise serializers.ValidationError('An ocurred has error! City not found.')
-            elif 'person' in str(e):
-                raise serializers.ValidationError('An ocurred has error! Person not found.')
-            else:
-                raise serializers.ValidationError('An unknown error occurred.')
-    
     class Meta:
         model = AddressesModel
         fields = ['street', 'area', 'city_id', 'person_id']
 
-#Identification pictures
-class IdentificationPicturesSerializer(serializers.ModelSerializer):
+#Identification images
+class IdentificationImagesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = IdentificationPictures
+        model = IdentificationImages
         fields = '__all__'
 
 #Person
 class PersonSerializer(serializers.ModelSerializer):
     addresses = AddressesSerializer(many = True, read_only = True)
-    identification_pictures = IdentificationPicturesSerializer(many = True, read_only = True)
+    identification_images = IdentificationImagesSerializer(many = True, read_only = True)
     type_id = TypesIdsSerializer(read_only = True)
 
     class Meta:
@@ -142,12 +146,12 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
         'max_length': 'The identification cannot exceed 100 characters.',
     }, max_length = 100)
 
-    profile_picture = serializers.ImageField(
+    profile_image = serializers.ImageField(
         error_messages = {
-            'required': 'The profile picture is required.',
-            'blank': 'The profile picture cannot be blank.',
-            'null': 'The profile picture cannot be blank.',
-            'invalid': 'The profile picture is invalid.',
+            'required': 'The profile image is required.',
+            'blank': 'The profile image cannot be blank.',
+            'null': 'The profile image cannot be blank.',
+            'invalid': 'The profile image is invalid.',
         }, validators=[
             FileExtensionValidator(allowed_extensions = ['jpg', 'jpeg', 'png'])
         ], 
@@ -155,10 +159,10 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
         allow_null = True
     )
 
-    identification_pictures = serializers.ListField(
+    identification_images = serializers.ListField(
         child = serializers.ImageField(
             error_messages={
-                'invalid': 'One or more identification pictures are invalid.',
+                'invalid': 'One or more identification images are invalid.',
             },
             validators=[
                 FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
@@ -249,35 +253,32 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
         return super().to_internal_value(data)
 
     def create(self, validated_data):
-        try:
-            identification_pictures = validated_data.pop('identification_pictures', [])
-            person_instance = super().create(validated_data)
+        identification_images = validated_data.pop('identification_images', [])
+        person_instance = super().create(validated_data)
 
-            for picture in identification_pictures:
-                IdentificationPictures.objects.create(person = person_instance, image = picture)
+        for image in identification_images:
+            IdentificationImages.objects.create(person = person_instance, image = image)
 
-            return person_instance
-        except IntegrityError as e:
-            raise serializers.ValidationError('An error occurred! Type identification not found.')
+        return person_instance
     
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
-            if attr == 'profile_picture':
+            if attr == 'profile_image':
                 if value:
-                    if instance.profile_picture:
-                        instance.profile_picture.delete(save = False)
+                    if instance.profile_image:
+                        instance.profile_image.delete(save = False)
 
                     setattr(instance, attr, value)
-            elif attr == 'identification_pictures':
+            elif attr == 'identification_images':
                 if value:  
-                    #existing_pictures = IdentificationPictures.objects.filter(person=instance)
-                    #for picture in existing_pictures:
-                    #    picture.image.delete(save=False)
+                    #existing_images = IdentificationImages.objects.filter(person=instance)
+                    #for image in existing_images:
+                    #    image.image.delete(save=False)
                     
-                    #existing_pictures.delete()
+                    #existing_images.delete()
 
-                    for picture in value:
-                        IdentificationPictures.objects.create(person=instance, image=picture)
+                    for image in value:
+                        IdentificationImages.objects.create(person = instance, image = image)
             else:
                 setattr(instance, attr, value)
 
@@ -287,7 +288,7 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = PersonsModel
-        fields = ['identification_id', 'profile_picture', 'identification_pictures', 'alias', 'occupation', 'firstname', 'middlename', 'lastname', 'second_lastname', 'mobile', 'phone', 'birthdate', 'type_id_id']
+        fields = ['identification_id', 'profile_image', 'identification_images', 'alias', 'occupation', 'firstname', 'middlename', 'lastname', 'second_lastname', 'mobile', 'phone', 'birthdate', 'type_id_id']
 
 #Contact types
 class ContactTypesSerializer(serializers.ModelSerializer):
@@ -363,17 +364,6 @@ class AddClientContactSerializer(serializers.ModelSerializer):
             data['type_id'] = data['type']['id']
             
         return super().to_internal_value(data)
-    
-    def create(self, validated_data):
-        try: 
-            return super().create(validated_data)
-        except IntegrityError as e:
-            if 'type' in str(e):
-                raise serializers.ValidationError('An ocurred has error! Type not found.')
-            elif 'client' in str(e):
-                raise serializers.ValidationError('An ocurred has error! Client not found.')
-            else:
-                raise serializers.ValidationError('An unknown error occurred.')
     
     class Meta:
         model = ClientContactsModel
@@ -458,19 +448,6 @@ class AddEditClientSerializer(serializers.ModelSerializer):
             data['type_id'] = None
             
         return super().to_internal_value(data)
-    
-    def create(self, validated_data):
-        try: 
-            return super().create(validated_data)
-        except IntegrityError as e:
-            if 'location' in str(e):
-                raise serializers.ValidationError('An ocurred has error! Location not found.')
-            elif 'type' in str(e):
-                raise serializers.ValidationError('An ocurred has error! Type not found.')
-            elif 'person' in str(e):
-                raise serializers.ValidationError('An ocurred has error! person not found.')
-            else:
-                raise serializers.ValidationError('An unknown error occurred.')
     
     class Meta:
         model = ClientsModel
@@ -699,8 +676,15 @@ class GetProductCategorySerializer(serializers.ModelSerializer):
         model = ProductCategoriesModel
         fields = ['id']
 
+#Product images
+class ProductImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImagesModel
+        fields = '__all__'
+
 #Products
 class ProductsSerializer(serializers.ModelSerializer):
+    product_images = ProductImagesSerializer(many = True, read_only = True)
     category = ProductCategoriesSerializer(read_only = True)
     brand = ProductBrandsSerializer(read_only = True)
     supplier = SuppliersSerializer(read_only = True)
@@ -711,6 +695,21 @@ class ProductsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AddEditProductSerializer(serializers.ModelSerializer):
+    images = serializers.ListField(
+        child = Base64ImageField(
+            error_messages = {
+                'invalid': 'One or more identification images are invalid.',
+            },
+            validators = [
+                FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
+            ], 
+            allow_null = True
+        ),
+        required = False,
+        allow_empty = True,
+        allow_null = True,
+    )
+
     barcode = serializers.CharField(error_messages = {
         'required': 'The barcode is required.',
         'blank': 'The barcode cannot be blank.',
@@ -781,6 +780,13 @@ class AddEditProductSerializer(serializers.ModelSerializer):
         'invalid': 'The min stock is invalid.',
     }, required = False)
 
+    status = serializers.BooleanField(error_messages = {
+        'required': 'The status is required.',
+        'blank': 'The status cannot be blank.',
+        'null': 'The status cannot be blank.',
+        'invalid': 'The status is invalid.',
+    }, required = False)
+
     category_id = serializers.IntegerField(error_messages = {
         'required': 'The category is required.',
         'blank': 'The category cannot be blank.',
@@ -826,7 +832,7 @@ class AddEditProductSerializer(serializers.ModelSerializer):
             data['category_id'] = None
         
         if data.get('brand_id') in [0, '0']:
-            data['brand_id'] = None
+            data['brand_id'] = 0
         
         if data.get('supplier_id') in [0, '0']:
             data['supplier_id'] = None
@@ -837,20 +843,27 @@ class AddEditProductSerializer(serializers.ModelSerializer):
         return super().to_internal_value(data)
     
     def create(self, validated_data):
-        try: 
-            return super().create(validated_data)
-        except IntegrityError as e:
-            if 'category' in str(e):
-                raise serializers.ValidationError('An ocurred has error! Category not found.')
-            elif 'brand' in str(e):
-                raise serializers.ValidationError('An ocurred has error! Brand not found.')
-            elif 'supplier' in str(e):
-                raise serializers.ValidationError('An ocurred has error! Supplier not found.')
-            elif 'tax' in str(e):
-                raise serializers.ValidationError('An ocurred has error! Tax not found.')
+        images = validated_data.pop('images', [])
+        instance = super().create(validated_data)
+
+        for image in images:
+            ProductImagesModel.objects.create(product = instance, image = image)
+
+        return instance
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            if attr == 'images':
+                if value:
+                    for image in value:
+                        ProductImagesModel.objects.create(product = instance, image = image)
             else:
-                raise serializers.ValidationError('An unknown error occurred.')
-    
+                setattr(instance, attr, value)
+        
+        instance.save()
+
+        return instance 
+
     class Meta:
         model = ProductsModel
         exclude = ['id', 'category', 'brand', 'supplier', 'tax']

@@ -12,7 +12,7 @@ import { Client, ClientContact } from '../../../types/modelType';
 interface ManageDetailsClientProps {
     addAlert: (alert: AlertType) => void;
     client_id: number;
-    toggleModal: (modalType: 'add' | 'delete' | 'profile_picture', isOpen: boolean) => void;
+    toggleModal: (modalType: 'add' | 'delete' | 'profile_image', isOpen: boolean) => void;
     setModalProfilePicture: (url: string) => void;
 }
 const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert, client_id, toggleModal, setModalProfilePicture }) => {
@@ -20,11 +20,11 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
     const [formValues, setFormValues] = useState<Client>({});
     const [activeTab, setActiveTab] = useState<string>('information');
     const [contacts, setContacts] = useState<ClientContact[]>([]);
-    const [identificationPictures, setIdentificationPictures] = useState<{ image: string }[]>([]);
+    const [identificationImages, setIdentificationImages] = useState<{ image: string }[]>([]);
 
     const handleImage = (url: string) => {
         setModalProfilePicture(url);
-        toggleModal('profile_picture', true);
+        toggleModal('profile_image', true);
     }
 
     useEffect(() => {
@@ -40,7 +40,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
 
                 setFormValues(response_data?.resp);
 
-                setIdentificationPictures(response_data.resp?.person?.identification_pictures);
+                setIdentificationImages(response_data.resp?.person?.identification_images);
                 setContacts(response_data.resp?.contacts);
             } catch (error) {
                 addAlert({ id: uuidv4(), text: 'Error fetching contact types', type: 'danger', timeout: 3000 });
@@ -321,7 +321,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                         required={false}
                         disabled={true}
                     />
-                    <div className='flex border-2 border-gray-200 rounded-2xl p-2 dark:border-slate-600 items-center justify-between w-full z-10 h-14 pr-5'>
+                    <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-10 h-14 pr-5'>
                         <h3 className='text-sm font-semibold dark:text-gray-100 pl-1'>{translations.allow_credit}</h3>
                         <div className='flex items-center gap-3'>
                             <div className='flex items-center'>
@@ -373,7 +373,7 @@ const ManageDetailsClientPage: React.FC<ManageDetailsClientProps> = ({ addAlert,
                 </div>
                 <div className={`flex flex-col gap-2 w-full tab-item ${'documents' === activeTab ? 'block' : 'hidden'}`}>
                    <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
-                        {identificationPictures.map((item, index) => (
+                        {identificationImages.map((item, index) => (
                             <div className='col-span-1 flex justify-center p-2 border-2 rounded-xl dark:border-slate-600'>
                                 <img className='cursor-pointer rounded-lg h-32' key={index} src={`${URL_BACKEND}${item.image}`} alt='Document' onClick={() => {handleImage(item.image)}} />
                             </div>

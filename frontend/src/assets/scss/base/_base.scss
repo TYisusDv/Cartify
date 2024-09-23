@@ -1,7 +1,7 @@
 @import "animate.css/animate.min.css";
 
 .input-group {
-  @apply flex relative w-full h-14 bg-transparent rounded-2xl items-center border-2 border-gray-200 px-3 gap-1 transition-all ease-in-out duration-300 dark:border-slate-600;
+  @apply flex relative w-full h-14 bg-transparent rounded-2xl items-center border-2 border-gray-200 px-3 gap-1 select-none transition-all ease-in-out duration-300 dark:border-slate-600;
 
   .label {
     @apply absolute cursor-text font-bold text-black text-sm transition-all ease-in-out duration-300 dark:text-white;
@@ -66,8 +66,24 @@
   }
 }
 
+.input-file {
+  @apply w-full text-sm text-black dark:text-white file:border-0 file:cursor-pointer file:mr-2 file:px-4 file:py-1 file:bg-blue-600 file:rounded-xl file:text-white file:font-bold;
+}
+
+.input-file.file-orange {
+  @apply file:bg-orange-500;
+}
+
+.input-file.file-yellow {
+  @apply file:bg-yellow-500;
+}
+
+.input-file.file-red {
+  @apply file:bg-red-500;
+}
+
 .btn {
-  @apply flex justify-center items-center w-full h-14 rounded-3xl font-semibold text-white border-2 transition-all ease-in-out duration-200 gap-1;
+  @apply flex justify-center items-center w-full h-14 rounded-3xl select-none font-semibold text-white border-2 transition-all ease-in-out duration-200 gap-1;
 
   &.btn-blue {
     @apply bg-blue-600 border-blue-600;

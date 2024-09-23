@@ -30,14 +30,14 @@ export interface Address {
 export interface TypeID {
     id?: number;
     name?: string;
-    status?: boolean | '0' | '1';
+    status?: boolean | '0' | '1' | 0 | 1;
 }
 
 //Person
 export interface Person {
     id?: number;
     identification_id?: string;
-    profile_picture?: string;
+    profile_image?: string;
     alias?: string;
     occupation?: string;
     firstname?: string;
@@ -55,7 +55,7 @@ export interface Person {
 export interface Location {
     id?: number;
     name?: string;
-    status?: boolean | '0' | '1';
+    status?: boolean | '0' | '1' | 0 | 1;
 }
 
 //Client type
@@ -68,7 +68,7 @@ export interface ClientType {
 export interface Client {
     id?: number;
     email?: string;
-    allow_credit?: boolean | '0' | '1';
+    allow_credit?: boolean | '0' | '1' | 0 | 1;
     note?: string;
     date_reg?: string;
     location?: Location;
@@ -112,14 +112,14 @@ export interface Supplier {
 export interface ProductBrand {
     id?: number;
     name?: string;
-    status?: boolean | '0' | '1';
+    status?: boolean | '0' | '1' | 0 | 1;
 }
 
 //Product category
 export interface ProductCategory {
     id?: number;
     name?: string;
-    status?: boolean | '0' | '1';
+    status?: boolean | '0' | '1' | 0 | 1;
 }
 
 //Tax
@@ -127,12 +127,13 @@ export interface Tax {
     id?: number;
     name?: string;
     value?: number;
-    status?: boolean | '0' | '1';
+    status?: boolean | '0' | '1' | 0 | 1;
 }
 
 //Product
 export interface Product {
     id?: number;
+    images?: string[];
     barcode?: string;
     name?: string;
     model?: string;
@@ -143,6 +144,7 @@ export interface Product {
     credit_profit?: number;
     credit_price?: number;
     min_stock?: number;
+    status?: boolean | '0' | '1' | 0 | 1;
     category?: ProductCategory;
     brand?: ProductBrand;
     supplier?: Supplier;

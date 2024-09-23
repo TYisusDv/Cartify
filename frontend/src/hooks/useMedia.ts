@@ -31,19 +31,26 @@ const useMedia = ({ addAlert }: UseMediaProps): UseMediaReturn => {
 
         try {
             const mediaStream = await navigator.mediaDevices.getUserMedia({
-                video: true,
+                video: {
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 },
+                },
             });
             setStream(mediaStream);
             if (videoRef.current) {
                 videoRef.current.srcObject = mediaStream;
                 videoRef.current.play();
             }
+
+            const videoTrack = mediaStream.getVideoTracks()[0];
+            const { width, height } = videoTrack.getSettings();
+            console.log(`Camera Dimensions: ${width}x${height}`);
         } catch (error) {
             addAlert({ id: uuidv4(), text: 'Error accessing camera', type: 'danger', timeout: 3000 });
         }
 
         setIsVideoActive(true);
-    }, [isVideoActive]);
+    }, [isVideoActive, addAlert]);
 
     const stopVideo = useCallback(() => {
         if (stream) {
@@ -60,13 +67,12 @@ const useMedia = ({ addAlert }: UseMediaProps): UseMediaReturn => {
         if (canvasRef.current && videoRef.current) {
             const context = canvasRef.current.getContext("2d");
             if (context) {
-                context.drawImage(
-                    videoRef.current,
-                    0,
-                    0,
-                    canvasRef.current.width,
-                    canvasRef.current.height
-                );
+                const { videoWidth, videoHeight } = videoRef.current;
+
+                canvasRef.current.width = videoWidth;
+                canvasRef.current.height = videoHeight;
+
+                context.drawImage(videoRef.current, 0, 0, videoWidth, videoHeight);
                 canvasRef.current.toBlob((blob) => {
                     if (blob) {
                         const file = new File([blob], `image_${Date.now()}.jpg`, {
@@ -75,7 +81,7 @@ const useMedia = ({ addAlert }: UseMediaProps): UseMediaReturn => {
                         setCapturedImages((prevImages) => [...prevImages, file]);
                         stopVideo();
                     }
-                }, "image/jpeg");
+                }, "image/jpeg", 1.0)
             }
         }
     }, [stopVideo]);
@@ -91,6 +97,26 @@ const useMedia = ({ addAlert }: UseMediaProps): UseMediaReturn => {
         };
     }, [capturedImages]);
 
+    useEffect(() => {
+        const drawLastCapturedImage = async () => {
+            if (canvasRef.current && capturedImages.length > 0) {
+                const lastImage = capturedImages[capturedImages.length - 1];
+                const img = new Image();
+                img.src = URL.createObjectURL(lastImage);
+
+                img.onload = () => {
+                    const context = canvasRef.current?.getContext("2d");
+                    if (canvasRef.current && context) {
+                        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+                        context.drawImage(img, 0, 0, canvasRef.current.width, canvasRef.current.height);
+                    }
+                };
+            }
+        };
+
+        drawLastCapturedImage();
+    }, [capturedImages]);
+
     return {
         isVideoActive,
         stream,
@@ -100,7 +126,7 @@ const useMedia = ({ addAlert }: UseMediaProps): UseMediaReturn => {
         canvasRef,
         startVideo,
         stopVideo,
-        takePicture,
+        takePicture
     };
 };
 

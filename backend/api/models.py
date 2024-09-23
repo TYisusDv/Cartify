@@ -12,6 +12,11 @@ def upload_to_profiles(instance, filename):
     filename = f'{uuid.uuid4()}.{ext}'
     return os.path.join('profiles', filename)
 
+def upload_to_products(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f'{uuid.uuid4()}.{ext}'
+    return os.path.join('products', filename)
+
 class LocationsModel(models.Model):
     id = models.AutoField(primary_key = True)
     name = models.CharField(max_length = 50, null = False, blank = False)
@@ -54,7 +59,7 @@ class CitiesModel(models.Model):
 class PersonsModel(models.Model):
     id = models.AutoField(primary_key = True)
     identification_id = models.CharField(max_length = 100, null = False, blank = False)
-    profile_picture = models.ImageField(upload_to = upload_to_profiles, null = True, blank = False)
+    profile_image = models.ImageField(upload_to = upload_to_profiles, null = True, blank = False)
     alias = models.CharField(max_length = 50, null = True, blank = False)
     occupation = models.CharField(max_length = 50, null = True, blank = False)
     firstname = models.CharField(max_length = 50, null = False, blank = False)
@@ -67,15 +72,15 @@ class PersonsModel(models.Model):
     type_id = models.ForeignKey(TypesIdsModel, null = False, blank = False, on_delete = models.RESTRICT)
 
     def delete(self, *args, **kwargs):
-        if self.profile_picture:
-            if os.path.isfile(self.profile_picture.path):
-                os.remove(self.profile_picture.path)
+        if self.profile_image:
+            if os.path.isfile(self.profile_image.path):
+                os.remove(self.profile_image.path)
 
-        for identification_picture in self.identification_pictures.all():
-            if identification_picture.image:
-                if os.path.isfile(identification_picture.image.path):
-                    os.remove(identification_picture.image.path)
-            identification_picture.delete()
+        for identification_image in self.identification_images.all():
+            if identification_image.image:
+                if os.path.isfile(identification_image.image.path):
+                    os.remove(identification_image.image.path)
+            identification_image.delete()
 
         super().delete(*args, **kwargs)
 
@@ -92,12 +97,12 @@ class AddressesModel(models.Model):
     class Meta:
         db_table = 'addresses'
 
-class IdentificationPictures(models.Model):
-    person = models.ForeignKey(PersonsModel, related_name = 'identification_pictures', on_delete = models.CASCADE)
+class IdentificationImages(models.Model):
+    person = models.ForeignKey(PersonsModel, related_name = 'identification_images', on_delete = models.CASCADE)
     image = models.ImageField(upload_to = upload_to_identifications, null = True, blank = False)
 
     class Meta: 
-        db_table = 'identification_pictures'
+        db_table = 'identification_images'
 
 class ClientTypesModel(models.Model):
     id = models.AutoField(primary_key = True)
@@ -194,7 +199,24 @@ class ProductsModel(models.Model):
     category = models.ForeignKey(ProductCategoriesModel, null = True, blank = False, on_delete = models.RESTRICT)
     brand = models.ForeignKey(ProductBrandsModel, null = True, blank = False, on_delete = models.RESTRICT)
     supplier = models.ForeignKey(SuppliersModel, null = True, blank = False, on_delete = models.RESTRICT) 
-    tax = models.ForeignKey(TaxesModel, null = True, blank = False, on_delete = models.RESTRICT) 
+    tax = models.ForeignKey(TaxesModel, null = True, blank = False, on_delete = models.RESTRICT)
+    status = models.BooleanField(default = True, null = False, blank = False)
     
+    def delete(self, *args, **kwargs):
+        for image in self.product_images.all():
+            if image.image:
+                if os.path.isfile(image.image.path):
+                    os.remove(image.image.path)
+            image.delete()
+
+        super().delete(*args, **kwargs)
+        
     class Meta: 
         db_table = 'products'
+
+class ProductImagesModel(models.Model):
+    product = models.ForeignKey(ProductsModel, related_name = 'product_images', on_delete = models.RESTRICT)
+    image = models.ImageField(upload_to = upload_to_products, null = True, blank = False)
+
+    class Meta: 
+        db_table = 'product_images'

@@ -25,7 +25,7 @@
     "general": "General",
     "home": "Inicio",
     "identification_id": "Número de identificación",
-    "identification_pictures_client": "Fotos de los documentos",
+    "identification_images_client": "Fotos de los documentos",
     "identification_type": "Tipo de identificación",
     "inventory": "Inventario",
     "language": "Idioma",
@@ -50,7 +50,7 @@
     "phone_number": "Número de teléfono",
     "point_of_sell": "Punto de venta",
     "products": "Productos",
-    "profile_picture_client": "Foto del cliente",
+    "profile_image_client": "Foto del cliente",
     "relationship": "Parentesco",
     "sales": "Ventas",
     "search": "Buscar",
@@ -74,7 +74,7 @@
     "edit": "Editar",
     "edit_supplier": "Editar proveedores",
     "delete": "Eliminar",
-    "delete_picture_sure": "¿Está seguro/a de que desea eliminar la foto?",
+    "delete_image_sure": "¿Está seguro/a de que desea eliminar la foto?",
     "name": "Nombre",
     "company": "Empresa",
     "advisor": "Asesor",
@@ -109,5 +109,7 @@
     "delete_tax": "Eliminar impuesto",
     "value": "Valor",
     "value_per": "Valor (%)",
-    "tax": "Impuesto"
+    "tax": "Impuesto",
+    "min_stock": "Stock minimo",
+    "product_images": "Imagenes del producto"
 }

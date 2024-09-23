@@ -2,3 +2,24 @@ body {
     margin: 0;
     padding: 0;
 }
+
+::-webkit-scrollbar {
+    @apply h-3 w-3;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-white bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply rounded-sm dark:bg-slate-600;
+}
+/*
+textarea::-webkit-scrollbar-track {
+    background: v.$br-input;
+}
+
+textarea::-webkit-scrollbar-thumb {
+    background: v.$color-ph-input; 
+}
+*/

@@ -91,7 +91,7 @@ const SelectGroup: React.FC<SelectGroupProps> = ({ name, value, label = 'name', 
   };
 
   return (
-    <div ref={containerRef} className={`relative w-full ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+    <div ref={containerRef} className={`relative w-full select-none ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
       <select
         ref={selectRef}
         name={name}

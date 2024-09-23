@@ -47,6 +47,7 @@ const InputGroup: React.FC<InputGroupProps> = ({ id, className, name, label, ico
                 value={value}
                 onChange={handleInputChange}
                 disabled={disabled}
+                autoComplete='off'
             />
             {icon}
         </div>

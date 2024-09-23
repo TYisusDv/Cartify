@@ -52,7 +52,7 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
     <section className='flex relative h-screen animate__animated animate__fadeIn animate__faster dark:bg-slate-800'>
       <nav className='fixed flex flex-col w-[260px] h-full border-r-2 border-gray-100 gap-2 p-8 z-10 dark:border-r-slate-600'>
         <div className='w-full'>
-          <h1 className='text-2xl font-bold dark:text-white'>Carsync</h1>
+          <h1 className='text-2xl font-bold dark:text-white'>Cartify</h1>
         </div>
         <ul className='flex flex-col mt-16 gap-2'>
           <li><Link to='/home' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/home')}`}><DashboardSquare01Icon /> {translations.home}</Link></li>
