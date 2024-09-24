@@ -1231,7 +1231,7 @@ class ManageProductsAPIView(APIView):
         if not product_serializer.is_valid():
             return JsonResponse({
                 'success': False, 
-                'resp': product_serializer.errors
+                'resp': product_serializer.errors,
             }, status = 400)    
                 
         product_instance = self.get_object(pk = product_id)           

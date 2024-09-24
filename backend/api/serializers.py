@@ -547,7 +547,7 @@ class AddEditSupplierSerializer(serializers.ModelSerializer):
         exclude = ['id']
 
 class GetSupplierSerializer(serializers.ModelSerializer):    
-    id = serializers.IntegerField(error_messages = {
+    id = serializers.UUIDField(error_messages = {
         'required': 'The supplier is required.',
         'blank': 'The supplier cannot be blank.',
         'null': 'The supplier cannot be blank.',
@@ -869,11 +869,11 @@ class AddEditProductSerializer(serializers.ModelSerializer):
         exclude = ['id', 'category', 'brand', 'supplier', 'tax']
 
 class GetProductSerializer(serializers.ModelSerializer):    
-    id = serializers.IntegerField(error_messages = {
-        'required': 'The product category is required.',
-        'blank': 'The product category cannot be blank.',
-        'null': 'The product category cannot be blank.',
-        'invalid': 'The product category is invalid.',
+    id = serializers.UUIDField(error_messages = {
+        'required': 'The product is required.',
+        'blank': 'The product cannot be blank.',
+        'null': 'The product cannot be blank.',
+        'invalid': 'The product is invalid.',
     })
     
     class Meta:

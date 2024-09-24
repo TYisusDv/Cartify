@@ -4,9 +4,10 @@ interface ModalProps {
     children: ReactNode;
     title: string;
     onClose: () => void;
+    className?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ children, title, onClose }) => {
+const Modal: React.FC<ModalProps> = ({ children, title, onClose, className = '' }) => {
     useEffect(() => {
         const panelContent = document.querySelector('.panel-content') as HTMLElement;
         if (panelContent) {
@@ -22,7 +23,7 @@ const Modal: React.FC<ModalProps> = ({ children, title, onClose }) => {
 
     return (
         <div className='absolute top-0 left-0 flex items-center justify-center h-full w-full p-2 z-50 bg-black/50 dark:bg-slate-800/80 animate__animated animate__fadeIn animate__faster'>
-            <div className='flex flex-col bg-white h-auto w-full max-w-[680px] rounded-3xl dark:bg-slate-700'>
+            <div className={`flex flex-col bg-white h-auto w-full max-w-[680px] rounded-3xl dark:bg-slate-700 ${className}`}>
                 <div className='flex justify-between w-full p-5 border-b-2 border-gray-200 dark:border-slate-600'>
                     <h1 className='text-lg font-bold dark:text-white'>{title}</h1>
                     <button type='button' className='rounded-full p-2 hover:bg-gray-200 dark:text-white dark:hover:bg-slate-600' aria-label='Close' onClick={onClose}>
@@ -32,7 +33,7 @@ const Modal: React.FC<ModalProps> = ({ children, title, onClose }) => {
                         </svg>
                     </button>
                 </div>
-                <div className='flex-1 overflow-y-auto p-5 pt-3 pb-3 max-h-[80vh]'>
+                <div className='flex-1 h-full overflow-y-auto p-5 pt-3 pb-3 max-h-[80vh]'>
                     {children}
                 </div>
             </div>

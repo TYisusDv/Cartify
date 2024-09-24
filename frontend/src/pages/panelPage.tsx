@@ -14,6 +14,7 @@ interface PanelPageProps {
 
 const HomePage = React.lazy(() => import('../pages/homePage'));
 const AuthLogoutPage = React.lazy(() => import('../pages/auth/authLogoutPage'));
+const AppInventoryPage = React.lazy(() => import('./app/inventory/AppInventoryPage'));
 const ManageUsersPage = React.lazy(() => import('./manage/manageUsersPage'));
 const ManageClientsPage = React.lazy(() => import('./manage/clients/manageClientsPage'));
 const ManageTaxesPage = React.lazy(() => import('./manage/taxes/ManageTaxesPage'));
@@ -57,8 +58,8 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
         <ul className='flex flex-col mt-16 gap-2'>
           <li><Link to='/home' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/home')}`}><DashboardSquare01Icon /> {translations.home}</Link></li>
           <hr className='border dark:border-slate-600' />
-          <li><Link to='/pos' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/pos')}`}><ShoppingCartCheck02Icon /> {translations.point_of_sell}</Link></li>
-          <li><Link to='/inventory' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/inventory')}`}><SearchList02Icon />  {translations.inventory}</Link></li>
+          <li><Link to='/app/pos' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/app/pos')}`}><ShoppingCartCheck02Icon /> {translations.point_of_sell}</Link></li>
+          <li><Link to='/app/inventory' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/app/inventory')}`}><SearchList02Icon />  {translations.inventory}</Link></li>
           <li><Link to='/statistics' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/statistics')}`}><Analytics02Icon />  {translations.statistics}</Link></li>
           <hr className='border dark:border-slate-600' />
           <li><Link to='/manage/users' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/users')}`}><UserGroupIcon />  {translations.users}</Link></li>
@@ -91,6 +92,7 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
           <Routes>
             <Route path='/' element={<Navigate to='/home' />} />
             <Route path='/home' element={<HomePage />} />
+            <Route path='/app/inventory' element={<AppInventoryPage addAlert={addAlert} />} />
             <Route path='/manage/users' element={<ManageUsersPage />} />
             <Route path='/manage/clients' element={<ManageClientsPage addAlert={addAlert} />} />
             <Route path='/manage/taxes' element={<ManageTaxesPage addAlert={addAlert} />} />

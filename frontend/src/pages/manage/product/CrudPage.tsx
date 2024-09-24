@@ -16,12 +16,12 @@ import useMedia from '../../../hooks/useMedia';
 interface CrudPageProps {
     addAlert: (alert: AlertType) => void;
     onClose: () => void;
-    toggleModal: (modalType: 'add_brand' | 'add_category' | 'add_supplier' | 'product_images', isOpen: boolean) => void;
+    toggleModal: (modalType: 'add_brand' | 'add_category' | 'add_supplier' | 'add_tax' | 'product_images', isOpen: boolean) => void;
     handleTableReload?: () => void;
-    setSelected?: (value: number) => void;
+    setSelected?: (value: string) => void;
     setImageUrl?: (url: string) => void;
     type: string;
-    selected_id: number;
+    selected_id: string;
 }
 
 const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, handleTableReload, setSelected, setImageUrl, type, selected_id }) => {
@@ -145,7 +145,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
             onClose();
 
             if (handleTableReload) handleTableReload();
-            if (setSelected) setSelected(0);
+            if (setSelected) setSelected('');
         }
     };
 
@@ -435,7 +435,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                             <div className='col-span-1 z-[7]'>
                                 <div className='flex gap-1 z-[8]'>
                                     {(type === 'edit' || type === 'add') && (
-                                        <button type='button' className={`btn btn-${colorPage} text-sm h-auto w-11 rounded-2xl`} onClick={() => { toggleModal('add_supplier', true) }}><Add01Icon /></button>
+                                        <button type='button' className={`btn btn-${colorPage} text-sm h-auto w-11 rounded-2xl`} onClick={() => { toggleModal('add_tax', true) }}><Add01Icon /></button>
                                     )}
                                     <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
                                         <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.tax}</h3>

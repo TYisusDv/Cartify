@@ -111,5 +111,9 @@
     "value_per": "Valor (%)",
     "tax": "Impuesto",
     "min_stock": "Stock minimo",
-    "product_images": "Imagenes del producto"
+    "product_images": "Imagenes del producto",
+    "app_inventory_info": "Administra el inventario aquí. ¡Agrega, edita y elimina!",
+    "add_movement": "Agregar movimiento",
+    "product": "Producto",
+    "quantity": "Cantidad"
 }

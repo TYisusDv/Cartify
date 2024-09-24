@@ -1,3 +1,18 @@
+//User
+export interface User {
+    id?: number;
+    password?: string;
+    last_login?: string;
+    is_superuser?: boolean;
+    username?: string;
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    is_staff?: boolean;
+    is_active?: boolean;
+    date_joined?: string;
+}
+
 //Country
 export interface Country {
     id?: number;
@@ -20,7 +35,7 @@ export interface City {
 
 //Address
 export interface Address {
-    id?: number;
+    id?: string;
     street?: string;
     area?: string;
     city?: City;
@@ -35,7 +50,7 @@ export interface TypeID {
 
 //Person
 export interface Person {
-    id?: number;
+    id?: string;
     identification_id?: string;
     profile_image?: string;
     alias?: string;
@@ -95,7 +110,7 @@ export interface ClientContact {
 
 //Suppliers
 export interface Supplier {
-    id?: number;
+    id?: string;
     company_name?: string;
     company_identification?: string;
     company_email?: string;
@@ -132,7 +147,7 @@ export interface Tax {
 
 //Product
 export interface Product {
-    id?: number;
+    id?: string;
     images?: string[];
     barcode?: string;
     name?: string;
@@ -149,4 +164,16 @@ export interface Product {
     brand?: ProductBrand;
     supplier?: Supplier;
     tax?: Tax;
+}
+
+//Inventory
+export interface Inventory {
+    id?: string;
+    quantity?: number;
+    type?: number;
+    note?: string;
+    date_reg?: string;
+    product?: Product;
+    location?: Location;
+    user?: User;
 }

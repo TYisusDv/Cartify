@@ -13,9 +13,9 @@ interface CrudPageProps {
     addAlert: (alert: AlertType) => void;
     onClose: () => void;
     handleTableReload?: () => void;
-    setSelected?: (value: number) => void;
+    setSelected?: (value: string) => void;
     type: string;
-    selected_id?: number;
+    selected_id?: string;
 }
 
 const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReload, setSelected, type, selected_id }) => {
@@ -75,7 +75,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
             addAlert({ id: uuidv4(), text: response?.data?.resp, type: 'primary', timeout: 3000 });
             onClose();
             if(handleTableReload) handleTableReload();
-            if(setSelected) setSelected(0);
+            if(setSelected) setSelected('');
         }        
     };
 

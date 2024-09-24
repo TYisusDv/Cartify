@@ -1,7 +1,7 @@
 import apiService from './apiService';
 import { Product } from '../types/modelType';
 
-export const getProduct = async (selected_id: number) => {
+export const getProduct = async (selected_id: string) => {
   const response = await apiService.get('/manage/products', {
     params: {
       query: 'get',
@@ -30,7 +30,7 @@ export const editProduct = async (form: Product) => {
   return response;
 };
 
-export const deleteProduct = async (selected_id: number) => {
+export const deleteProduct = async (selected_id: string) => {
   const response = await apiService.delete('/manage/products', {
     params: {
       id: selected_id,

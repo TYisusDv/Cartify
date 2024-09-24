@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 import uuid, os
 
 def upload_to_identifications(instance, filename):
@@ -57,7 +58,7 @@ class CitiesModel(models.Model):
         db_table = 'cities'
 
 class PersonsModel(models.Model):
-    id = models.AutoField(primary_key = True)
+    id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
     identification_id = models.CharField(max_length = 100, null = False, blank = False)
     profile_image = models.ImageField(upload_to = upload_to_profiles, null = True, blank = False)
     alias = models.CharField(max_length = 50, null = True, blank = False)
@@ -88,7 +89,7 @@ class PersonsModel(models.Model):
         db_table = 'persons'
 
 class AddressesModel(models.Model):
-    id = models.AutoField(primary_key = True)
+    id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
     street = models.CharField(max_length = 100, null = False, blank = False)
     area = models.CharField(max_length = 50, null = True, blank = False)
     city = models.ForeignKey(CitiesModel, null = False, blank = False, on_delete = models.RESTRICT)
@@ -144,7 +145,7 @@ class ClientContactsModel(models.Model):
         db_table = 'client_contacts'
 
 class SuppliersModel(models.Model):
-    id = models.AutoField(primary_key = True)
+    id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
     company_name = models.CharField(max_length = 100, null = False, blank = False)
     company_identification = models.CharField(max_length = 50, null = True, blank = False)
     company_email = models.EmailField(null = True, blank = False)
@@ -185,7 +186,7 @@ class TaxesModel(models.Model):
         db_table = 'taxes'
 
 class ProductsModel(models.Model):
-    id = models.AutoField(primary_key = True)
+    id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
     barcode = models.CharField(max_length = 50, null = True, blank = False)
     name = models.CharField(null = False, blank = False)
     model = models.CharField(max_length = 50, null = True, blank = False)
@@ -220,3 +221,16 @@ class ProductImagesModel(models.Model):
 
     class Meta: 
         db_table = 'product_images'
+
+class InventoryModel(models.Model):
+    id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+    quantity = models.FloatField(default = 0, null = False, blank = False)
+    type = models.IntegerField(null = False, blank = False)
+    note = models.CharField(max_length = 100, null = True, blank = False)
+    date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
+    product = models.ForeignKey(ProductsModel, on_delete = models.RESTRICT)
+    location = models.ForeignKey(LocationsModel, on_delete = models.RESTRICT)
+    user = models.ForeignKey(User, on_delete = models.RESTRICT)
+        
+    class Meta: 
+        db_table = 'inventory'

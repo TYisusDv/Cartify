@@ -4,8 +4,8 @@ import useTranslations from '../../../hooks/useTranslations';
 
 interface TablePageProps {
     data?: Array<{ [key: string]: any }>;
-    selected: number;
-    setSelected: (value: number) => void;
+    selected: string;
+    setSelected: (value: string) => void;
 }
 
 const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) => {
