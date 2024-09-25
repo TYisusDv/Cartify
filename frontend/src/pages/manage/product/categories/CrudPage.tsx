@@ -90,14 +90,14 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                     onChange={handleChange({ setFormValues })}
                     value={formValues.name || ''}
                     color={colorPage}
-                    disabled={type === 'details' || type === 'delete' ? true : false}
+                    disabled={['details', 'delete'].includes(type)}
                 />
                 <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-10 gap-2'>
                     <label className='inline-flex items-center cursor-pointer'>
                         <span className='ml-1 me-2 text-sm font-bold text-gray-900 dark:text-gray-300'>{translations.visible}</span>
                         <input type='checkbox' 
                             value={formValues.status ? '1' : '0'} 
-                            disabled={type === 'details' || type === 'delete' ? true : false} 
+                            disabled={['details', 'delete'].includes(type)} 
                             className='sr-only peer' 
                             name='status' 
                             onChange={handleChange({ setFormValues })} 

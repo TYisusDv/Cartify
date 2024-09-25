@@ -92,7 +92,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             onChange={handleChange({ setFormValues })}
                             value={formValues.name || ''}
                             color={colorPage}
-                            disabled={type === 'details' || type === 'delete' ? true : false}
+                            disabled={['details', 'delete'].includes(type)}
                         />
                     </div>
                     <div className='col-span-1'>
@@ -105,7 +105,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             value={formValues.value}
                             color={colorPage}
                             required={false}
-                            disabled={type === 'details' || type === 'delete' ? true : false}
+                            disabled={['details', 'delete'].includes(type)}
                         />
                     </div>
                 </div>
@@ -114,7 +114,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                         <span className='ml-1 me-2 text-sm font-bold text-gray-900 dark:text-gray-300'>{translations.visible}</span>
                         <input type='checkbox'
                             value={formValues.status ? '1' : '0'}
-                            disabled={type === 'details' || type === 'delete' ? true : false}
+                            disabled={['details', 'delete'].includes(type)}
                             className='sr-only peer'
                             name='status'
                             onChange={handleChange({ setFormValues })}

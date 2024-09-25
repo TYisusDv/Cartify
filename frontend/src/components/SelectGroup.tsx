@@ -1,5 +1,5 @@
 import { ArrowDown01Icon, CheckmarkCircle01Icon } from 'hugeicons-react';
-import React, { useState, useRef, ChangeEvent, useEffect } from 'react';
+import React, { useState, useRef, ChangeEvent, useEffect, useCallback } from 'react';
 import { getList } from '../services/componentsService';
 import useClickOutside from '../hooks/useClickOutSide';
 import useTranslations from '../hooks/useTranslations';
@@ -22,7 +22,7 @@ interface SelectGroupProps {
 
 const SelectGroup: React.FC<SelectGroupProps> = ({ name, value, label = 'name', label_per, onChange, endpoint, myOptions, disabled = false }) => {
   const { translations } = useTranslations();
-  const [selectedValue, setSelectedValue] = useState(value || 0);
+  const [selectedValue, setSelectedValue] = useState(value || '0');
   const [isOpen, setIsOpen] = useState(false);
   const [options, setOptions] = useState<Option[]>([
     { value: 0, label: translations.select_an_option }
@@ -31,23 +31,7 @@ const SelectGroup: React.FC<SelectGroupProps> = ({ name, value, label = 'name', 
   const selectRef = useRef<HTMLSelectElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useClickOutside(containerRef, () => setIsOpen(false));
-
-  useEffect(() => {
-    if (myOptions) {
-      setOptions([{ value: 0, label: translations.select_an_option }, ...myOptions]);
-    } else if (endpoint) {
-      loadOptions(searchQuery);
-    }
-  }, [myOptions, endpoint, searchQuery]);
-
-  useEffect(() => {
-    if (value) {
-      setSelectedValue(value);
-    }
-  }, [value]);
-
-  const loadOptions = async (query: string) => {
+  const loadOptions = useCallback(async (query: string) => {
     if (endpoint) {
       try {
         const params = {
@@ -60,13 +44,30 @@ const SelectGroup: React.FC<SelectGroupProps> = ({ name, value, label = 'name', 
             value: option.id,
             label: label_per ? `${option[label]} (${option[label_per]}%)` : option[label]
           }));
-          setOptions([{ value: 0, label: translations.select_an_option }, ...newOptions]);
+          setOptions([{ value: '0', label: translations.select_an_option }, ...newOptions]);
         }
       } catch (error) {
-        setOptions([{ value: 0, label: translations.select_an_option }]);
+        console.error("Error fetching options:", error);
+        setOptions([{ value: '0', label: translations.select_an_option }]);
       }
     }
-  };
+  }, [endpoint, label, label_per, translations]);
+
+  useClickOutside(containerRef, () => setIsOpen(false));
+
+  useEffect(() => {
+    if (myOptions) {
+      setOptions([{ value: '0', label: translations.select_an_option }, ...myOptions]);
+    } else if (endpoint) {
+      loadOptions(searchQuery);
+    }
+  }, [myOptions, endpoint, searchQuery, translations.select_an_option, loadOptions]);
+
+  useEffect(() => {
+    if (value) {
+      setSelectedValue(value);
+    }
+  }, [value]);
 
   const handleSelect = (e: ChangeEvent<HTMLSelectElement>) => {
     const newValue = e.target.value;
@@ -95,7 +96,7 @@ const SelectGroup: React.FC<SelectGroupProps> = ({ name, value, label = 'name', 
       <select
         ref={selectRef}
         name={name}
-        className="hidden"
+        className='hidden'
         value={selectedValue}
         onChange={handleSelect}
         disabled={disabled}
@@ -117,31 +118,32 @@ const SelectGroup: React.FC<SelectGroupProps> = ({ name, value, label = 'name', 
           }
         }}
       >
-        {options.find((option) => option.value.toString() === selectedValue.toString())?.label || translations.select_an_option}
+        {options.find((option) => option.value.toString() === selectedValue.toString())?.label}
         <ArrowDown01Icon size={20} />
       </div>
       {isOpen && !disabled && (
-        <div className="absolute left-0 top-full text-sm mt-1 w-full border border-gray-200 rounded-md bg-white dark:bg-slate-700 dark:text-white dark:border-slate-600">
+        <div className='absolute left-0 top-full text-sm mt-1 w-full border border-gray-200 rounded-md bg-white dark:bg-slate-700 dark:text-white dark:border-slate-600'>
           {endpoint && (
             <input
-              type="text"
+              type='text'
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full p-2 border-b border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white outline-none"
+              className='w-full p-2 border-b border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white outline-none'
               placeholder={translations.search}
               disabled={disabled}
             />
           )}
-          <ul className="max-h-60 overflow-y-auto">
+          <ul className='max-h-60 overflow-y-auto'>
             {options.map((option) => (
               <li
                 key={option.value}
                 className={`flex items-center justify-between p-2 gap-2 hover:bg-gray-200 dark:hover:bg-slate-600 cursor-pointer ${selectedValue.toString() === option.value.toString() ? 'bg-gray-200 dark:bg-slate-600' : ''} ${disabled ? 'cursor-default' : ''}`}
                 onClick={() => handleOptionClick(option.value)}
               >
-                {option.label} {selectedValue.toString() === option.value.toString() ? <CheckmarkCircle01Icon className="text-black dark:text-white" size={18} /> : ''}
+                {option.label} {selectedValue.toString() === option.value.toString() ? <CheckmarkCircle01Icon className='text-black dark:text-white' size={18} /> : ''}
               </li>
-            ))}
+            )
+            )}
           </ul>
         </div>
       )}

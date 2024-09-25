@@ -341,7 +341,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     required={false}
                                     value={formValues.barcode || ''}
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                         </div>
@@ -355,7 +355,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     onChange={handleChange({ setFormValues })}
                                     value={formValues.name || ''}
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                             <div className='col-span-1'>
@@ -368,7 +368,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     required={false}
                                     value={formValues.model || ''}
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                         </div>
@@ -386,7 +386,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                                 name='brand.id'
                                                 onChange={handleSelectChange(setFormValues)}
                                                 value={formValues.brand?.id || 0}
-                                                disabled={type === 'details' || type === 'delete' ? true : false}
+                                                disabled={['details', 'delete'].includes(type)}
                                             />
                                         </div>
                                     </div>
@@ -405,7 +405,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                                 name='category.id'
                                                 onChange={handleSelectChange(setFormValues)}
                                                 value={formValues.category?.id || 0}
-                                                disabled={type === 'details' || type === 'delete' ? true : false}
+                                                disabled={['details', 'delete'].includes(type)}
                                             />
                                         </div>
                                     </div>
@@ -425,7 +425,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                         name='supplier.id'
                                         onChange={handleSelectChange(setFormValues)}
                                         value={formValues.supplier?.id || 0}
-                                        disabled={type === 'details' || type === 'delete' ? true : false}
+                                        disabled={['details', 'delete'].includes(type)}
                                     />
                                 </div>
                             </div>
@@ -446,7 +446,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                                 name='tax.id'
                                                 onChange={handleSelectChange(setFormValues)}
                                                 value={formValues.tax?.id || 0}
-                                                disabled={type === 'details' || type === 'delete' ? true : false}
+                                                disabled={['details', 'delete'].includes(type)}
                                             />
                                         </div>
                                     </div>
@@ -463,7 +463,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     required={false}
                                     value={formValues.cost_price}
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                         </div>
@@ -479,7 +479,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     value={formValues.cash_profit}
                                     type='number'
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                             <div className='col-span-1'>
@@ -493,7 +493,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     value={formValues.cash_price}
                                     type='number'
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                         </div>
@@ -509,7 +509,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     value={formValues.credit_profit}
                                     type='number'
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                             <div className='col-span-1'>
@@ -523,7 +523,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                                     value={formValues.credit_price}
                                     type='number'
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                         </div>
@@ -538,14 +538,14 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                             required={false}
                             value={formValues.min_stock || 0}
                             color={colorPage}
-                            disabled={type === 'details' || type === 'delete' ? true : false}
+                            disabled={['details', 'delete'].includes(type)}
                         />
                         <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full z-10 gap-2'>
                             <label className='inline-flex items-center cursor-pointer'>
                                 <span className='ml-1 me-2 text-sm font-bold text-gray-900 dark:text-gray-300'>{translations.visible}</span>
                                 <input type='checkbox'
                                     value={formValues.status ? '1' : '0'}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                     className='sr-only peer'
                                     name='status'
                                     onChange={handleChange({ setFormValues })}
@@ -564,7 +564,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                             required={false}
                             value={formValues.note || ''}
                             color={colorPage}
-                            disabled={type === 'details' || type === 'delete' ? true : false}
+                            disabled={['details', 'delete'].includes(type)}
                         />
                     </div>
                     <div className={`flex flex-col gap-2 w-full tab-item ${'product_images' === activeTab ? 'block' : 'hidden'}`}>

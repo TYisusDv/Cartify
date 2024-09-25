@@ -1241,3 +1241,158 @@ class ManageProductsAPIView(APIView):
             'success': True,
             'resp': 'Deleted successfully.'
         }, status = 200)
+
+#Inventory
+class AppInventoryAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self, pk) :
+        try:
+            return InventoryModel.objects.get(pk = pk)
+        except InventoryModel.DoesNotExist:
+            raise Http404('Inventory not found.')
+
+    def get(self, request):
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':   
+            if order_by == 'actions':
+                order_by = 'id'
+
+            model = InventoryModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = InventorySerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            inventory_id = data.get('id', None)
+
+            inventory_serializer = GetInventorySerializer(data = data)  
+            if not inventory_serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': inventory_serializer.errors
+                }, status = 400)    
+                    
+            inventory_instance = self.get_object(pk = inventory_id)
+            inventory_serialized = InventorySerializer(inventory_instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': inventory_serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = InventoryModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = InventorySerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = InventoryModel.objects.count()
+            visible = InventoryModel.objects.filter(status = 1).count()
+            hidden = InventoryModel.objects.filter(status = 0).count()  
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total,
+                    'visible': visible,
+                    'hidden': hidden
+                }
+            })      
+
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        with transaction.atomic():
+            user_id = request.user.id
+            data = request.data
+            
+            movements = data.get('movements', [])            
+            for movement in movements:
+                movement['user_id'] = user_id
+
+                inventory_serializer = AddEditInventorySerializer(data = movement)
+                if not inventory_serializer.is_valid():
+                    transaction.set_rollback(True)
+                    return JsonResponse({'success': False, 'resp': inventory_serializer.errors}, status = 400)
+
+                inventory_serializer.save()
+
+            return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        user_id = request.user.id
+        data['user_id'] = user_id
+        inventory_id = data.get('id', None)
+
+        inventory_serializer = GetInventorySerializer(data = data)  
+        if not inventory_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': inventory_serializer.errors
+            }, status = 400)    
+                
+        inventory_instance = self.get_object(pk = inventory_id)     
+
+        inventory_serializer = AddEditInventorySerializer(inventory_instance, data = data)
+        if not inventory_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': inventory_serializer.errors}, status = 400)
+
+        inventory_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        inventory_id = data.get('id', None)
+
+        inventory_serializer = GetInventorySerializer(data = data)  
+        if not inventory_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': inventory_serializer.errors,
+            }, status = 400)    
+                
+        inventory_instance = self.get_object(pk = inventory_id)           
+        inventory_instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)

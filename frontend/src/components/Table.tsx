@@ -20,14 +20,16 @@ interface TableProps {
     reloadTable: number;
     tbody: ReactElement;
     filters?: ReactElement;
+    order_by?: string;
+    order?: string;
 }
 
-const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, filters }) => {
+const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, filters, order_by = 'id', order = 'desc' }) => {
     const { translations } = useTranslations();
     const [data, setData] = useState<DataRow[]>([]);
     const itemsPerPage = 10;
     const [totalPages, setTotalPages] = useState(1);
-    const [formValues, setFormValues] = useState({ query: 'table', page: 1, show: itemsPerPage, search: '', order_by: 'id', order: 'desc' });
+    const [formValues, setFormValues] = useState({ query: 'table', page: 1, show: itemsPerPage, search: '', order_by: order_by, order: order });
 
     useEffect(() => {
         const fetchData = async () => {

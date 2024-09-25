@@ -105,7 +105,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     onChange={handleChange({ setFormValues })}
                                     value={formValues.company_name || ''}
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                             <div className='col-span-1'>
@@ -118,7 +118,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     required={false}
                                     value={formValues.company_identification || ''}
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                         </div>
@@ -131,7 +131,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             required={false}
                             value={formValues.company_email || ''}
                             color={colorPage}
-                            disabled={type === 'details' || type === 'delete' ? true : false}
+                            disabled={['details', 'delete'].includes(type)}
                         />
                         <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                             <div className='col-span-1'>
@@ -144,7 +144,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     required={false}
                                     value={formValues.company_phone || ''}
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                             <div className='col-span-1'>
@@ -157,7 +157,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     required={false}
                                     value={formValues.company_phone_2 || ''}
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                         </div>
@@ -170,7 +170,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             required={false}
                             value={formValues.company_address || ''}
                             color={colorPage}
-                            disabled={type === 'details' || type === 'delete' ? true : false}
+                            disabled={['details', 'delete'].includes(type)}
                         />
                     </div>
                     <div className={`flex flex-col gap-2 w-full tab-item ${'advisor' === activeTab ? 'block' : 'hidden'}`}>
@@ -183,7 +183,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             required={false}
                             value={formValues.advisor_fullname || ''}
                             color={colorPage}
-                            disabled={type === 'details' || type === 'delete' ? true : false}
+                            disabled={['details', 'delete'].includes(type)}
                         />
                         <InputGroup
                             id='advisor_email'
@@ -194,7 +194,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             required={false}
                             value={formValues.advisor_email || ''}
                             color={colorPage}
-                            disabled={type === 'details' || type === 'delete' ? true : false}
+                            disabled={['details', 'delete'].includes(type)}
                         />
                         <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                             <div className='col-span-1'>
@@ -207,7 +207,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     required={false}
                                     value={formValues.advisor_phone || ''}
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                             <div className='col-span-1'>
@@ -220,7 +220,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     required={false}
                                     value={formValues.advisor_phone_2 || ''}
                                     color={colorPage}
-                                    disabled={type === 'details' || type === 'delete' ? true : false}
+                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                         </div>

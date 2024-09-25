@@ -172,8 +172,10 @@ export interface Inventory {
     quantity?: number;
     type?: number;
     note?: string;
-    date_reg?: string;
+    date_reg?: Date;
     product?: Product;
     location?: Location;
     user?: User;
+    location_transfer?: Location;
+    user_transfer?: User;
 }

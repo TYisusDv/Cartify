@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Add01Icon, Delete02Icon, EyeIcon, PencilEdit02Icon } from 'hugeicons-react';
+import { Add01Icon, Delete02Icon, EyeIcon, PencilEdit02Icon, SearchList02Icon } from 'hugeicons-react';
 import { AlertType } from '../../../types/alert';
 import useTranslations from '../../../hooks/useTranslations';
 import DelayedSuspense from '../../../components/DelayedSuspense';
@@ -15,7 +15,7 @@ interface AppInventoryPageProps {
 
 const AppInventoryPage: React.FC<AppInventoryPageProps> = ({ addAlert }) => {
     const { translations } = useTranslations();
-    const [selected, setSelected] = useState<string>('');
+    const [selected, setSelected] = useState<string | undefined>();
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, details: false });
     const [reloadTable, setReloadTable] = useState(0);
 
@@ -28,12 +28,13 @@ const AppInventoryPage: React.FC<AppInventoryPageProps> = ({ addAlert }) => {
     };
 
     const table_header = [
-        { name: '', headerName: 'Fecha de registro' },
-        { name: '', headerName: 'Cantidad' },
-        { name: '', headerName: 'Producto' },
-        { name: '', headerName: 'Ubicación' },
-        { name: '', headerName: 'Nota' },
-        { name: '', headerName: 'Empleado' },
+        { name: 'date_reg', headerName: 'Fecha de registro' },
+        { name: 'quantity', headerName: 'Cantidad' },
+        { name: 'product.name', headerName: 'Producto' },
+        { name: 'location.name', headerName: 'Ubicación' },
+        { name: 'type', headerName: 'Tipo' },
+        { name: 'note', headerName: 'Nota' },
+        { name: 'user.first_name', headerName: 'Empleado' },
     ];
     
     return (
@@ -50,47 +51,30 @@ const AppInventoryPage: React.FC<AppInventoryPageProps> = ({ addAlert }) => {
                     <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('add', true)}><Add01Icon /></button>
                 </div>
             </div>
-            <div className='flex flex-col p-8 gap-3 animate__animated animate__fadeIn animate__faster'>
-                <h1 className='text-black font-bold text-lg pb-2 dark:text-white border-b-2 dark:border-slate-600'>Entradas</h1>
-                <div className='w-full'>
-                    <Table 
-                        endpoint='manage/products' 
-                        reloadTable={reloadTable} 
-                        header={table_header} 
-                        tbody={
-                            <TablePage 
-                                selected={selected} 
-                                setSelected={setSelected}
-                            />
-                        } 
-                    />
+            <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 border-t-2 border-b-2 border-gray-100 py-6 dark:border-slate-600'>
+                    <div className='col-span-1 flex items-center gap-3 pb-0 dark:border-slate-600'>
+                        <div className='flex justify-center items-center h-12 w-12 bg-gray-200 rounded-full dark:bg-slate-600 dark:text-white'>
+                            <SearchList02Icon />
+                        </div>
+                        <div>
+                            <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total</h2>
+                            <h3 className='text-lg font-bold dark:text-white'>0</h3>
+                        </div>
+                    </div>
                 </div>
-                <h1 className='text-black font-bold text-lg pb-2 dark:text-white border-b-2 dark:border-slate-600'>Salidas</h1>
-                <div className='w-full'>
+                <div className='w-full mt-6'>
                     <Table 
-                        endpoint='manage/products' 
+                        endpoint='app/inventory' 
                         reloadTable={reloadTable} 
                         header={table_header} 
+                        order_by='date_reg'
                         tbody={
                             <TablePage 
                                 selected={selected} 
                                 setSelected={setSelected}
                             />
-                        } 
-                    />
-                </div>
-                <h1 className='text-black font-bold text-lg pb-2 dark:text-white border-b-2 dark:border-slate-600'>Traslados</h1>
-                <div className='w-full'>
-                    <Table 
-                        endpoint='manage/products' 
-                        reloadTable={reloadTable} 
-                        header={table_header} 
-                        tbody={
-                            <TablePage 
-                                selected={selected} 
-                                setSelected={setSelected}
-                            />
-                        } 
+                        }
                     />
                 </div>
             </div>
@@ -98,6 +82,24 @@ const AppInventoryPage: React.FC<AppInventoryPageProps> = ({ addAlert }) => {
             {isModalOpen.add && (
                 <Modal title={translations.add_movement} onClose={() => toggleModal('add', false)} className='max-w-[980px]'>
                     <CrudPage addAlert={addAlert} type='add' selected_id={selected} onClose={() => toggleModal('add', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                </Modal>
+            )} 
+
+            {isModalOpen.edit && (
+                <Modal title={translations.edit_movement} onClose={() => toggleModal('edit', false)} className='max-w-[980px]'>
+                    <CrudPage addAlert={addAlert} type='edit' selected_id={selected} onClose={() => toggleModal('edit', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                </Modal>
+            )}  
+
+            {isModalOpen.details && (
+                <Modal title={translations.details_movement} onClose={() => toggleModal('details', false)} className='max-w-[980px]'>
+                    <CrudPage addAlert={addAlert} type='details' selected_id={selected} onClose={() => toggleModal('details', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                </Modal>
+            )}  
+
+            {isModalOpen.delete && (
+                <Modal title={translations.delete_movement_sure} onClose={() => toggleModal('delete', false)} className='max-w-[980px]'>
+                    <CrudPage addAlert={addAlert} type='delete' selected_id={selected} onClose={() => toggleModal('delete', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}         
         </DelayedSuspense>

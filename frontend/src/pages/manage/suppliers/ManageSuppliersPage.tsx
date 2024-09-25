@@ -74,7 +74,7 @@ const ManageSuppliersPage: React.FC<ManageSuppliersPageProps> = ({ addAlert }) =
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t-2 border-b-2 border-gray-100 py-6 dark:border-slate-600'>
-                    <div className='col-span-1 flex items-center gap-3 pb-5 border-gray-100 lg:p-0 dark:border-slate-600'>
+                    <div className='col-span-1 flex items-center gap-3 pb-0 dark:border-slate-600'>
                         <div className='flex justify-center items-center h-12 w-12 bg-gray-200 rounded-full dark:bg-slate-600 dark:text-white'>
                             <DistributionIcon />
                         </div>
@@ -110,7 +110,7 @@ const ManageSuppliersPage: React.FC<ManageSuppliersPageProps> = ({ addAlert }) =
                 <Modal title={translations.details_supplier} onClose={() => toggleModal('details', false)}>
                     <CrudPage addAlert={addAlert} type='details' selected_id={selected} onClose={() => toggleModal('details', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
-            )}          
+            )}
         </DelayedSuspense>
     );
 };

@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
-from django.db import IntegrityError
 from django.core.validators import FileExtensionValidator
 from .models import *
 import json, base64
@@ -18,7 +17,18 @@ class Base64ImageField(serializers.ImageField):
             return super().to_internal_value(file) 
 
         return super().to_internal_value(data)
-    
+
+#User
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+class UserExcludeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        exclude = ['password', 'last_login', 'is_superuser', 'is_staff', 'is_active', 'date_joined', 'groups', 'user_permissions']
+
 #Auth login
 class LogInSerializer(serializers.ModelSerializer):
     username = serializers.CharField(error_messages = {
@@ -832,7 +842,7 @@ class AddEditProductSerializer(serializers.ModelSerializer):
             data['category_id'] = None
         
         if data.get('brand_id') in [0, '0']:
-            data['brand_id'] = 0
+            data['brand_id'] = None
         
         if data.get('supplier_id') in [0, '0']:
             data['supplier_id'] = None
@@ -878,4 +888,122 @@ class GetProductSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ProductsModel
+        fields = ['id']
+
+#Inventory
+class InventorySerializer(serializers.ModelSerializer):
+    product = ProductsSerializer(read_only = True)
+    location = LocationsSerializer(read_only = True)
+    user = UserExcludeSerializer(read_only = True)
+    location_transfer = LocationsSerializer(read_only = True)
+    user_transfer = UserExcludeSerializer(read_only = True)
+
+    class Meta:
+        model = InventoryModel
+        fields = '__all__'
+
+class AddEditInventorySerializer(serializers.ModelSerializer):
+    type = serializers.IntegerField(error_messages = {
+        'required': 'The inventory type is required.',
+        'blank': 'The inventory type cannot be blank.',
+        'null': 'The inventory type cannot be blank.',
+        'invalid': 'The inventory type is invalid.',
+    }, required = True)
+
+    quantity = serializers.FloatField(error_messages = {
+        'required': 'The quantity is required.',
+        'blank': 'The quantity cannot be blank.',
+        'null': 'The quantity cannot be blank.',
+        'invalid': 'The quantity is invalid.',
+    }, required = False)
+
+    note = serializers.CharField(error_messages = {
+        'required': 'The note is required.',
+        'blank': 'The note cannot be blank.',
+        'null': 'The note cannot be blank.',
+        'max_length': 'The note cannot exceed 100 characters.',
+    }, required= False, max_length = 100, allow_blank = True, allow_null = True)
+
+    product_id = serializers.UUIDField(error_messages = {
+        'required': 'The product is required.',
+        'blank': 'The product cannot be blank.',
+        'null': 'The product cannot be blank.',
+        'invalid': 'The product is invalid.',
+    }, allow_null = False)
+
+    location_id = serializers.IntegerField(error_messages = {
+        'required': 'The location is required.',
+        'blank': 'The location cannot be blank.',
+        'null': 'The location cannot be blank.',
+        'invalid': 'The location is invalid.',
+    }, allow_null = False)
+
+    user_id = serializers.IntegerField(error_messages = {
+        'required': 'The user is required.',
+        'blank': 'The user cannot be blank.',
+        'null': 'The user cannot be blank.',
+        'invalid': 'The user is invalid.',
+    }, allow_null = False)
+
+    location_transfer_id = serializers.IntegerField(error_messages = {
+        'required': 'The location is required.',
+        'blank': 'The location cannot be blank.',
+        'null': 'The location cannot be blank.',
+        'invalid': 'The location is invalid.',
+    }, required = False, allow_null = True)
+
+    user_transfer_id = serializers.IntegerField(error_messages = {
+        'required': 'The user is required.',
+        'blank': 'The user cannot be blank.',
+        'null': 'The user cannot be blank.',
+        'invalid': 'The user is invalid.',
+    }, required = False, allow_null = True)
+
+    def to_internal_value(self, data):
+        if 'product' in data and isinstance(data['product'], dict) and 'id' in data['product']:
+            data['product_id'] = data['product']['id']
+        
+        if 'location' in data and isinstance(data['location'], dict) and 'id' in data['location']:
+            data['location_id'] = data['location']['id']
+        
+        if 'location_transfer' in data and isinstance(data['location_transfer'], dict) and 'id' in data['location_transfer']:
+            data['location_transfer_id'] = data['location_transfer']['id']
+        
+        if 'user_transfer' in data and isinstance(data['user_transfer'], dict) and 'id' in data['user_transfer']:
+            data['user_transfer_id'] = data['user_transfer']['id']
+        
+        if data.get('product_id') in [0, '0']:
+            data['product_id'] = None
+        
+        if data.get('location_id') in [0, '0']:
+            data['location_id'] = None
+        
+        if data.get('location_transfer_id') in [0, '0']:
+            data['location_transfer_id'] = None
+        
+        if data.get('user_transfer_id') in [0, '0']:
+            data['user_transfer_id'] = None
+
+        return super().to_internal_value(data)
+
+    class Meta:
+        model = InventoryModel
+        exclude = ['id', 'product', 'location', 'user', 'location_transfer', 'user_transfer']
+    
+    def validate_type(self, value):
+        if value not in [1, 2, 3]:
+            raise serializers.ValidationError('Invalid inventory type.')
+        
+        return value
+
+class GetInventorySerializer(serializers.ModelSerializer):    
+    id = serializers.UUIDField(error_messages = {
+        'required': 'The inventory is required.',
+        'blank': 'The inventory cannot be blank.',
+        'null': 'The inventory cannot be blank.',
+        'invalid': 'The inventory is invalid.',
+    })
+    
+    class Meta:
+        model = InventoryModel
         fields = ['id']

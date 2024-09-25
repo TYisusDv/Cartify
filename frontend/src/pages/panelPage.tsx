@@ -51,7 +51,7 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
 
   return (
     <section className='flex relative h-screen animate__animated animate__fadeIn animate__faster dark:bg-slate-800'>
-      <nav className='fixed flex flex-col w-[260px] h-full border-r-2 border-gray-100 gap-2 p-8 z-10 dark:border-r-slate-600'>
+      <nav className='fixed flex flex-col w-[260px] h-full border-r-2 border-gray-100 gap-2 p-8 z-[1] dark:border-r-slate-600'>
         <div className='w-full'>
           <h1 className='text-2xl font-bold dark:text-white'>Cartify</h1>
         </div>
@@ -121,6 +121,7 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
           </div>
         </Modal>
       )}
+      <div id='portal-modal'></div>
     </section>
   );
 };

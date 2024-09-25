@@ -231,6 +231,8 @@ class InventoryModel(models.Model):
     product = models.ForeignKey(ProductsModel, on_delete = models.RESTRICT)
     location = models.ForeignKey(LocationsModel, on_delete = models.RESTRICT)
     user = models.ForeignKey(User, on_delete = models.RESTRICT)
+    location_transfer = models.ForeignKey(LocationsModel, null = True, blank = False, related_name='inventory_location_transfer', on_delete = models.RESTRICT)
+    user_transfer = models.ForeignKey(User, null = True, blank = False, related_name='inventory_user_transfer', on_delete = models.RESTRICT)
         
     class Meta: 
         db_table = 'inventory'
