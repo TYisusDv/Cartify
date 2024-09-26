@@ -7,6 +7,7 @@ urlpatterns = [
     path('auth/log-in', LoginAPIView.as_view(), name='auth-log-in'),
     path('auth/refresh', AuthRefreshAPIView.as_view(), name='auth-log-in'),
     path('app/inventory', AppInventoryAPIView.as_view(), name='app-inventory'),
+    path('manage/users', ManageUsersAPIView.as_view(), name='manage-users'),
     path('manage/countries', ManageCountriesAPIView.as_view(), name='manage-countries'),
     path('manage/states', ManageStatesAPIView.as_view(), name='manage-states'),
     path('manage/cities', ManageCitiesAPIView.as_view(), name='manage-cities'),

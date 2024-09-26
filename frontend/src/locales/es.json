@@ -119,5 +119,9 @@
     "users": "Usuarios",
     "value": "Valor",
     "value_per": "Valor (%)",
-    "visible": "Visible"
+    "visible": "Visible",
+    "user": "Usuario",
+    "dealer": "Repartidor",
+    "location_entry": "Ubicación entrada",
+    "location_exit": "Ubicación salida"
 }

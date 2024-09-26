@@ -149,6 +149,12 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                                     Tipo
                                                 </th>
                                                 <th scope='col' className='px-6 py-3'>
+                                                    Ubicacion traslado
+                                                </th>
+                                                <th scope='col' className='px-6 py-3'>
+                                                    Usuario traslado
+                                                </th>
+                                                <th scope='col' className='px-6 py-3'>
                                                     Nota
                                                 </th>
                                                 <th scope='col' className='px-6 py-3'></th>
@@ -172,6 +178,8 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                                                                 : '-'
                                                                 }
                                                             </td>
+                                                            <td className='px-6 py-4'>{movement.location_transfer?.name || '-'}</td>
+                                                            <td className='px-6 py-4'>{(movement.user_transfer as { name?: string })?.name || '-'}</td>
                                                             <td className='px-6 py-4'>{movement.note || '-'}</td>
                                                             <td className='px-6 py-4'>
                                                                 <button
@@ -189,7 +197,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                                 :
                                                 (
                                                     <tr>
-                                                        <td colSpan={5} className='px-6 py-6 text-center dark:text-white'>{translations.no_data}</td>
+                                                        <td colSpan={8} className='px-6 py-6 text-center dark:text-white'>{translations.no_data}</td>
                                                     </tr>
                                                 )
                                             }
@@ -235,7 +243,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                                 <div className='col-span-1 z-[9]'>
                                     <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
-                                        <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.location} <span className='text-red-500'>*</span></h3>
+                                        <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{formValues.type?.toString() === '3' ? translations.location_exit : translations.location } <span className='text-red-500'>*</span></h3>
                                         <div className='w-full'>
                                             <SelectGroup
                                                 endpoint='manage/locations'
@@ -281,13 +289,28 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                                         <div className='col-span-1 z-[7]'>
                                             <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
-                                                <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.location}</h3>
+                                                <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.location_entry}</h3>
                                                 <div className='w-full'>
                                                     <SelectGroup
                                                         endpoint='manage/locations'
                                                         name='location_transfer.id'
                                                         onChange={handleSelectChange(setFormValues)}
                                                         value={formValues.location_transfer?.id || 0}
+                                                        disabled={['details', 'delete'].includes(type)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className='col-span-1 z-[7]'>
+                                            <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
+                                                <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.dealer}</h3>
+                                                <div className='w-full'>
+                                                    <SelectGroup
+                                                        endpoint='manage/users'
+                                                        name='user_transfer.id'
+                                                        label='first_name'
+                                                        onChange={handleSelectChange(setFormValues)}
+                                                        value={formValues.user_transfer?.id || 0}
                                                         disabled={['details', 'delete'].includes(type)}
                                                     />
                                                 </div>
@@ -344,7 +367,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                             <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                                 <div className='col-span-1 z-[9]'>
                                     <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
-                                        <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.location} <span className='text-red-500'>*</span></h3>
+                                        <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{formValues.type?.toString() === '3' ? translations.location_exit : translations.location } <span className='text-red-500'>*</span></h3>
                                         <div className='w-full'>
                                             <SelectGroup
                                                 endpoint='manage/locations'
@@ -379,6 +402,43 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                 color={colorPage}
                                 value={formValues.note || ''}
                             />
+                            {formValues.type?.toString() === '3' && (
+                                <>
+                                    <hr className='border dark:border-slate-600 mx-2 mt-5' />
+                                    <h1 className='text-black font-bold dark:text-white mx-2 my-1'>Traslado</h1>
+                                    <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
+                                        <div className='col-span-1 z-[7]'>
+                                            <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
+                                                <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.location_entry}</h3>
+                                                <div className='w-full'>
+                                                    <SelectGroup
+                                                        endpoint='manage/locations'
+                                                        name='location_transfer.id'
+                                                        onChange={handleSelectChange(setFormValues)}
+                                                        value={formValues.location_transfer?.id || 0}
+                                                        disabled={['details', 'delete'].includes(type)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className='col-span-1 z-[7]'>
+                                            <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
+                                                <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.dealer}</h3>
+                                                <div className='w-full'>
+                                                    <SelectGroup
+                                                        endpoint='manage/users'
+                                                        name='user_transfer.id'
+                                                        label='first_name'
+                                                        onChange={handleSelectChange(setFormValues)}
+                                                        value={formValues.user_transfer?.id || 0}
+                                                        disabled={['details', 'delete'].includes(type)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                         <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>
                             <div className='col-span-1 md:col-end-3 w-full'>

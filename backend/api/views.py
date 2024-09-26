@@ -73,6 +73,29 @@ class AuthRefreshAPIView(APIView):
             }
         })
 
+#Users
+class ManageUsersAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+  
+    def get(self, request):
+        query = request.query_params.get('query', None)
+        search = request.query_params.get('search', '')
+        
+        if query == 'list':
+            model = User.objects.filter(
+                Q(id__icontains = search) |
+                Q(username__icontains = search) |
+                Q(first_name__icontains = search) | 
+                Q(last_name__icontains = search)
+            )[:10]
+            serialized = UserExcludeSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+
 #Countries
 class ManageCountriesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
