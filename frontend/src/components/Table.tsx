@@ -1,8 +1,7 @@
 import React, { cloneElement, ReactElement, useEffect, useState } from "react";
 import { Search01Icon } from 'hugeicons-react';
-import { handleChange } from '../utils/formUtils';
 import { getTable } from '../services/componentsService';
-import InputGroup from "./InputGroup";
+import Input from "./Input";
 import useTranslations from "../hooks/useTranslations";
 
 interface Header {
@@ -72,12 +71,17 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
         <div className='flex flex-col gap-2'>
            <div className='flex items-center gap-2'>
                 <div className='w-full max-w-72 h-full bg-gray-100 dark:bg-slate-700 rounded-2xl'>
-                    <InputGroup
-                        id='search'
-                        name='search'
+                    <Input
+                        props={{
+                            id: 'search',
+                            name: 'search',
+                            onChange: (e) => setFormValues(prev => ({
+                                ...prev,
+                                search: e.target.value || ''
+                            }))
+                        }}
                         label={translations.search}
                         icon={<Search01Icon className='icon' size={20} />}
-                        onChange={handleChange({ setFormValues })}
                         required={false}
                     />
                 </div>

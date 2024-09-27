@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Search01Icon, UserGroupIcon } from 'hugeicons-react';
-import { handleChange } from '../../utils/formUtils';
 import useTranslations from '../../hooks/useTranslations';
 import DelayedSuspense from '../../components/DelayedSuspense';
 import SkeletonLoader from '../../components/SkeletonLoader';
-import InputGroup from '../../components/InputGroup';
+import Input from '../../components/Input';
 
 const ManageUsersPage: React.FC = () => {
     const { translations } = useTranslations();
@@ -56,18 +55,7 @@ const ManageUsersPage: React.FC = () => {
                     </div>
                 </div>
                 <div className='flex flex-col mt-8 gap-2'>
-                    <div className='flex justify-between gap-2'>
-                        <div></div>
-                        <div className='w-full max-w-72'>
-                            <InputGroup 
-                                id='search'
-                                name='search'
-                                label='Search' 
-                                icon={<Search01Icon className='icon' size={20} />} 
-                                onChange={handleChange({ setFormValues })} 
-                            />
-                        </div>
-                    </div>
+                    
                     <div className='flex w-full'>  
                         <div className="overflow-x-auto sm:rounded-lg w-full">
                             <table className="w-full text-sm text-left">

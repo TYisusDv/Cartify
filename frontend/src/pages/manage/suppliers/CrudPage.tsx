@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { AlertType } from '../../../types/alert';
-import { handleChange } from '../../../utils/formUtils';
 import { Supplier } from '../../../types/modelType';
 import { addSupplier, deleteSupplier, editSupplier, getSupplier } from '../../../services/suppliersService';
 import { Mail01Icon, RoadLocation01Icon, SmartPhone01Icon, TelephoneIcon, UserCircleIcon, UserIdVerificationIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import useFormSubmit from '../../../hooks/useFormSubmit';
-import InputGroup from '../../../components/InputGroup';
+import Input from '../../../components/Input';
 
 interface CrudPageProps {
     addAlert: (alert: AlertType) => void;
@@ -97,130 +96,180 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                     <div className={`flex flex-col gap-2 w-full tab-item ${'company' === activeTab ? 'block' : 'hidden'}`}>
                         <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                             <div className='col-span-1'>
-                                <InputGroup
-                                    id='company_name'
-                                    name='company_name'
+                                <Input
+                                    props={{
+                                        id: 'company_name',
+                                        name: 'company_name',
+                                        value: formValues.company_name,
+                                        onChange: (e) => setFormValues(prev => ({
+                                            ...prev,
+                                            company_name: e.target.value || ''
+                                        })),
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }} 
                                     label={translations.name}
                                     icon={<UserCircleIcon className='icon' size={24} />}
-                                    onChange={handleChange({ setFormValues })}
-                                    value={formValues.company_name || ''}
                                     color={colorPage}
-                                    disabled={['details', 'delete'].includes(type)}
                                 />
                             </div>
                             <div className='col-span-1'>
-                                <InputGroup
-                                    id='company_identification'
-                                    name='company_identification'
+                                <Input
+                                    props={{
+                                        id: 'company_identification',
+                                        name: 'company_identification',
+                                        value: formValues.company_identification,
+                                        onChange: (e) => setFormValues(prev => ({
+                                            ...prev,
+                                            company_identification: e.target.value || ''
+                                        })),
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
                                     label='NIT'
                                     icon={<UserIdVerificationIcon className='icon' size={24} />}
-                                    onChange={handleChange({ setFormValues })}
-                                    required={false}
-                                    value={formValues.company_identification || ''}
                                     color={colorPage}
-                                    disabled={['details', 'delete'].includes(type)}
+                                    required={false}
                                 />
                             </div>
                         </div>
-                        <InputGroup
-                            id='company_email'
-                            name='company_email'
+                        <Input
+                            props={{
+                                id: 'company_email',
+                                name: 'company_email',
+                                value: formValues.company_email,
+                                onChange: (e) => setFormValues(prev => ({
+                                    ...prev,
+                                    company_email: e.target.value || ''
+                                })),
+                                disabled: ['details', 'delete'].includes(type)
+                            }}
                             label={translations.email}
-                            icon={<Mail01Icon className='icon' size={24} />}
-                            onChange={handleChange({ setFormValues })}
-                            required={false}
-                            value={formValues.company_email || ''}
+                            icon={<Mail01Icon className='icon' size={24} />}                            
                             color={colorPage}
-                            disabled={['details', 'delete'].includes(type)}
+                            required={false}
                         />
                         <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                             <div className='col-span-1'>
-                                <InputGroup
-                                    id='company_phone'
-                                    name='company_phone'
+                                <Input
+                                    props={{
+                                        id: 'company_phone',
+                                        name: 'company_phone',
+                                        value: formValues.company_phone,
+                                        onChange: (e) => setFormValues(prev => ({
+                                            ...prev,
+                                            company_phone: e.target.value || ''
+                                        })),
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
                                     label={`${translations.phone_number} #1`}
                                     icon={<SmartPhone01Icon className='icon' size={24} />}
-                                    onChange={handleChange({ setFormValues })}
-                                    required={false}
-                                    value={formValues.company_phone || ''}
                                     color={colorPage}
-                                    disabled={['details', 'delete'].includes(type)}
+                                    required={false}
                                 />
                             </div>
                             <div className='col-span-1'>
-                                <InputGroup
-                                    id='company_phone_2'
-                                    name='company_phone_2'
+                                <Input
+                                    props={{
+                                        id: 'company_phone_2',
+                                        name: 'company_phone_2',
+                                        value: formValues.company_phone_2,
+                                        onChange: (e) => setFormValues(prev => ({
+                                            ...prev,
+                                            company_phone_2: e.target.value || ''
+                                        })),
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
                                     label={`${translations.phone_number} #2`}
-                                    icon={<TelephoneIcon className='icon' size={24} />}
-                                    onChange={handleChange({ setFormValues })}
-                                    required={false}
-                                    value={formValues.company_phone_2 || ''}
+                                    icon={<TelephoneIcon className='icon' size={24} />}                                    
                                     color={colorPage}
-                                    disabled={['details', 'delete'].includes(type)}
+                                    required={false}
                                 />
                             </div>
                         </div>
-                        <InputGroup
-                            id='company_address'
-                            name='company_address'
+                        <Input
+                            props={{
+                                id: 'company_address',
+                                name: 'company_address',
+                                value: formValues.company_address,
+                                onChange: (e) => setFormValues(prev => ({
+                                    ...prev,
+                                    company_address: e.target.value || ''
+                                })),
+                                disabled: ['details', 'delete'].includes(type)
+                            }}                            
                             label={translations.street}
-                            icon={<RoadLocation01Icon className='icon' size={24} />}
-                            onChange={handleChange({ setFormValues })}
-                            required={false}
-                            value={formValues.company_address || ''}
+                            icon={<RoadLocation01Icon className='icon' size={24} />}                            
                             color={colorPage}
-                            disabled={['details', 'delete'].includes(type)}
+                            required={false}
                         />
                     </div>
                     <div className={`flex flex-col gap-2 w-full tab-item ${'advisor' === activeTab ? 'block' : 'hidden'}`}>
-                        <InputGroup
-                            id='advisor_fullname'
-                            name='advisor_fullname'
+                        <Input
+                            props={{
+                                id: 'advisor_fullname',
+                                name: 'advisor_fullname',
+                                value: formValues.advisor_fullname,
+                                onChange: (e) => setFormValues(prev => ({
+                                    ...prev,
+                                    advisor_fullname: e.target.value || ''
+                                })),
+                                disabled: ['details', 'delete'].includes(type)
+                            }}   
                             label={translations.name}
                             icon={<UserCircleIcon className='icon' size={24} />}
-                            onChange={handleChange({ setFormValues })}
-                            required={false}
-                            value={formValues.advisor_fullname || ''}
                             color={colorPage}
-                            disabled={['details', 'delete'].includes(type)}
+                            required={false}
                         />
-                        <InputGroup
-                            id='advisor_email'
-                            name='advisor_email'
+                        <Input
+                            props={{
+                                id: 'advisor_email',
+                                name: 'advisor_email',
+                                value: formValues.advisor_email,
+                                onChange: (e) => setFormValues(prev => ({
+                                    ...prev,
+                                    advisor_email: e.target.value || ''
+                                })),
+                                disabled: ['details', 'delete'].includes(type)
+                            }}
                             label={translations.email}
                             icon={<Mail01Icon className='icon' size={24} />}
-                            onChange={handleChange({ setFormValues })}
-                            required={false}
-                            value={formValues.advisor_email || ''}
                             color={colorPage}
-                            disabled={['details', 'delete'].includes(type)}
+                            required={false}
                         />
                         <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                             <div className='col-span-1'>
-                                <InputGroup
-                                    id='advisor_phone'
-                                    name='advisor_phone'
+                                <Input
+                                    props={{
+                                        id: 'advisor_phone',
+                                        name: 'advisor_phone',
+                                        value: formValues.advisor_phone,
+                                        onChange: (e) => setFormValues(prev => ({
+                                            ...prev,
+                                            advisor_phone: e.target.value || ''
+                                        })),
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
                                     label={`${translations.phone_number} #1`}
-                                    icon={<SmartPhone01Icon className='icon' size={24} />}
-                                    onChange={handleChange({ setFormValues })}
-                                    required={false}
-                                    value={formValues.advisor_phone || ''}
+                                    icon={<SmartPhone01Icon className='icon' size={24} />}                                    
                                     color={colorPage}
-                                    disabled={['details', 'delete'].includes(type)}
+                                    required={false}
                                 />
                             </div>
                             <div className='col-span-1'>
-                                <InputGroup
-                                    id='advisor_phone_2'
-                                    name='advisor_phone_2'
+                                <Input
+                                    props={{
+                                        id: 'advisor_phone_2',
+                                        name: 'advisor_phone_2',
+                                        value: formValues.advisor_phone_2,
+                                        onChange: (e) => setFormValues(prev => ({
+                                            ...prev,
+                                            advisor_phone_2: e.target.value || ''
+                                        })),
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
                                     label={`${translations.phone_number} #2`}
-                                    icon={<TelephoneIcon className='icon' size={24} />}
-                                    onChange={handleChange({ setFormValues })}
-                                    required={false}
-                                    value={formValues.advisor_phone_2 || ''}
+                                    icon={<TelephoneIcon className='icon' size={24} />}                                    
                                     color={colorPage}
-                                    disabled={['details', 'delete'].includes(type)}
+                                    required={false}
                                 />
                             </div>
                         </div>

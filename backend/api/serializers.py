@@ -811,7 +811,7 @@ class AddEditProductSerializer(serializers.ModelSerializer):
         'invalid': 'The brand is invalid.',
     }, required = False, allow_null = True)
 
-    supplier_id = serializers.IntegerField(error_messages = {
+    supplier_id = serializers.UUIDField(error_messages = {
         'required': 'The supplier is required.',
         'blank': 'The supplier cannot be blank.',
         'null': 'The supplier cannot be blank.',

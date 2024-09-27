@@ -4,8 +4,6 @@ import { getTheme, saveTheme } from '../../utils/themeUtils';
 import { getLanguage, saveLanguage } from '../../utils/LanguageUtils';
 import useTranslations from '../../hooks/useTranslations';
 import DelayedSuspense from '../../components/DelayedSuspense';
-import SelectGroup from '../../components/SelectGroup';
-import { handleSelectChange } from '../../utils/formUtils';
 
 const SettingGeneralPage: React.FC = () => {
     const { translations } = useTranslations();
@@ -44,18 +42,7 @@ const SettingGeneralPage: React.FC = () => {
     return (
         <DelayedSuspense fallback={<div className='flex w-full pl-24'><Loading03Icon size={20} className='animate-spin dark:text-white' /></div>} delay={300}>
             <div className='flex flex-col gap-2 w-full p-2'>
-                <div className='flex items-center justify-between animate__animated animate__fadeIn animate__faster z-20'>
-                    <h3 className='text-sm text-nowrap dark:text-gray-100'>{translations.theme}</h3>
-                    <div className='w-full max-w-32'>
-                        <SelectGroup myOptions={theme_options} name='theme' value={valuesTheme.theme} onChange={handleSelectChange(setValuesTheme)} />
-                    </div>
-                </div>
-                <div className='flex items-center justify-between animate__animated animate__fadeIn animate__faster z-10'>
-                    <h3 className='text-sm text-nowrap dark:text-gray-100'>{translations.language}</h3>
-                    <div className='w-full max-w-32'>
-                        <SelectGroup myOptions={language_options} name='language' value={valuesLanguages.language} onChange={handleSelectChange(setValuesLanguages)} />
-                    </div>
-                </div>
+                
             </div>            
         </DelayedSuspense>
     );

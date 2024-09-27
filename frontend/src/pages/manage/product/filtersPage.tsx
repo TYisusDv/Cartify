@@ -1,7 +1,7 @@
 import React from 'react';
-import SelectGroup from '../../../components/SelectGroup';
-import { handleSelectChange } from '../../../utils/formUtils';
 import useTranslations from '../../../hooks/useTranslations';
+import Select from '../../../components/Select';
+import { StoreLocation01Icon } from 'hugeicons-react';
 
 interface FiltersPageProps {
     formValues?: any;
@@ -13,28 +13,50 @@ const FiltersPage: React.FC<FiltersPageProps> = ({ formValues, setFormValues }) 
 
     return (
         <div className='flex gap-2 w-full'>
-            <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2 max-w-80'>
-                <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.brand}</h3>
-                <div className='w-full'>
-                    <SelectGroup
-                        endpoint='manage/product/brands'
-                        name='brand.id'
-                        onChange={setFormValues ? handleSelectChange(setFormValues) : undefined}
-                        value={formValues.brand?.id || 0}
-                    />
-                </div>
-            </div>
-            <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2 max-w-80'>
-                <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.category}</h3>
-                <div className='w-full'>
-                    <SelectGroup
-                        endpoint='manage/product/categories'
-                        name='category.id'
-                        onChange={setFormValues ? handleSelectChange(setFormValues) : undefined}
-                        value={formValues.category?.id || 0}
-                    />
-                </div>
-            </div>            
+            <Select
+                props={{
+                    id: 'brand',
+                    name: 'brand',
+                    onChange: (e) => {
+                        if (setFormValues) {
+                            setFormValues((prev: any) => ({
+                                ...prev,
+                                brand: {
+                                    id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                }
+                            }));
+                        }
+                    },
+                    value: formValues.brand?.id
+                }}
+                endpoint='manage/product/brands'
+                endpoint_value='id'
+                endpoint_text='{name}'
+                icon={<StoreLocation01Icon size={20} />}
+                label={translations.brand}
+            />
+            <Select
+                props={{
+                    id: 'category',
+                    name: 'category',
+                    onChange: (e) => {
+                        if (setFormValues) {
+                            setFormValues((prev: any) => ({
+                                ...prev,
+                                category: {
+                                    id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                }
+                            }));
+                        }
+                    },
+                    value: formValues.category?.id
+                }}
+                endpoint='manage/product/categories'
+                endpoint_value='id'
+                endpoint_text='{name}'
+                icon={<StoreLocation01Icon size={20} />}
+                label={translations.brand}
+            />
         </div>
     );
 };

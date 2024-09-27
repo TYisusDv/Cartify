@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Add01Icon, Cancel01Icon, LiftTruckIcon, Note04Icon } from 'hugeicons-react';
-import { handleChange, handleSelectChange } from '../../../utils/formUtils';
+import { Add01Icon, BarCode02Icon, Cancel01Icon, LiftTruckIcon, Note04Icon, SearchAreaIcon, StoreLocation01Icon, UserAccountIcon } from 'hugeicons-react';
 import { v4 as uuidv4 } from 'uuid';
 import { AlertType } from '../../../types/alert';
 import { Inventory } from '../../../types/modelType';
@@ -8,8 +7,9 @@ import { addInventory, deleteInventory, editInventory, getInventory } from '../.
 import useTranslations from '../../../hooks/useTranslations';
 import useFormSubmit from '../../../hooks/useFormSubmit';
 import Modal from '../../../components/Modal';
-import SelectGroup from '../../../components/SelectGroup';
-import InputGroup from '../../../components/InputGroup';
+import Input from '../../../components/Input';
+import Select from '../../../components/Select';
+import { CustomChangeEvent } from '../../../types/componentsType';
 
 interface CrudPageProps {
     addAlert: (alert: AlertType) => void;
@@ -69,11 +69,12 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
     ];
 
     useEffect(() => {
-        if(formValues.type?.toString() !== '3'){
+        if (formValues.type?.toString() !== '3') {
             setFormValues(prev => (
-                {...prev, 
-                    location_transfer: {id: 0},
-                    user_transfer: {id: 0}
+                {
+                    ...prev,
+                    location_transfer: { id: 0 },
+                    user_transfer: { id: 0 }
                 }
             ))
         }
@@ -179,7 +180,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                                                 }
                                                             </td>
                                                             <td className='px-6 py-4'>{movement.location_transfer?.name || '-'}</td>
-                                                            <td className='px-6 py-4'>{(movement.user_transfer as { name?: string })?.name || '-'}</td>
+                                                            <td className='px-6 py-4'>{movement.user_transfer?.first_name || '-'}</td>
                                                             <td className='px-6 py-4'>{movement.note || '-'}</td>
                                                             <td className='px-6 py-4'>
                                                                 <button
@@ -212,75 +213,101 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                         <>
                             <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                                 <div className='col-span-1 z-[10]'>
-                                    <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
-                                        <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.product} <span className='text-red-500'>*</span></h3>
-                                        <div className='w-full'>
-                                            <SelectGroup
-                                                endpoint='manage/products'
-                                                name='product.id'
-                                                onChange={handleSelectChange(setFormValues)}
-                                                value={formValues.product?.id || 0}
-                                                disabled={['details', 'delete'].includes(type)}
-                                            />
-                                        </div>
-                                    </div>
+                                    <Select
+                                        props={{
+                                            id: 'product',
+                                            name: 'product',
+                                            onChange: (e) => setFormValues(prev => ({
+                                                ...prev,
+                                                product: {
+                                                    id: e.target.value
+                                                }
+                                            })),
+                                            value: formValues.product?.id,
+                                            disabled: ['details', 'delete'].includes(type)
+                                        }}
+                                        endpoint='manage/products'
+                                        endpoint_value='id'
+                                        endpoint_text='{name}'
+                                        icon={<BarCode02Icon size={20} />}
+                                        label={translations.product}
+                                    />
                                 </div>
                                 <div className='col-span-1'>
-                                    <InputGroup
-                                        id='quantity'
-                                        name='quantity'
-                                        type='number'
+                                    <Input
+                                        props={{
+                                            id: 'quantity',
+                                            name: 'quantity',
+                                            type: 'number',
+                                            value: formValues.quantity || 0,
+                                            onChange: (e) => setFormValues(prev => ({
+                                                ...prev,
+                                                quantity: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                            })),
+                                            disabled: ['details', 'delete'].includes(type)
+                                        }}
                                         label={translations.quantity}
                                         icon={<LiftTruckIcon className='icon' size={24} />}
-                                        onChange={handleChange({ setFormValues })}
-                                        required={false}
                                         color={colorPage}
-                                        value={formValues.quantity || 0}
-                                        disabled={['details', 'delete'].includes(type)}
+                                        required={false}
                                     />
                                 </div>
                             </div>
                             <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                                 <div className='col-span-1 z-[9]'>
-                                    <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
-                                        <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{formValues.type?.toString() === '3' ? translations.location_exit : translations.location } <span className='text-red-500'>*</span></h3>
-                                        <div className='w-full'>
-                                            <SelectGroup
-                                                endpoint='manage/locations'
-                                                name='location.id'
-                                                onChange={handleSelectChange(setFormValues)}
-                                                value={formValues.location?.id || 0}
-                                                disabled={['details', 'delete'].includes(type)}
-                                            />
-                                        </div>
-                                    </div>
+                                    <Select
+                                        props={{
+                                            id: 'location',
+                                            name: 'location',
+                                            onChange: (e) => setFormValues(prev => ({
+                                                ...prev,
+                                                location: {
+                                                    id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                                }
+                                            })),
+                                            value: formValues.location?.id,
+                                            disabled: ['details', 'delete'].includes(type)
+                                        }}
+                                        endpoint='manage/locations'
+                                        endpoint_value='id'
+                                        endpoint_text='{name}'
+                                        icon={<StoreLocation01Icon size={20} />}
+                                        label={formValues.type?.toString() === '3' ? translations.location_exit : translations.location}
+                                    />
                                 </div>
                                 <div className='col-span-1 z-[8]'>
-                                    <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
-                                        <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.type} <span className='text-red-500'>*</span></h3>
-                                        <div className='w-full'>
-                                            <SelectGroup
-                                                name='type'
-                                                myOptions={inventory_type_options}
-                                                onChange={handleSelectChange(setFormValues)}
-                                                value={formValues.type || 0}
-                                                disabled={['details', 'delete'].includes(type)}
-                                            />
-                                        </div>
-                                    </div>
+                                    <Select
+                                        props={{
+                                            id: 'type',
+                                            name: 'type',
+                                            onChange: (e) => setFormValues(prev => ({
+                                                ...prev,
+                                                type: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                            })),
+                                            value: formValues.type,
+                                            disabled: ['details', 'delete'].includes(type)
+                                        }}
+                                        myOptions={inventory_type_options}
+                                        icon={<SearchAreaIcon size={20} />}
+                                        label={translations.type}
+                                    />
                                 </div>
                             </div>
-                            <InputGroup
-                                id='note'
-                                name='note'
+                            <Input
+                                props={{
+                                    id: 'note',
+                                    name: 'note',
+                                    value: formValues.note,
+                                    onChange: (e) => setFormValues(prev => ({
+                                        ...prev,
+                                        note: e.target.value || ''
+                                    })),
+                                    disabled: ['details', 'delete'].includes(type)
+                                }}
                                 label={translations.note}
                                 icon={<Note04Icon className='icon' size={24} />}
-                                onChange={handleChange({ setFormValues })}
-                                required={false}
                                 color={colorPage}
-                                value={formValues.note || ''}
-                                disabled={['details', 'delete'].includes(type)}
-
+                                required={false}
                             />
                             {formValues.type?.toString() === '3' && (
                                 <>
@@ -288,33 +315,46 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     <h1 className='text-black font-bold dark:text-white mx-2 my-1'>Traslado</h1>
                                     <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                                         <div className='col-span-1 z-[7]'>
-                                            <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
-                                                <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.location_entry}</h3>
-                                                <div className='w-full'>
-                                                    <SelectGroup
-                                                        endpoint='manage/locations'
-                                                        name='location_transfer.id'
-                                                        onChange={handleSelectChange(setFormValues)}
-                                                        value={formValues.location_transfer?.id || 0}
-                                                        disabled={['details', 'delete'].includes(type)}
-                                                    />
-                                                </div>
-                                            </div>
+                                            <Select
+                                                props={{
+                                                    id: 'location_transfer',
+                                                    name: 'location_transfer',
+                                                    onChange: (e) => setFormValues(prev => ({
+                                                        ...prev,
+                                                        location_transfer: {
+                                                            id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                                        }
+                                                    })),
+                                                    value: formValues.location_transfer?.id,
+                                                    disabled: ['details', 'delete'].includes(type)
+                                                }}
+                                                endpoint='manage/locations'
+                                                endpoint_value='id'
+                                                endpoint_text='{name}'
+                                                icon={<StoreLocation01Icon size={20} />}
+                                                label={translations.location_entry}
+                                            />
                                         </div>
-                                        <div className='col-span-1 z-[7]'>
-                                            <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
-                                                <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.dealer}</h3>
-                                                <div className='w-full'>
-                                                    <SelectGroup
-                                                        endpoint='manage/users'
-                                                        name='user_transfer.id'
-                                                        label='first_name'
-                                                        onChange={handleSelectChange(setFormValues)}
-                                                        value={formValues.user_transfer?.id || 0}
-                                                        disabled={['details', 'delete'].includes(type)}
-                                                    />
-                                                </div>
-                                            </div>
+                                        <div className='col-span-1 z-[6]'>
+                                            <Select
+                                                props={{
+                                                    id: 'user_transfer',
+                                                    name: 'user_transfer',
+                                                    onChange: (e) => setFormValues(prev => ({
+                                                        ...prev,
+                                                        user_transfer: {
+                                                            id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                                        }
+                                                    })),
+                                                    value: formValues.user_transfer?.id,
+                                                    disabled: ['details', 'delete'].includes(type)
+                                                }}
+                                                endpoint='manage/users'
+                                                endpoint_value='id'
+                                                endpoint_text='{first_name}'
+                                                icon={<UserAccountIcon size={20} />}
+                                                label={translations.dealer}
+                                            />
                                         </div>
                                     </div>
                                 </>
@@ -338,69 +378,107 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                         <div className={`flex flex-col gap-2 w-full tab-item`}>
                             <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                                 <div className='col-span-1 z-[10]'>
-                                    <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
-                                        <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.product} <span className='text-red-500'>*</span></h3>
-                                        <div className='w-full'>
-                                            <SelectGroup
-                                                endpoint='manage/products'
-                                                name='product.id'
-                                                onChange={handleSelectChange(setFormValues)}
-                                                value={formValues.product?.id || 0}
-                                            />
-                                        </div>
-                                    </div>
+                                    <Select
+                                        props={{
+                                            id: 'product',
+                                            name: 'product',
+                                            onChange: (e: CustomChangeEvent) => {
+                                                setFormValues(prev => ({
+                                                    ...prev,
+                                                    product: {
+                                                        id: e.target.value,
+                                                        name: e.object?.name,
+                                                    }
+                                                }));
+                                            },
+                                            value: formValues.product?.id,
+                                            disabled: ['details', 'delete'].includes(type)
+                                        }}
+                                        endpoint='manage/products'
+                                        endpoint_value='id'
+                                        endpoint_text='{name}'
+                                        icon={<BarCode02Icon size={20} />}
+                                        label={translations.product}
+                                    />
                                 </div>
                                 <div className='col-span-1'>
-                                    <InputGroup
-                                        id='quantity'
-                                        name='quantity'
-                                        type='number'
+                                    <Input
+                                        props={{
+                                            id: 'quantity',
+                                            name: 'quantity',
+                                            type: 'number',
+                                            value: formValues.quantity || 0,
+                                            onChange: (e) => setFormValues(prev => ({
+                                                ...prev,
+                                                quantity: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                            })),
+                                            disabled: ['details', 'delete'].includes(type)
+                                        }}
                                         label={translations.quantity}
                                         icon={<LiftTruckIcon className='icon' size={24} />}
-                                        onChange={handleChange({ setFormValues })}
-                                        required={false}
                                         color={colorPage}
-                                        value={formValues.quantity || 0}
+                                        required={false}
                                     />
                                 </div>
                             </div>
                             <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                                 <div className='col-span-1 z-[9]'>
-                                    <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
-                                        <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{formValues.type?.toString() === '3' ? translations.location_exit : translations.location } <span className='text-red-500'>*</span></h3>
-                                        <div className='w-full'>
-                                            <SelectGroup
-                                                endpoint='manage/locations'
-                                                name='location.id'
-                                                onChange={handleSelectChange(setFormValues)}
-                                                value={formValues.location?.id || 0}
-                                            />
-                                        </div>
-                                    </div>
+                                    <Select
+                                        props={{
+                                            id: 'location',
+                                            name: 'location',
+                                            onChange: (e: CustomChangeEvent) => {
+                                                setFormValues(prev => ({
+                                                    ...prev,
+                                                    location: {
+                                                        id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                                        name: e.object?.name,
+                                                    }
+                                                }));
+                                            },
+                                            value: formValues.location?.id,
+                                            disabled: ['details', 'delete'].includes(type)
+                                        }}
+                                        endpoint='manage/locations'
+                                        endpoint_value='id'
+                                        endpoint_text='{name}'
+                                        icon={<StoreLocation01Icon size={20} />}
+                                        label={formValues.type?.toString() === '3'? translations.location_exit : translations.location}
+                                    />
                                 </div>
                                 <div className='col-span-1 z-[8]'>
-                                    <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
-                                        <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.type} <span className='text-red-500'>*</span></h3>
-                                        <div className='w-full'>
-                                            <SelectGroup
-                                                name='type'
-                                                myOptions={inventory_type_options}
-                                                onChange={handleSelectChange(setFormValues)}
-                                                value={formValues.type || 0}
-                                            />
-                                        </div>
-                                    </div>
+                                    <Select
+                                        props={{
+                                            id: 'type',
+                                            name: 'type',
+                                            onChange: (e) => setFormValues(prev => ({
+                                                ...prev,
+                                                type: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                            })),
+                                            value: formValues.type,
+                                            disabled: ['details', 'delete'].includes(type)
+                                        }}
+                                        myOptions={inventory_type_options}
+                                        icon={<SearchAreaIcon size={20} />}
+                                        label={translations.type}
+                                    />
                                 </div>
                             </div>
-                            <InputGroup
-                                id='note'
-                                name='note'
+                            <Input
+                                props={{
+                                    id: 'note',
+                                    name: 'note',
+                                    value: formValues.note,
+                                    onChange: (e) => setFormValues(prev => ({
+                                        ...prev,
+                                        note: e.target.value || ''
+                                    })),
+                                    disabled: ['details', 'delete'].includes(type)
+                                }}
                                 label={translations.note}
                                 icon={<Note04Icon className='icon' size={24} />}
-                                onChange={handleChange({ setFormValues })}
-                                required={false}
                                 color={colorPage}
-                                value={formValues.note || ''}
+                                required={false}
                             />
                             {formValues.type?.toString() === '3' && (
                                 <>
@@ -408,33 +486,52 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     <h1 className='text-black font-bold dark:text-white mx-2 my-1'>Traslado</h1>
                                     <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
                                         <div className='col-span-1 z-[7]'>
-                                            <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
-                                                <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.location_entry}</h3>
-                                                <div className='w-full'>
-                                                    <SelectGroup
-                                                        endpoint='manage/locations'
-                                                        name='location_transfer.id'
-                                                        onChange={handleSelectChange(setFormValues)}
-                                                        value={formValues.location_transfer?.id || 0}
-                                                        disabled={['details', 'delete'].includes(type)}
-                                                    />
-                                                </div>
-                                            </div>
+                                            <Select
+                                                props={{
+                                                    id: 'location_transfer',
+                                                    name: 'location_transfer',
+                                                    onChange: (e: CustomChangeEvent) => {
+                                                        setFormValues(prev => ({
+                                                            ...prev,
+                                                            location_transfer: {
+                                                                id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                                                name: e.object?.name,
+                                                            }
+                                                        }));
+                                                    },
+                                                    value: formValues.location_transfer?.id,
+                                                    disabled: ['details', 'delete'].includes(type)
+                                                }}
+                                                endpoint='manage/locations'
+                                                endpoint_value='id'
+                                                endpoint_text='{name}'
+                                                icon={<StoreLocation01Icon size={20} />}
+                                                label={translations.location_entry}
+                                            />
                                         </div>
                                         <div className='col-span-1 z-[7]'>
-                                            <div className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2'>
-                                                <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{translations.dealer}</h3>
-                                                <div className='w-full'>
-                                                    <SelectGroup
-                                                        endpoint='manage/users'
-                                                        name='user_transfer.id'
-                                                        label='first_name'
-                                                        onChange={handleSelectChange(setFormValues)}
-                                                        value={formValues.user_transfer?.id || 0}
-                                                        disabled={['details', 'delete'].includes(type)}
-                                                    />
-                                                </div>
-                                            </div>
+                                            <Select
+                                                props={{
+                                                    id: 'user_transfer',
+                                                    name: 'user_transfer',
+                                                    onChange: (e: CustomChangeEvent) => {
+                                                        setFormValues(prev => ({
+                                                            ...prev,
+                                                            user_transfer: {
+                                                                id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                                                first_name: e.object?.first_name,
+                                                            }
+                                                        }));
+                                                    },
+                                                    value: formValues.user_transfer?.id,
+                                                    disabled: ['details', 'delete'].includes(type)
+                                                }}
+                                                endpoint='manage/users'
+                                                endpoint_value='id'
+                                                endpoint_text='{first_name}'
+                                                icon={<UserAccountIcon size={20} />}
+                                                label={translations.dealer}
+                                            />
                                         </div>
                                     </div>
                                 </>

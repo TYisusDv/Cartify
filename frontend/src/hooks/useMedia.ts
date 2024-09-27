@@ -44,7 +44,6 @@ const useMedia = ({ addAlert }: UseMediaProps): UseMediaReturn => {
 
             const videoTrack = mediaStream.getVideoTracks()[0];
             const { width, height } = videoTrack.getSettings();
-            console.log(`Camera Dimensions: ${width}x${height}`);
         } catch (error) {
             addAlert({ id: uuidv4(), text: 'Error accessing camera', type: 'danger', timeout: 3000 });
         }
