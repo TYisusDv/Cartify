@@ -242,9 +242,6 @@ class ManageClientsAPIView(APIView):
         show = request.query_params.get('show', 10)
         
         if query == 'table':           
-            if order_by == 'actions':
-                order_by = 'id'
-
             model = ClientsModel.objects.filter(
                 Q(id__icontains = search)
             ).select_related('person').prefetch_related('person__addresses')
@@ -561,9 +558,6 @@ class ManageSuppliersAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':           
-            if order_by == 'actions':
-                order_by = 'id'
-
             model = SuppliersModel.objects.filter(
                 Q(id__icontains = search)
             )
@@ -703,9 +697,6 @@ class ManageTaxesAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':
-            if order_by == 'actions':
-                order_by = 'id'
-
             model = TaxesModel.objects.filter(
                 Q(id__icontains = search)
             )
@@ -845,9 +836,6 @@ class ManageProductBrandsAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':
-            if order_by == 'actions':
-                order_by = 'id'
-
             model = ProductBrandsModel.objects.filter(
                 Q(id__icontains = search)
             )
@@ -987,9 +975,6 @@ class ManageProductCategoriesAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':           
-            if order_by == 'actions':
-                order_by = 'id'
-
             model = ProductCategoriesModel.objects.filter(
                 Q(id__icontains = search)
             )
@@ -1132,9 +1117,6 @@ class ManageProductsAPIView(APIView):
             brand_id = request.query_params.get('brand[id]', None)
             category_id = request.query_params.get('category[id]', None)
 
-            if order_by == 'actions':
-                order_by = 'id'
-
             model = ProductsModel.objects.filter(
                 Q(id__icontains = search) |
                 Q(name__icontains = search) |
@@ -1184,6 +1166,7 @@ class ManageProductsAPIView(APIView):
         elif query == 'list':
             model = ProductsModel.objects.filter(
                 Q(id__icontains = search) |
+                Q(barcode__icontains = search) | 
                 Q(name__icontains = search)
             )[:10]
             serialized = ProductsSerializer(model, many = True)
@@ -1264,7 +1247,146 @@ class ManageProductsAPIView(APIView):
             'success': True,
             'resp': 'Deleted successfully.'
         }, status = 200)
+    
+#Inventory types
+class ManageInventoryTypesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self, pk) :
+        try:
+            return InventoryTypesModel.objects.get(pk = pk)
+        except InventoryTypesModel.DoesNotExist:
+            raise Http404('Inventory type not found.')
 
+    def get(self, request):
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':           
+            model = InventoryTypesModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = InventoryTypesSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            inventory_type_id = data.get('id', None)
+
+            inventory_type_serializer = GetInventoryTypeSerializer(data = data)  
+            if not inventory_type_serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': inventory_type_serializer.errors
+                }, status = 400)    
+                    
+            inventory_type_instance = self.get_object(pk = inventory_type_id)
+            inventory_type_serialized = InventoryTypesSerializer(inventory_type_instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': inventory_type_serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = InventoryTypesModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = InventoryTypesSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = InventoryTypesModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+
+        inventory_type_serializer = AddEditInventoryTypeSerializer(data = data)
+        if not inventory_type_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': inventory_type_serializer.errors}, status = 400)
+
+        inventory_type_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        inventory_type_id = data.get('id', None)
+
+        inventory_type_serializer = GetInventoryTypeSerializer(data = data)  
+        if not inventory_type_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': inventory_type_serializer.errors
+            }, status = 400)    
+                
+        inventory_type_instance = self.get_object(pk = inventory_type_id)     
+
+        inventory_type_serializer = AddEditInventoryTypeSerializer(inventory_type_instance, data = data)
+        if not inventory_type_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': inventory_type_serializer.errors}, status = 400)
+
+        inventory_type_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        inventory_type_id = data.get('id', None)
+
+        inventory_type_serializer = GetInventoryTypeSerializer(data = data)  
+        if not inventory_type_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': inventory_type_serializer.errors
+            }, status = 400)    
+                
+        inventory_type_instance = self.get_object(pk = inventory_type_id)           
+        inventory_type_instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
+    
 #Inventory
 class AppInventoryAPIView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -1286,12 +1408,22 @@ class AppInventoryAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':   
-            if order_by == 'actions':
-                order_by = 'id'
+            type = request.query_params.get('type', None)
+            product_id = request.query_params.get('product[id]', None)
+            location_id = request.query_params.get('location[id]', None)
 
             model = InventoryModel.objects.filter(
                 Q(id__icontains = search)
             )
+            
+            if product_id not in [None,  0, '0']:
+                model = model.filter(product_id = product_id)
+            
+            if type not in [None,  0, '0']:
+                model = model.filter(type = type)
+            
+            if location_id not in [None,  0, '0']:
+                model = model.filter(location_id = location_id)
 
             if order == 'desc':
                 order_by = f'-{order_by}'

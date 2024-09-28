@@ -1,7 +1,7 @@
 import React, { Suspense, useState } from 'react';
 import { Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
 import { AlertType } from '../types/alert';
-import { Analytics02Icon, BarCode02Icon, BrandfetchIcon, DashboardSquare01Icon, DistributionIcon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserGroupIcon } from 'hugeicons-react';
+import { Analytics02Icon, BarCode02Icon, BrandfetchIcon, DashboardSquare01Icon, DistributionIcon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserGroupIcon } from 'hugeicons-react';
 import useTranslations from '../hooks/useTranslations';
 import SkeletonLoader from '../components/SkeletonLoader';
 import ErrorPage from './errorPage';
@@ -22,6 +22,7 @@ const ManageSuppliersPage = React.lazy(() => import('./manage/suppliers/ManageSu
 const ManageProductsPage = React.lazy(() => import('./manage/product/ManageProductsPage'));
 const ManageProductBrandsPage = React.lazy(() => import('./manage/product/brands/ManageProductBrandsPage'));
 const ManageProductCategoriesPage = React.lazy(() => import('./manage/product/categories/ManageProductCategoriesPage'));
+const ManageInventoryTypesPage = React.lazy(() => import('./app/inventory/types/ManageInventoryTypesPage'));
 const SettingGeneralPage = React.lazy(() => import('../pages/settings/settingGeneralPage'));
 
 const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
@@ -59,19 +60,34 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
           <li><Link to='/home' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/home')}`}><DashboardSquare01Icon /> {translations.home}</Link></li>
           <hr className='border dark:border-slate-600' />
           <li><Link to='/app/pos' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/app/pos')}`}><ShoppingCartCheck02Icon /> {translations.point_of_sell}</Link></li>
-          <li><Link to='/app/inventory' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/app/inventory')}`}><SearchList02Icon />  {translations.inventory}</Link></li>
+          <li>
+            <DropdownMenu 
+              label={translations.inventory} 
+              icon={<SearchList02Icon className='w-7' />}
+              links={['/app/inventory', '/manage/inventory/types']}
+
+            >
+                <li><Link to='/app/inventory' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/app/inventory')}`}><SearchList02Icon size={20} /> {translations.inventory}</Link></li>
+                <li><Link to='/manage/inventory/types' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/inventory/types')}`}><SearchAreaIcon size={20} /> {translations.types}</Link></li>
+            </DropdownMenu>
+          </li>
           <li><Link to='/statistics' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/statistics')}`}><Analytics02Icon />  {translations.statistics}</Link></li>
           <hr className='border dark:border-slate-600' />
           <li><Link to='/manage/users' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/users')}`}><UserGroupIcon />  {translations.users}</Link></li>
           <li><Link to='/manage/clients' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/clients')}`}><LocationUser04Icon />  {translations.clients}</Link></li>
           <li><Link to='/manage/locations' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/locations')}`}><StoreLocation02Icon />  {translations.locations}</Link></li>
           <li><Link to='/manage/taxes' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/taxes')}`}><TaxesIcon />  {translations.taxes}</Link></li>
-          <li>           
-            <DropdownMenu label={translations.products} icon={<BarCode02Icon className='w-7' />}>
-                <li><Link to='/manage/products' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/products')}`}><BarCode02Icon size={20} /> {translations.products}</Link></li>
-                <li><Link to='/manage/product/brands' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/product/brands')}`}><BrandfetchIcon size={20} /> {translations.brands}</Link></li>
-                <li><Link to='/manage/product/categories' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/product/categories')}`}><Layers01Icon size={20} /> {translations.categories}</Link></li>
+          <li>
+            <DropdownMenu
+              label={translations.products}
+              icon={<BarCode02Icon className='w-7' />}
+              links={['/manage/products', '/manage/product/brands', '/manage/product/categories']}
+            >
+              <li><Link to='/manage/products' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/products')}`}><BarCode02Icon size={20} /> {translations.products}</Link></li>
+              <li><Link to='/manage/product/brands' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/product/brands')}`}><BrandfetchIcon size={20} /> {translations.brands}</Link></li>
+              <li><Link to='/manage/product/categories' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/product/categories')}`}><Layers01Icon size={20} /> {translations.categories}</Link></li>
             </DropdownMenu>
+
           </li>
           <li><Link to='/manage/suppliers' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/suppliers')}`}><DistributionIcon />  {translations.suppliers}</Link></li>
           <li><Link to='/manage/sales' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/sales')}`}><ShoppingBasketSecure03Icon />  {translations.sales}</Link></li>
@@ -100,6 +116,7 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
             <Route path='/manage/products' element={<ManageProductsPage addAlert={addAlert} />} />
             <Route path='/manage/product/brands' element={<ManageProductBrandsPage addAlert={addAlert} />} />
             <Route path='/manage/product/categories' element={<ManageProductCategoriesPage addAlert={addAlert} />} />
+            <Route path='/manage/inventory/types' element={<ManageInventoryTypesPage addAlert={addAlert} />} />
             <Route path='/auth/logout' element={<AuthLogoutPage />} />
             <Route path='*' element={<ErrorPage code={404} detail={translations.error_404} />} />
           </Routes>

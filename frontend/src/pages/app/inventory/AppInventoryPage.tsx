@@ -8,6 +8,7 @@ import Table from '../../../components/Table';
 import Modal from '../../../components/Modal';
 import TablePage from './TablePage';
 import CrudPage from './CrudPage';
+import FiltersPage from './filtersPage';
 
 interface AppInventoryPageProps {
     addAlert: (alert: AlertType) => void;
@@ -75,6 +76,7 @@ const AppInventoryPage: React.FC<AppInventoryPageProps> = ({ addAlert }) => {
                                 setSelected={setSelected}
                             />
                         }
+                        filters={<FiltersPage />}
                     />
                 </div>
             </div>

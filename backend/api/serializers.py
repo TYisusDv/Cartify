@@ -890,6 +890,44 @@ class GetProductSerializer(serializers.ModelSerializer):
         model = ProductsModel
         fields = ['id']
 
+#Inventory types
+class InventoryTypesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InventoryTypesModel
+        fields = '__all__'
+
+class AddEditInventoryTypeSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(error_messages = {
+        'required': 'The name is required.',
+        'blank': 'The name cannot be blank.',
+        'null': 'The name cannot be blank.',
+        'max_length': 'The name cannot exceed 100 characters.',
+    }, max_length = 100, allow_blank = False, allow_null = False)
+
+    type = serializers.IntegerField(error_messages = {
+        'required': 'The inventory type is required.',
+        'blank': 'The inventory type cannot be blank.',
+        'null': 'The inventory type cannot be blank.',
+        'invalid': 'The inventory type is invalid.',
+    }, required = True)
+    
+    class Meta:
+        model = InventoryTypesModel
+        exclude = ['id']
+
+class GetInventoryTypeSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The inventory type is required.',
+        'blank': 'The inventory type cannot be blank.',
+        'null': 'The inventory type cannot be blank.',
+        'invalid': 'The inventory type is invalid.',
+    })
+    
+    class Meta:
+        model = InventoryTypesModel
+        fields = ['id']
+ 
+
 #Inventory
 class InventorySerializer(serializers.ModelSerializer):
     product = ProductsSerializer(read_only = True)
@@ -897,19 +935,13 @@ class InventorySerializer(serializers.ModelSerializer):
     user = UserExcludeSerializer(read_only = True)
     location_transfer = LocationsSerializer(read_only = True)
     user_transfer = UserExcludeSerializer(read_only = True)
+    user_transfer_receives = UserExcludeSerializer(read_only = True)
 
     class Meta:
         model = InventoryModel
         fields = '__all__'
 
 class AddEditInventorySerializer(serializers.ModelSerializer):
-    type = serializers.IntegerField(error_messages = {
-        'required': 'The inventory type is required.',
-        'blank': 'The inventory type cannot be blank.',
-        'null': 'The inventory type cannot be blank.',
-        'invalid': 'The inventory type is invalid.',
-    }, required = True)
-
     quantity = serializers.FloatField(error_messages = {
         'required': 'The quantity is required.',
         'blank': 'The quantity cannot be blank.',
@@ -953,10 +985,17 @@ class AddEditInventorySerializer(serializers.ModelSerializer):
     }, required = False, allow_null = True)
 
     user_transfer_id = serializers.IntegerField(error_messages = {
-        'required': 'The user is required.',
-        'blank': 'The user cannot be blank.',
-        'null': 'The user cannot be blank.',
-        'invalid': 'The user is invalid.',
+        'required': 'The dealer is required.',
+        'blank': 'The dealer cannot be blank.',
+        'null': 'The dealer cannot be blank.',
+        'invalid': 'The dealer is invalid.',
+    }, required = False, allow_null = True)
+
+    user_transfer_receives_id = serializers.IntegerField(error_messages = {
+        'required': 'The person who receives is required.',
+        'blank': 'The person who receives cannot be blank.',
+        'null': 'The person who receives cannot be blank.',
+        'invalid': 'The person who receives is invalid.',
     }, required = False, allow_null = True)
 
     def to_internal_value(self, data):
@@ -972,6 +1011,9 @@ class AddEditInventorySerializer(serializers.ModelSerializer):
         if 'user_transfer' in data and isinstance(data['user_transfer'], dict) and 'id' in data['user_transfer']:
             data['user_transfer_id'] = data['user_transfer']['id']
         
+        if 'user_transfer_receives' in data and isinstance(data['user_transfer_receives'], dict) and 'id' in data['user_transfer_receives']:
+            data['user_transfer_receives_id'] = data['user_transfer_receives']['id']
+        
         if data.get('product_id') in [0, '0']:
             data['product_id'] = None
         
@@ -983,12 +1025,15 @@ class AddEditInventorySerializer(serializers.ModelSerializer):
         
         if data.get('user_transfer_id') in [0, '0']:
             data['user_transfer_id'] = None
+        
+        if data.get('user_transfer_receives_id') in [0, '0']:
+            data['user_transfer_receives_id'] = None
 
         return super().to_internal_value(data)
 
     class Meta:
         model = InventoryModel
-        exclude = ['id', 'product', 'location', 'user', 'location_transfer', 'user_transfer']
+        exclude = ['id', 'product', 'location', 'user', 'location_transfer', 'user_transfer', 'user_transfer_receives']
     
     def validate_type(self, value):
         if value not in [1, 2, 3]:

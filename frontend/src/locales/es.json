@@ -123,5 +123,12 @@
     "user": "Usuario",
     "dealer": "Repartidor",
     "location_entry": "Ubicación entrada",
-    "location_exit": "Ubicación salida"
+    "location_exit": "Ubicación salida",
+    "person_who_receives": "Persona quien recibe",
+    "types": "Tipos",
+    "inventory_types": "Tipos de inventario",
+    "manage_inventory_types_info": "Administra tipos de inventario aquí. ¡Agrega, edita y elimina!",
+    "inventory_entry": "Entrada",
+    "inventory_exit": "Salida",
+    "inventory_transfer": "Traslado"
 }

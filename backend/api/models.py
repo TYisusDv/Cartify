@@ -162,7 +162,7 @@ class SuppliersModel(models.Model):
 
 class ProductBrandsModel(models.Model):
     id = models.AutoField(primary_key = True)
-    name = models.CharField(null = False, blank = False)
+    name = models.CharField(max_length = 100, null = False, blank = False)
     status = models.BooleanField(default = True, null = False, blank = False)
     
     class Meta: 
@@ -170,7 +170,7 @@ class ProductBrandsModel(models.Model):
 
 class ProductCategoriesModel(models.Model):
     id = models.AutoField(primary_key = True)
-    name = models.CharField(null = False, blank = False)
+    name = models.CharField(max_length = 100, null = False, blank = False)
     status = models.BooleanField(default = True, null = False, blank = False)
     
     class Meta: 
@@ -222,17 +222,26 @@ class ProductImagesModel(models.Model):
     class Meta: 
         db_table = 'product_images'
 
+class InventoryTypesModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    name = models.CharField(max_length = 100, null = False, blank = False)
+    type = models.IntegerField(null = False, blank = False)  
+
+    class Meta: 
+        db_table = 'inventory_types'
+
 class InventoryModel(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
     quantity = models.FloatField(default = 0, null = False, blank = False)
-    type = models.IntegerField(null = False, blank = False)
     note = models.CharField(max_length = 100, null = True, blank = False)
     date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
+    type = models.ForeignKey(InventoryTypesModel, on_delete = models.RESTRICT)
     product = models.ForeignKey(ProductsModel, on_delete = models.RESTRICT)
     location = models.ForeignKey(LocationsModel, on_delete = models.RESTRICT)
     user = models.ForeignKey(User, on_delete = models.RESTRICT)
     location_transfer = models.ForeignKey(LocationsModel, null = True, blank = False, related_name='inventory_location_transfer', on_delete = models.RESTRICT)
     user_transfer = models.ForeignKey(User, null = True, blank = False, related_name='inventory_user_transfer', on_delete = models.RESTRICT)
-        
+    user_transfer_receives = models.ForeignKey(User, null = True, blank = False, related_name='inventory_user_transfer_receives', on_delete = models.RESTRICT)
+
     class Meta: 
         db_table = 'inventory'

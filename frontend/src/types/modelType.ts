@@ -166,16 +166,24 @@ export interface Product {
     tax?: Tax;
 }
 
+//Inventory type
+export interface InventoryType {
+    id?: number;
+    name?: string;
+    type?: number;
+}
+
 //Inventory
 export interface Inventory {
     id?: string;
-    quantity?: number;
-    type?: number;
+    quantity?: number;    
     note?: string;
     date_reg?: Date;
+    type?: InventoryType;
     product?: Product;
     location?: Location;
     user?: User;
     location_transfer?: Location;
     user_transfer?: User;
+    user_transfer_receives?: User;
 }

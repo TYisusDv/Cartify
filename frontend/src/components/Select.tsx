@@ -1,5 +1,5 @@
 import { ArrowDown01Icon } from 'hugeicons-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { getList } from '../services/componentsService';
 import { getNestedText, getNestedValue } from '../utils/formUtils';
 import useTranslations from '../hooks/useTranslations';
@@ -31,15 +31,15 @@ const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_va
         setIsOpen(!isOpen);
     };
 
-    const handleOptionClick = (value: any) => {
+    const handleOptionClick = useCallback((value: any) => {
         const selectedOption = options.find(option => option.value.toString() === value.toString());
-
+    
         setValue(value);
-
+    
         if (selectRef.current) {
             selectRef.current.value = value;
         }
-
+    
         if (props?.onChange) {
             const event: CustomChangeEvent = {
                 target: {
@@ -48,11 +48,11 @@ const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_va
                 object: selectedOption?.object
             } as CustomChangeEvent;
     
-            props.onChange(event); 
+            props.onChange(event);
         }
-
+    
         setIsOpen(false);
-    };
+    }, [options, props, selectRef, setValue, setIsOpen]);
 
     useClickOutside(containerRef, () => setIsOpen(false));
 
@@ -79,7 +79,7 @@ const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_va
             };
 
             fetchData();
-        } else if(myOptions){
+        } else if (myOptions) {
             const newOptions = myOptions.map((option: any) => ({
                 value: option.value,
                 text: option.label
@@ -89,11 +89,11 @@ const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_va
     }, [endpoint, translations.select_an_option, endpoint_value, endpoint_text, searchQuery, myOptions]);
 
     useEffect(() => {
-        handleOptionClick(props?.value || '0')
+        setValue(props?.value || '0');
     }, [props?.value]);
 
     return (
-        <div ref={containerRef} className='flex border-2 border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2 dark:text-white'>
+        <div ref={containerRef} className='flex border-2 h-full border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2 dark:text-white'>
             <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{label} {required ? <span className='text-red-500'>*</span> : ''}</h3>
             <div className='relative w-full'>
                 <select
@@ -106,13 +106,13 @@ const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_va
                     ))}
                 </select>
                 <div
-                    className={`flex items-center justify-between text-sm rounded-md p-2 ${props?.disabled ? 'cursor-default dark:hover:bg-slate-700' : 'cursor-pointer  dark:hover:bg-slate-600'}`}
+                    className={`relative flex flex-wrap items-center justify-between text-sm rounded-md p-2 ${props?.disabled ? 'cursor-default dark:hover:bg-slate-700' : 'cursor-pointer dark:hover:bg-slate-600'}`}
                     onClick={handleOpen}
                 >
-                    <span>{options.find((option) => option.value.toString() === value.toString())?.text}</span>
-                    <div className='flex justify-end w-[20px]'>{icon ? icon : <ArrowDown01Icon size={20} />}</div>
+                    <span className='line-clamp-1'>{options.find((option) => option.value.toString() === value.toString())?.text}</span>
+                    <div className='w-[20px] flex-shrink-0'>{icon ? icon : <ArrowDown01Icon size={20} />}</div>
                 </div>
-                { isOpen && !props?.disabled && (
+                {isOpen && !props?.disabled && (
                     <div className='absolute w-full text-sm border-2 rounded-md mt-1 dark:bg-slate-700 dark:border-slate-600'>
                         {endpoint && (
                             <input

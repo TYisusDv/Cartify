@@ -20,9 +20,16 @@ interface CrudPageProps {
 
 const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReload, setSelected, type, selected_id }) => {
     const { translations } = useTranslations();
-    const [formValues, setFormValues] = useState<Tax>({ id: selected_id, value: 0, status: true });
+    const [formValues, setFormValues] = useState<Tax>(() => {
+        const savedForm = sessionStorage.getItem('taxFormValues');
+        return savedForm ? JSON.parse(savedForm) : { id: selected_id, value: 0, status: true };
+    });
     const [colorPage, setColorPage] = useState<'blue' | 'orange' | 'red' | 'yellow'>('blue');
 
+    useEffect(() => {
+        sessionStorage.setItem('taxFormValues', JSON.stringify(formValues));
+    }, [formValues]);
+    
     useEffect(() => {
         const colorMapping: { [key in CrudPageProps['type']]: string } = {
             delete: 'red',

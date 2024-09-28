@@ -69,16 +69,17 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
 
     return (
         <div className='flex flex-col gap-2'>
-           <div className='flex items-center gap-2'>
-                <div className='w-full max-w-72 h-full bg-gray-100 dark:bg-slate-700 rounded-2xl'>
+           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 items-start gap-2'>
+                <div className='col-span-1 w-full bg-gray-100 dark:bg-slate-700 rounded-2xl'>
                     <Input
                         props={{
                             id: 'search',
                             name: 'search',
                             onChange: (e) => setFormValues(prev => ({
                                 ...prev,
-                                search: e.target.value || ''
-                            }))
+                                search: e.target.value
+                            })),
+                            value: formValues.search || ''
                         }}
                         label={translations.search}
                         icon={<Search01Icon className='icon' size={20} />}
