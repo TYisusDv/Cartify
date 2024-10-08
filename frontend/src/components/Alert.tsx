@@ -1,126 +1,58 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { AlertType } from "../types/alert";
+import React, { useEffect, useState } from 'react';
+import { Alert01Icon, Cancel01Icon, CheckmarkCircle02Icon } from 'hugeicons-react';
 
-const Alert: React.FC<AlertType> = ({
-  id,
-  text,
-  type,
-  timeout = 4000,
-  removeAlert,
-}) => {
-  const [isClosing, setIsClosing] = useState(false);
+interface AlertProps {
+    title: string;
+    msg: string;
+    color?: 'blue' | 'red' | 'orange' | 'green' | 'purple';
+    icon?: string;
+    timeout?: number;
+    onClose: () => void;
+}
 
-  const handleClose = useCallback(() => {
-    setIsClosing(true);
+const Alert: React.FC<AlertProps> = ({ color = 'blue', icon, title, msg, timeout, onClose }) => {
+    const [visible, setVisible] = useState(true);
+    const iconClasses: Record<string, string> = {
+        blue: 'bg-blue-500 text-white',
+        red: 'bg-red-500 text-white',
+        orange: 'bg-orange-500 text-white',
+        green: 'bg-green-500 text-white',
+        purple: 'bg-purple-500 text-white',
+    };
 
-    setTimeout(() => {
-      if (removeAlert) {
-        removeAlert(id);
-      }
-    }, 300);
-  }, [id, removeAlert]);
+    const iconClass = iconClasses[color];
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      handleClose();
-    }, timeout);
+    const iconMap: Record<string, JSX.Element> = {
+        Alert01Icon: <Alert01Icon className='w-7 h-7' />,
+        CheckmarkCircle02Icon: <CheckmarkCircle02Icon className='w-7 h-7' />,
+    };
 
-    return () => clearTimeout(timer);
-  }, [handleClose, timeout]);
+    const handleClose = () => {
+        setVisible(false);
+        setTimeout(() => onClose(), 300);
+    };
 
-  const typeStyles = {
-    success: {
-      iconBg: "bg-green-800",
-      iconText: "text-green-200",
-      alertBg: "bg-green-900",
-      alertText: "text-green-400",
-      svg: (
-        <svg
-          className="w-5 h-5"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
-        </svg>
-      ),
-    },
-    danger: {
-      iconBg: "bg-red-800",
-      iconText: "text-red-200",
-      alertBg: "bg-red-900",
-      alertText: "text-red-400",
-      svg: (
-        <svg
-          className="w-5 h-5"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z" />
-        </svg>
-      ),
-    },
-    primary: {
-      iconBg: "bg-blue-800",
-      iconText: "text-blue-200",
-      alertBg: "bg-blue-900",
-      alertText: "text-blue-400",
-      svg: (
-        <svg
-          className="w-5 h-5"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
-        </svg>
-      ),
-    },
-  };
+    useEffect(() => {
+        setTimeout(() => {
+            setVisible(false);
+            setTimeout(() => onClose(), 300);
+        }, timeout)
+    }, [])
 
-  const styles = typeStyles[type] || typeStyles.primary;
-
-  return (
-    <div
-      className={`flex items-center w-full max-w-xs p-4 rounded-lg shadow text-gray-700 bg-white dark:bg-slate-800 dark:text-gray-200 min-w-60 gap-2 transition-all duration-300 ease-in-out opacity-0 ${isClosing ? "opacity-0" : "opacity-100"
-        }`}
-      role="alert"
-    >
-      <div
-        className={`inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg ${styles.iconBg} ${styles.iconText}`}
-      >
-        {styles.svg}
-      </div>
-      <div className="ms-3 text-sm font-normal">{text}</div>
-      <button
-        type="button"
-        className="ms-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 inline-flex items-center justify-center h-8 w-8 text-gray-700 bg-white hover:bg-gray-200 dark:hover:text-white dark:bg-slate-800 dark:hover:bg-slate-900 dark:text-gray-200"
-        aria-label="Close"
-        onClick={handleClose}
-      >
-        <span className="sr-only">Close</span>
-        <svg
-          className="w-3 h-3"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 14 14"
-        >
-          <path
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-          />
-        </svg>
-      </button>
-    </div>
-  );
+    return (
+        <div className={`flex items-center justify-between gap-2 w-full p-3 rounded-lg shadow-sm bg-slate-50 dark:bg-slate-700 ${visible ? 'animate-fade-in' : 'animate-fade-out'}`}>
+            <div className='flex items-center gap-3'>
+                <span className={`flex items-center justify-center p-2 rounded-full ${iconClass}`}>{icon ? iconMap[icon] : null}</span>
+                <div className='flex flex-col w-full'>
+                    <h2 className='font-medium text-black dark:text-white'>{title}</h2>
+                    <p className='text-sm -mt-1 text-gray-700 dark:text-gray-300'>{msg}</p>
+                </div>
+            </div>
+            <span className='w-5 mr-2 cursor-pointer text-black hover:text-red-500 dark:text-white' onClick={handleClose}>
+                <Cancel01Icon className='h-5 w-5' />
+            </span>
+        </div>
+    );
 };
 
 export default Alert;

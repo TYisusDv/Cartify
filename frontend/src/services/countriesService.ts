@@ -6,5 +6,5 @@ export const listCountries = async () => {
       query: 'list'
     }
   });
-  return response;
+  return response.data;
 };

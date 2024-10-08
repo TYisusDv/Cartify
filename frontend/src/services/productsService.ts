@@ -8,7 +8,7 @@ export const getProduct = async (selected_id: string) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };
 
 export const getCountProducts = async () => {
@@ -17,17 +17,17 @@ export const getCountProducts = async () => {
       query: 'count',
     }
   });
-  return response;
+  return response.data;
 };
 
 export const addProduct = async (form: Product) => {
   const response = await apiService.post('/manage/products', form);
-  return response;
+  return response.data;
 };
 
 export const editProduct = async (form: Product) => {
   const response = await apiService.put('/manage/products', form);
-  return response;
+  return response.data;
 };
 
 export const deleteProduct = async (selected_id: string) => {
@@ -36,5 +36,5 @@ export const deleteProduct = async (selected_id: string) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };

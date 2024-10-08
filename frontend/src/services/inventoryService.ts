@@ -8,7 +8,7 @@ export const getInventory = async (selected_id: string | undefined) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };
 
 export const getCountAllInventory = async () => {
@@ -17,7 +17,7 @@ export const getCountAllInventory = async () => {
       query: 'count_all',
     }
   });
-  return response;
+  return response.data;
 };
 
 export const getCountInventory = async () => {
@@ -26,7 +26,7 @@ export const getCountInventory = async () => {
       query: 'count',
     }
   });
-  return response;
+  return response.data;
 };
 
 export const getCountInventoryTransfer = async () => {
@@ -35,19 +35,19 @@ export const getCountInventoryTransfer = async () => {
       query: 'count_transfer',
     }
   });
-  return response;
+  return response.data;
 };
 
 export const addInventory = async (form: Inventory[]) => {
   const response = await apiService.post('/app/inventory', {
     movements: form
   });
-  return response;
+  return response.data;
 };
 
 export const editInventory = async (form: Inventory) => {
   const response = await apiService.put('/app/inventory', form);
-  return response;
+  return response.data;
 };
 
 export const deleteInventory = async (selected_id: string | undefined) => {
@@ -56,5 +56,5 @@ export const deleteInventory = async (selected_id: string | undefined) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };

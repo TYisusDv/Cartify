@@ -66,8 +66,8 @@ const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_va
                         search: searchQuery || ''
                     };
                     const response = await getList(endpoint, params);
-                    if (response.data.success) {
-                        const newOptions = response.data.resp.map((option: any) => ({
+                    if (response.success) {
+                        const newOptions = response.resp.map((option: any) => ({
                             value: getNestedValue(option, endpoint_value) || generateUUID(),
                             text: getNestedText(option, endpoint_text) || '{TextError}',
                             object: option

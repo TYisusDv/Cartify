@@ -1,29 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { AlertType } from './types/alert';
 import { isAuthenticated } from './utils/authUtils';
 import { getTheme } from './utils/themeUtils';
-import Alert from './components/Alert';
 import PreLoader from './components/PreLoader';
 import DelayedSuspense from './components/DelayedSuspense';
+import AlertsList from './components/AlertList';
 
 const AuthPage = React.lazy(() => import('./pages/auth/authPage'));
 const PanelPage = React.lazy(() => import('./pages/panelPage'));
 
 function App() {
-  const [alerts, setAlerts] = useState<AlertType[]>([]);
-
-  const addAlert = useCallback((alert: AlertType) => {
-    setAlerts(prevAlerts => [
-      ...prevAlerts,
-      { id: alert.id, text: alert.text, timeout: alert.timeout, type: alert.type }
-    ]);
-  }, []);
-
-  const removeAlert = (id: string) => {
-    setAlerts(prevAlerts => prevAlerts.filter(alert => alert.id !== id));
-  };
-
   const applyTheme = useCallback((theme: string) => {
     document.documentElement.classList.remove('dark', 'light', 'theme');
 
@@ -59,20 +45,16 @@ function App() {
 
   return (
     <div className='App'>
-      <div className='flex flex-col absolute top-0 right-0 p-2 gap-2 z-[99]'>
-        {alerts.map(alert => (
-          <Alert key={alert.id} id={alert.id} text={alert.text} type={alert.type} removeAlert={removeAlert} />
-        ))}
-      </div>
       <Router>
         <DelayedSuspense fallback={<PreLoader />} delay={1000}>
           {isAuthenticated() ? (
-            <PanelPage addAlert={addAlert} />
+            <PanelPage />
           ) : (
-            <AuthPage addAlert={addAlert} />
+            <AuthPage />
           )}
+          <AlertsList />
         </DelayedSuspense>
-      </Router>
+      </Router>      
     </div>
   );
 }

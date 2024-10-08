@@ -892,6 +892,237 @@ class GetProductSerializer(serializers.ModelSerializer):
         model = ProductsModel
         fields = ['id']
 
+#PaymentMethods
+class PaymentMethodsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentMethodsModel
+        fields = '__all__'
+
+class AddEditPaymentMethodSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(error_messages = {
+        'required': 'The name is required.',
+        'blank': 'The name cannot be blank.',
+        'null': 'The name cannot be blank.',
+        'max_length': 'The name cannot exceed 254 characters.',
+    }, allow_blank = False, allow_null = False)
+
+    value = serializers.FloatField(error_messages = {
+        'required': 'The value is required.',
+        'blank': 'The value cannot be blank.',
+        'null': 'The value cannot be blank.',
+        'invalid': 'The value is invalid.',
+    }, required = False)
+
+    status = serializers.BooleanField(error_messages = {
+        'required': 'The status is required.',
+        'blank': 'The status cannot be blank.',
+        'null': 'The status cannot be blank.',
+        'invalid': 'The status is invalid.',
+    }, required = False)
+    
+    class Meta:
+        model = PaymentMethodsModel
+        exclude = ['id']
+
+class GetPaymentMethodSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The payment method is required.',
+        'blank': 'The payment method cannot be blank.',
+        'null': 'The payment method cannot be blank.',
+        'invalid': 'The payment method is invalid.',
+    })
+    
+    class Meta:
+        model = PaymentMethodsModel
+        fields = ['id']
+        
+#Sale
+class SalesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SalesModel
+        fields = '__all__'
+
+class AddEditSaleSerializer(serializers.ModelSerializer):
+    total = serializers.FloatField(error_messages = {
+        'required': 'The total is required.',
+        'blank': 'The total cannot be blank.',
+        'null': 'The total cannot be blank.',
+        'invalid': 'The total is invalid.',
+    })
+
+    type = serializers.IntegerField(error_messages = {
+        'required': 'The type is required.',
+        'blank': 'The type cannot be blank.',
+        'null': 'The type cannot be blank.',
+        'invalid': 'The type is invalid.',
+    })
+
+    client_id = serializers.IntegerField(error_messages = {
+        'required': 'The client is required.',
+        'blank': 'The client cannot be blank.',
+        'null': 'The client cannot be blank.',
+        'invalid': 'The client is invalid.',
+    })
+
+    def to_internal_value(self, data):
+        if 'client' in data and isinstance(data['client'], dict) and 'id' in data['client']:
+            data['client_id'] = data['client']['id']
+        
+        if data.get('client_id') in [0, '0']:
+            data['client_id'] = None
+
+        return super().to_internal_value(data)
+    
+    class Meta:
+        model = SalesModel
+        exclude = ['id', 'client']
+
+class GetSaleSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The payment method is required.',
+        'blank': 'The payment method cannot be blank.',
+        'null': 'The payment method cannot be blank.',
+        'invalid': 'The payment method is invalid.',
+    })
+    
+    class Meta:
+        model = SalesModel
+        fields = ['id']
+
+#Sale payment
+class SalePaymentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SalePaymentsModel
+        fields = '__all__'
+
+class AddEditSalePaymentSerializer(serializers.ModelSerializer):
+    no = serializers.IntegerField(error_messages = {
+        'required': 'The no is required.',
+        'blank': 'The no cannot be blank.',
+        'null': 'The no cannot be blank.',
+        'invalid': 'The no is invalid.',
+    }, required = False)
+
+    subtotal = serializers.FloatField(error_messages = {
+        'required': 'The subtotal is required.',
+        'blank': 'The subtotal cannot be blank.',
+        'null': 'The subtotal cannot be blank.',
+        'invalid': 'The subtotal is invalid.',
+    })
+
+    commission = serializers.FloatField(error_messages = {
+        'required': 'The commission is required.',
+        'blank': 'The commission cannot be blank.',
+        'null': 'The commission cannot be blank.',
+        'invalid': 'The commission is invalid.',
+    })
+
+    discount_per = serializers.FloatField(error_messages = {
+        'required': 'The discount per is required.',
+        'blank': 'The discount per cannot be blank.',
+        'null': 'The discount per cannot be blank.',
+        'invalid': 'The discount per is invalid.',
+    })
+
+    discount = serializers.FloatField(error_messages = {
+        'required': 'The discount is required.',
+        'blank': 'The discount cannot be blank.',
+        'null': 'The discount cannot be blank.',
+        'invalid': 'The discount is invalid.',
+    })
+
+    total = serializers.FloatField(error_messages = {
+        'required': 'The total is required.',
+        'blank': 'The total cannot be blank.',
+        'null': 'The total cannot be blank.',
+        'invalid': 'The total is invalid.',
+    })
+
+    pay = serializers.FloatField(error_messages = {
+        'required': 'The pay is required.',
+        'blank': 'The pay cannot be blank.',
+        'null': 'The pay cannot be blank.',
+        'invalid': 'The pay is invalid.',
+    })
+
+    change = serializers.FloatField(error_messages = {
+        'required': 'The change is required.',
+        'blank': 'The change cannot be blank.',
+        'null': 'The change cannot be blank.',
+        'invalid': 'The change is invalid.',
+    })
+
+    location_id = serializers.IntegerField(error_messages = {
+        'required': 'The location is required.',
+        'blank': 'The location cannot be blank.',
+        'null': 'The location cannot be blank.',
+        'invalid': 'The location is invalid.',
+    })
+
+    payment_method_id = serializers.IntegerField(error_messages = {
+        'required': 'The payment method is required.',
+        'blank': 'The payment method cannot be blank.',
+        'null': 'The payment method cannot be blank.',
+        'invalid': 'The payment method is invalid.',
+    })
+
+    sale_id = serializers.IntegerField(error_messages = {
+        'required': 'The sale is required.',
+        'blank': 'The sale cannot be blank.',
+        'null': 'The sale cannot be blank.',
+        'invalid': 'The sale is invalid.',
+    })
+
+    user_id = serializers.IntegerField(error_messages = {
+        'required': 'The user is required.',
+        'blank': 'The user cannot be blank.',
+        'null': 'The user cannot be blank.',
+        'invalid': 'The user is invalid.',
+    })
+
+    def to_internal_value(self, data):
+        if 'location' in data and isinstance(data['location'], dict) and 'id' in data['location']:
+            data['location_id'] = data['location']['id']
+        
+        if 'payment_method' in data and isinstance(data['payment_method'], dict) and 'id' in data['payment_method']:
+            data['payment_method_id'] = data['payment_method']['id']
+        
+        if 'sale' in data and isinstance(data['sale'], dict) and 'id' in data['sale']:
+            data['sale_id'] = data['sale']['id']
+
+        if 'user' in data and isinstance(data['user'], dict) and 'id' in data['user']:
+            data['user_id'] = data['user']['id']
+        
+        if data.get('location_id') in [0, '0']:
+            data['location_id'] = None
+        
+        if data.get('payment_method_id') in [0, '0']:
+            data['payment_method_id'] = None
+        
+        if data.get('sale_id') in [0, '0']:
+            data['sale_id'] = None
+        
+        if data.get('user_id') in [0, '0']:
+            data['user_id'] = None
+
+        return super().to_internal_value(data)
+    
+    class Meta:
+        model = SalePaymentsModel
+        exclude = ['id', 'location', 'payment_method', 'sale', 'user']
+
+class GetSalePaymentSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The payment method is required.',
+        'blank': 'The payment method cannot be blank.',
+        'null': 'The payment method cannot be blank.',
+        'invalid': 'The payment method is invalid.',
+    })
+    
+    class Meta:
+        model = SalePaymentsModel
+        fields = ['id']
+
 #Inventory types
 class InventoryTypesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -944,6 +1175,20 @@ class InventorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AddEditInventorySerializer(serializers.ModelSerializer):
+    price = serializers.FloatField(error_messages = {
+        'required': 'The price is required.',
+        'blank': 'The price cannot be blank.',
+        'null': 'The price cannot be blank.',
+        'invalid': 'The price is invalid.',
+    }, required = False)
+
+    cost = serializers.FloatField(error_messages = {
+        'required': 'The cost is required.',
+        'blank': 'The cost cannot be blank.',
+        'null': 'The cost cannot be blank.',
+        'invalid': 'The cost is invalid.',
+    }, required = False)
+
     quantity = serializers.FloatField(error_messages = {
         'required': 'The quantity is required.',
         'blank': 'The quantity cannot be blank.',
@@ -1007,6 +1252,13 @@ class AddEditInventorySerializer(serializers.ModelSerializer):
         'invalid': 'The person who receives is invalid.',
     }, required = False, allow_null = True)
 
+    sale_id = serializers.IntegerField(error_messages = {
+        'required': 'The sale is required.',
+        'blank': 'The sale cannot be blank.',
+        'null': 'The sale cannot be blank.',
+        'invalid': 'The sale is invalid.',
+    }, required = False, allow_null = True)
+
     def to_internal_value(self, data):
         if 'product' in data and isinstance(data['product'], dict) and 'id' in data['product']:
             data['product_id'] = data['product']['id']
@@ -1026,6 +1278,9 @@ class AddEditInventorySerializer(serializers.ModelSerializer):
         if 'user_transfer_receives' in data and isinstance(data['user_transfer_receives'], dict) and 'id' in data['user_transfer_receives']:
             data['user_transfer_receives_id'] = data['user_transfer_receives']['id']
         
+        if 'sale' in data and isinstance(data['sale'], dict) and 'id' in data['sale']:
+            data['sale_id'] = data['sale']['id']
+        
         if data.get('product_id') in [0, '0']:
             data['product_id'] = None
 
@@ -1043,12 +1298,15 @@ class AddEditInventorySerializer(serializers.ModelSerializer):
         
         if data.get('user_transfer_receives_id') in [0, '0']:
             data['user_transfer_receives_id'] = None
+        
+        if data.get('sale_id') in [0, '0']:
+            data['sale_id'] = None
 
         return super().to_internal_value(data)
 
     class Meta:
         model = InventoryModel
-        exclude = ['id', 'product', 'type', 'location', 'user', 'location_transfer', 'user_transfer', 'user_transfer_receives']
+        exclude = ['id', 'product', 'type', 'location', 'user', 'location_transfer', 'user_transfer', 'user_transfer_receives', 'sale']
     
     def validate_type(self, value):
         if value not in [1, 2, 3]:
@@ -1068,47 +1326,3 @@ class GetInventorySerializer(serializers.ModelSerializer):
         model = InventoryModel
         fields = ['id']
 
-#PaymentMethods
-class PaymentMethodsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PaymentMethodsModel
-        fields = '__all__'
-
-class AddEditPaymentMethodSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(error_messages = {
-        'required': 'The name is required.',
-        'blank': 'The name cannot be blank.',
-        'null': 'The name cannot be blank.',
-        'max_length': 'The name cannot exceed 254 characters.',
-    }, allow_blank = False, allow_null = False)
-
-    value = serializers.FloatField(error_messages = {
-        'required': 'The value is required.',
-        'blank': 'The value cannot be blank.',
-        'null': 'The value cannot be blank.',
-        'invalid': 'The value is invalid.',
-    }, required = False)
-
-    status = serializers.BooleanField(error_messages = {
-        'required': 'The status is required.',
-        'blank': 'The status cannot be blank.',
-        'null': 'The status cannot be blank.',
-        'invalid': 'The status is invalid.',
-    }, required = False)
-    
-    class Meta:
-        model = PaymentMethodsModel
-        exclude = ['id']
-
-class GetPaymentMethodSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(error_messages = {
-        'required': 'The payment method is required.',
-        'blank': 'The payment method cannot be blank.',
-        'null': 'The payment method cannot be blank.',
-        'invalid': 'The payment method is invalid.',
-    })
-    
-    class Meta:
-        model = PaymentMethodsModel
-        fields = ['id']
-        

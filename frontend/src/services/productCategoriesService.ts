@@ -8,7 +8,7 @@ export const getProductCategory = async (selected_id: number) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };
 
 export const getCountProductCategories = async () => {
@@ -17,17 +17,17 @@ export const getCountProductCategories = async () => {
       query: 'count',
     }
   });
-  return response;
+  return response.data;
 };
 
 export const addProductCategory = async (form: ProductCategory) => {
   const response = await apiService.post('/manage/product/categories', form);
-  return response;
+  return response.data;
 };
 
 export const editProductCategory = async (form: ProductCategory) => {
   const response = await apiService.put('/manage/product/categories', form);
-  return response;
+  return response.data;
 };
 
 export const deleteProductCategory = async (selected_id: number) => {
@@ -36,5 +36,5 @@ export const deleteProductCategory = async (selected_id: number) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };

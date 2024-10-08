@@ -222,6 +222,45 @@ class ProductImagesModel(models.Model):
     class Meta: 
         db_table = 'product_images'
 
+class PaymentMethodsModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    name = models.CharField(null = False, blank = False)
+    value = models.FloatField(default = 0, null = False, blank = False)
+    status = models.BooleanField(default = True, null = False, blank = False)
+    
+    class Meta: 
+        db_table = 'payment_methods'
+
+class SalesModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    total = models.FloatField(default = 0, null = False, blank = False)
+    type = models.IntegerField(default = 1, null = False, blank = False)
+    date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
+    client = models.ForeignKey(ClientsModel, null = False, blank = False, related_name='client_sales', on_delete = models.RESTRICT)
+
+    class Meta: 
+        db_table = 'sales'
+
+class SalePaymentsModel(models.Model):
+    id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+    no = models.IntegerField(unique = True, null = True, blank = True)
+    subtotal = models.FloatField(default = 0, null = False, blank = False)
+    commission = models.FloatField(default = 0, null = False, blank = False)
+    discount_per = models.FloatField(default = 0, null = False, blank = False)
+    discount = models.FloatField(default = 0, null = False, blank = False)
+    total = models.FloatField(default = 0, null = False, blank = False)
+    pay = models.FloatField(default = 0, null = False, blank = False)
+    change = models.FloatField(default = 0, null = False, blank = False)
+    note = models.CharField(max_length = 100, null = True, blank = False)
+    date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
+    user = models.ForeignKey(User, null = False, blank = False, related_name='sales_payments_user', on_delete = models.RESTRICT)
+    location = models.ForeignKey(LocationsModel, null = False, blank = False, related_name='sales_payments_location', on_delete = models.RESTRICT)
+    payment_method = models.ForeignKey(PaymentMethodsModel, null = False, blank = False, related_name='sales_payments_payment_method', on_delete = models.RESTRICT)
+    sale = models.ForeignKey(SalesModel, null = False, blank = False, related_name='sales_payments_sale', on_delete = models.RESTRICT)
+    
+    class Meta: 
+        db_table = 'sales_payments'
+
 class InventoryTypesModel(models.Model):
     id = models.AutoField(primary_key = True)
     name = models.CharField(max_length = 100, null = False, blank = False)
@@ -232,6 +271,8 @@ class InventoryTypesModel(models.Model):
 
 class InventoryModel(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+    price = models.FloatField(default = 0, null = False, blank = False)
+    cost = models.FloatField(default = 0, null = False, blank = False)
     quantity = models.FloatField(default = 0, null = False, blank = False)
     note = models.CharField(max_length = 100, null = True, blank = False)
     date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
@@ -242,15 +283,7 @@ class InventoryModel(models.Model):
     location_transfer = models.ForeignKey(LocationsModel, null = True, blank = False, related_name='inventory_location_transfer', on_delete = models.RESTRICT)
     user_transfer = models.ForeignKey(User, null = True, blank = False, related_name='inventory_user_transfer', on_delete = models.RESTRICT)
     user_transfer_receives = models.ForeignKey(User, null = True, blank = False, related_name='inventory_user_transfer_receives', on_delete = models.RESTRICT)
-
-    class Meta: 
-        db_table = 'inventory'
-
-class PaymentMethodsModel(models.Model):
-    id = models.AutoField(primary_key = True)
-    name = models.CharField(null = False, blank = False)
-    value = models.FloatField(default = 0, null = False, blank = False)
-    status = models.BooleanField(default = True, null = False, blank = False)
+    sale = models.ForeignKey(SalesModel, null = True, blank = False, related_name='inventory_sale', on_delete = models.RESTRICT)
     
     class Meta: 
-        db_table = 'payment_methods'
+        db_table = 'inventory'

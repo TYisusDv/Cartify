@@ -6,5 +6,5 @@ export const listTypesIds = async () => {
       query: 'list'
     }
   });
-  return response;
+  return response.data;
 };

@@ -8,7 +8,7 @@ export const getPaymentMethod = async (selected_id: number) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };
 
 export const getCountPaymentMethods = async () => {
@@ -17,17 +17,17 @@ export const getCountPaymentMethods = async () => {
       query: 'count',
     }
   });
-  return response;
+  return response.data;
 };
 
 export const addPaymentMethod = async (form: PaymentMethod) => {
   const response = await apiService.post('/manage/paymentmethods', form);
-  return response;
+  return response.data;
 };
 
 export const editPaymentMethod = async (form: PaymentMethod) => {
   const response = await apiService.put('/manage/paymentmethods', form);
-  return response;
+  return response.data;
 };
 
 export const deletePaymentMethod = async (selected_id: number) => {
@@ -36,5 +36,5 @@ export const deletePaymentMethod = async (selected_id: number) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };

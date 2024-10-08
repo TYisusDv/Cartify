@@ -3,6 +3,9 @@ import { Search01Icon } from 'hugeicons-react';
 import { getTable } from '../services/componentsService';
 import Input from "./Input";
 import useTranslations from "../hooks/useTranslations";
+import { extractMessages } from '../utils/formUtils';
+import { generateUUID } from '../utils/uuidGen';
+import { addAlert } from '../utils/Alerts';
 
 interface Header {
     name: string;
@@ -33,14 +36,25 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
 
     useEffect(() => {
         const fetchData = async () => {
-            try {                
+            try {
                 const response = await getTable(endpoint, formValues);
-                const response_data = response.data;
-                if (response_data) {
-                    setData(response_data.resp); 
-                    setTotalPages(response_data.total_pages);
-                }
-            } catch (error) {}
+                const response_resp = response.resp;
+
+                setData(response_resp);
+                setTotalPages(response.total_pages);                
+            } catch (error) {
+                const messages = extractMessages(error);
+                messages.forEach(msg => {
+                    addAlert({
+                        id: generateUUID(),
+                        title: 'An error has occurred.',
+                        msg: msg,
+                        icon: 'Alert01Icon',
+                        color: 'red',
+                        timeout: 2000
+                    });
+                });
+            }
         };
 
         fetchData();
@@ -70,7 +84,7 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
 
     return (
         <div className='flex flex-col gap-2'>
-           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 items-start gap-2'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 items-start gap-2'>
                 <div className='col-span-1 w-full bg-gray-100 dark:bg-slate-700 rounded-2xl'>
                     <Input
                         props={{
@@ -95,10 +109,10 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
                         <thead className="select-none text-sm text-black uppercase bg-gray-200 dark:bg-slate-600 dark:text-white">
                             <tr>
                                 {header.map((header) => (
-                                    <th 
-                                        key={header.name} 
-                                        scope="col" 
-                                        className="px-6 py-3 cursor-pointer" 
+                                    <th
+                                        key={header.name}
+                                        scope="col"
+                                        className="px-6 py-3 cursor-pointer"
                                         onClick={() => toggleOrder(header.name)}
                                     >
                                         {header.headerName} {getOrderIcon(header.name)}

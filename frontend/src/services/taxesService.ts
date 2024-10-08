@@ -8,7 +8,7 @@ export const getTax = async (selected_id: number) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };
 
 export const getCountTaxes = async () => {
@@ -17,17 +17,17 @@ export const getCountTaxes = async () => {
       query: 'count',
     }
   });
-  return response;
+  return response.data;
 };
 
 export const addTax = async (form: Tax) => {
   const response = await apiService.post('/manage/taxes', form);
-  return response;
+  return response.data;
 };
 
 export const editTax = async (form: Tax) => {
   const response = await apiService.put('/manage/taxes', form);
-  return response;
+  return response.data;
 };
 
 export const deleteTax = async (selected_id: number) => {
@@ -36,5 +36,5 @@ export const deleteTax = async (selected_id: number) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };

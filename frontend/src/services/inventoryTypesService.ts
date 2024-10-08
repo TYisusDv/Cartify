@@ -8,7 +8,7 @@ export const getInventoryType = async (selected_id: number) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };
 
 export const getCountInventoryTypes = async () => {
@@ -17,17 +17,17 @@ export const getCountInventoryTypes = async () => {
       query: 'count',
     }
   });
-  return response;
+  return response.data;
 };
 
 export const addInventoryType = async (form: InventoryType) => {
   const response = await apiService.post('/manage/inventory/types', form);
-  return response;
+  return response.data;
 };
 
 export const editInventoryType = async (form: InventoryType) => {
   const response = await apiService.put('/manage/inventory/types', form);
-  return response;
+  return response.data;
 };
 
 export const deleteInventoryType = async (selected_id: number) => {
@@ -36,5 +36,5 @@ export const deleteInventoryType = async (selected_id: number) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };

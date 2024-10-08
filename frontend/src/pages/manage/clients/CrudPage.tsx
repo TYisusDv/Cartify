@@ -1,20 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { AlertType } from '../../../types/alert';
 import { Client } from '../../../types/modelType';
 import { addClient, deleteClient, editClient, getClient } from '../../../services/clientsService';
 import useTranslations from '../../../hooks/useTranslations';
-import useFormSubmit from '../../../hooks/useFormSubmit';
 import Select from '../../../components/Select';
 import { Calendar01Icon, ComputerVideoIcon, Delete02Icon, JobSearchIcon, Location01Icon, Mail01Icon, MosqueLocationIcon, Note04Icon, RoadLocation01Icon, StoreLocation01Icon, UserAccountIcon, UserCircleIcon, UserQuestion02Icon } from 'hugeicons-react';
 import Input from '../../../components/Input';
 import useMedia from '../../../hooks/useMedia';
-import { handleFileChange } from '../../../utils/formUtils';
+import { extractMessages, handleFileChange } from '../../../utils/formUtils';
 import { URL_BACKEND } from '../../../services/apiService';
 import ModalPhotos from '../../../components/ModalPhotos';
+import { addAlert } from '../../../utils/Alerts';
+import { generateUUID } from '../../../utils/uuidGen';
 
 interface CrudPageProps {
-    addAlert: (alert: AlertType) => void;
     onClose: () => void;
     handleTableReload?: () => void;
     selected_id: number;
@@ -22,7 +20,7 @@ interface CrudPageProps {
     type: string;
 }
 
-const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReload, setSelected, type, selected_id }) => {
+const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSelected, type, selected_id }) => {
     const { translations } = useTranslations();
     const [formValues, setFormValues] = useState<Client>({ id: selected_id });
     const [activeTab, setActiveTab] = useState<'information' | 'details' | 'identification_images_client'>('information');
@@ -41,7 +39,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
         capturedImages: capturedImagesClient,
         setCapturedImages: setCapturedImagesClient,
         canvasRef: canvasRefClient
-    } = useMedia({ addAlert });
+    } = useMedia();
     const inputImageClient = useRef<HTMLInputElement | null>(null);
 
     const handleToggleVideoClient = () => {
@@ -81,7 +79,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
         capturedImages,
         setCapturedImages,
         canvasRef
-    } = useMedia({ addAlert });
+    } = useMedia();
     const inputImages = useRef<HTMLInputElement | null>(null);
 
     const handleToggleVideo = () => {
@@ -119,93 +117,104 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
             const fetchGet = async () => {
                 try {
                     const response = await getClient(selected_id);
-                    const response_data = response.data;
+                    const response_resp = response.resp;
 
-                    if (!response_data.success) {
-                        addAlert({ id: uuidv4(), text: response_data.message, type: 'danger', timeout: 3000 });
-                        return;
-                    }
-
-                    setFormValues(response_data?.resp);
-                    setIdentificationPictures(response_data.resp?.person?.identification_images || []);
+                    setFormValues(response_resp);
+                    setIdentificationPictures(response_resp.person?.identification_images || []);
                 } catch (error) {
-                    addAlert({ id: uuidv4(), text: 'Error fetching client', type: 'danger', timeout: 3000 });
                 }
             };
 
             fetchGet();
         }
-    }, [type, addAlert, selected_id]);
-
-    const handleForm = async () => {
-        let modFormValues = formValues;
-
-        if (type === 'add' || type === 'edit') {
-            const imagesPromises = capturedImages.map(file => {
-                return new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        resolve(reader.result as string);
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file)
-                });
-            });
-
-            const imagesBase64 = await Promise.all(imagesPromises);
-
-            modFormValues = {
-                ...formValues,
-                person: {
-                    ...formValues.person,
-                    identification_images: imagesBase64
-                },
-            };
-
-            const imagePromises = capturedImagesClient.map(file => {
-                return new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        resolve(reader.result as string);
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file)
-                });
-            });
-
-            const imageBase64 = await Promise.all(imagePromises);
-
-            modFormValues = {
-                ...modFormValues,
-                person: {
-                    ...modFormValues.person,
-                    profile_image: imageBase64[0]
-                },
-            };
-        }
-
-        if (type === 'add') return addClient(modFormValues);
-        else if (type === 'edit') return editClient(modFormValues);
-        else if (type === 'delete') return deleteClient(selected_id);
-    };
-
-    const { handleSubmit, isLoading } = useFormSubmit(handleForm, addAlert);
+    }, [type, selected_id]);
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const response = await handleSubmit(formValues);
 
-        if (response) {
-            if (!response?.data?.success) {
-                addAlert({ id: uuidv4(), text: response?.data?.resp, type: 'danger', timeout: 3000 });
-                return;
+        try {
+            let modFormValues = formValues;
+
+            if (type === 'add' || type === 'edit') {
+                const imagesPromises = capturedImages.map(file => {
+                    return new Promise<string>((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            resolve(reader.result as string);
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file)
+                    });
+                });
+
+                const imagesBase64 = await Promise.all(imagesPromises);
+
+                modFormValues = {
+                    ...formValues,
+                    person: {
+                        ...formValues.person,
+                        identification_images: imagesBase64
+                    },
+                };
+
+                const imagePromises = capturedImagesClient.map(file => {
+                    return new Promise<string>((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            resolve(reader.result as string);
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file)
+                    });
+                });
+
+                const imageBase64 = await Promise.all(imagePromises);
+
+                modFormValues = {
+                    ...modFormValues,
+                    person: {
+                        ...modFormValues.person,
+                        profile_image: imageBase64[0]
+                    },
+                };
             }
 
-            addAlert({ id: uuidv4(), text: response?.data?.resp, type: 'primary', timeout: 3000 });
+            let response_resp;
+            if (type === 'add') {
+                const response = await addClient(modFormValues);
+                response_resp = response?.resp;
+            } else if (type === 'edit') {
+                const response = await editClient(modFormValues);
+                response_resp = response?.resp;
+            } else if (type === 'delete' && selected_id) {
+                const response = await deleteClient(selected_id);
+                response_resp = response?.resp;
+            }
+
+            addAlert({
+                id: generateUUID(),
+                title: 'Success',
+                msg: response_resp,
+                icon: 'CheckmarkCircle02Icon',
+                timeout: 2000
+            });
+
             onClose();
 
             if (handleTableReload) handleTableReload();
             if (setSelected) setSelected(0);
+        } catch (error) {
+            const messages = extractMessages(error);
+            messages.forEach(msg => {
+                addAlert({
+                    id: generateUUID(),
+                    title: 'An error has occurred.',
+                    msg: msg,
+                    icon: 'Alert01Icon',
+                    color: 'red',
+                    timeout: 2000
+                });
+            });
         }
     };
 
@@ -776,7 +785,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                     <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>
                         <div className='col-span-1 md:col-end-3 w-full'>
                             {(type === 'delete' || type === 'edit' || type === 'add') && (
-                                <button type='submit' className={`btn btn-${colorPage} max-w-48 h-12 float-end`} disabled={isLoading}>
+                                <button type='submit' className={`btn btn-${colorPage} max-w-48 h-12 float-end`}>
                                     {translations[type]}
                                 </button>
                             )}

@@ -52,13 +52,8 @@ const InputList: React.FC<InputListProps> = ({ id, name, label, icon, onChange, 
                 });
                 const response_data = response.data;
 
-                if (response_data.success) {
-                    setSuggestions(response_data.resp);
-                    setShowSuggestions(true);
-                } else {
-                    setSuggestions([]);
-                    setShowSuggestions(false);
-                }
+                setSuggestions(response_data.resp);
+                setShowSuggestions(true);
             } catch (error) {
                 setSuggestions([]);
                 setShowSuggestions(false);

@@ -1,10 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { AlertType } from "../types/alert";
-import { v4 as uuidv4 } from 'uuid';
-
-interface UseMediaProps {
-    addAlert: (alert: AlertType) => void;
-}
+import { generateUUID } from '../utils/uuidGen';
 
 interface UseMediaReturn {
     isVideoActive: boolean;
@@ -18,7 +13,7 @@ interface UseMediaReturn {
     takePicture: () => void;
 }
 
-const useMedia = ({ addAlert }: UseMediaProps): UseMediaReturn => {
+const useMedia = (): UseMediaReturn => {
     const [isVideoActive, setIsVideoActive] = useState<boolean>(false);
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [capturedImages, setCapturedImages] = useState<File[]>([]);
@@ -45,11 +40,11 @@ const useMedia = ({ addAlert }: UseMediaProps): UseMediaReturn => {
             //const videoTrack = mediaStream.getVideoTracks()[0];
             //const { width, height } = videoTrack.getSettings();
         } catch (error) {
-            addAlert({ id: uuidv4(), text: 'Error accessing camera', type: 'danger', timeout: 3000 });
+            
         }
 
         setIsVideoActive(true);
-    }, [isVideoActive, addAlert]);
+    }, [isVideoActive]);
 
     const stopVideo = useCallback(() => {
         if (stream) {

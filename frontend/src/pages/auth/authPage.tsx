@@ -1,40 +1,44 @@
 import React, { useState } from 'react';
 import { login } from '../../services/authService';
 import { AuthLoginValues } from '../../types/auth';
-import { AlertType } from '../../types/alert';
 import { UserAccountIcon, LockPasswordIcon } from 'hugeicons-react';
 import { saveRefreshToken, saveToken } from '../../utils/authUtils';
-import { v4 as uuidv4 } from 'uuid';
 import Input from '../../components/Input';
-import useFormSubmit from '../../hooks/useFormSubmit';
+import { extractMessages } from '../../utils/formUtils';
+import { addAlert } from '../../utils/Alerts';
+import { generateUUID } from '../../utils/uuidGen';
 
-interface AuthPageProps {
-  addAlert: (alert: AlertType) => void;
-}
-
-const AuthPage: React.FC<AuthPageProps> = ({ addAlert }) => {
+const AuthPage: React.FC = () => {
   const [formValues, setFormValues] = useState<AuthLoginValues>({ username: '', password: '' });
-
-  const handleLogin = async () => {
-    return await login(formValues.username, formValues.password);
-  };
-
-  const { handleSubmit, isLoading } = useFormSubmit(handleLogin, addAlert);
-
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const response = await handleSubmit(formValues);
-    if (response) {
-      const response_data = response.data;
-      if (!response_data.success) {
-        addAlert({ id: uuidv4(), text: response_data.resp, type: 'danger', timeout: 3000 });
-        return;
-      }
+    try {      
+      const response = await login(formValues.username, formValues.password);
+      const response_resp = response?.resp;
 
-      saveToken(response_data.resp.accessToken);
-      saveRefreshToken(response_data.resp.refreshToken);
-      addAlert({ id: uuidv4(), text: 'Success! Welcome to Cartify.', type: 'primary', timeout: 3000 });
+      addAlert({
+        id: generateUUID(),
+        title: 'Success',
+        msg: response_resp,
+        icon: 'CheckmarkCircle02Icon',
+        timeout: 2000
+      });
+
+      saveToken(response_resp.accessToken);
+      saveRefreshToken(response_resp.refreshToken);
+    } catch (error) {
+      const messages = extractMessages(error);
+      messages.forEach(msg => {
+        addAlert({
+          id: generateUUID(),
+          title: 'An error has occurred.',
+          msg: msg,
+          icon: 'Alert01Icon',
+          color: 'red',
+          timeout: 2000
+        });
+      });
     }
   };
 
@@ -86,7 +90,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ addAlert }) => {
             </div>
             <div className='grid grid-cols-1 md:grid-cols-2 w-full gap-2 mt-6'>
               <div className='col-span-1 md:col-end-3'>
-                <button className='btn' disabled={isLoading}>Log in</button>
+                <button className='btn'>Log in</button>
               </div>
             </div>
           </form>

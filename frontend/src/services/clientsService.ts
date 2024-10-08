@@ -3,13 +3,13 @@ import { Client } from '../types/modelType';
 
 export const addClient = async (client: Client, ) => {
   const response = await apiService.post('/manage/clients', client);
-  return response;
+  return response.data;
 };
 
 
 export const editClient = async (client: Client, ) => {
   const response = await apiService.put('/manage/clients', client);
-  return response;
+  return response.data;
 };
 
 export const getClient = async (id: number) => {
@@ -19,7 +19,7 @@ export const getClient = async (id: number) => {
       id: id
     }
   });
-  return response;
+  return response.data;
 };
 
 export const getCountClients = async () => {
@@ -28,7 +28,7 @@ export const getCountClients = async () => {
       query: 'count'
     }
   });
-  return response;
+  return response.data;
 };
 
 export const deleteClient = async (id: number) => {
@@ -37,5 +37,5 @@ export const deleteClient = async (id: number) => {
       id: id 
     }
   });
-  return response;
+  return response.data;
 };

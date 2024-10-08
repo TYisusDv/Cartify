@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Add01Icon, Delete02Icon, EyeIcon, PencilEdit02Icon, SearchList02Icon } from 'hugeicons-react';
-import { AlertType } from '../../../../types/alert';
 import useTranslations from '../../../../hooks/useTranslations';
 import DelayedSuspense from '../../../../components/DelayedSuspense';
 import SkeletonLoader from '../../../../components/SkeletonLoader';
@@ -9,14 +8,9 @@ import Modal from '../../../../components/Modal';
 import TablePage from './TablePage';
 import CrudPage from './CrudPage';
 import FiltersPage from './filtersPage';
-import { generateUUID } from '../../../../utils/uuidGen';
 import { getCountInventoryTransfer } from '../../../../services/inventoryService';
 
-interface AppInventoryTransferPageProps {
-    addAlert: (alert: AlertType) => void;
-}
-
-const AppInventoryTransferPage: React.FC<AppInventoryTransferPageProps> = ({ addAlert }) => {
+const AppInventoryTransferPage: React.FC = () => {
     const { translations } = useTranslations();
     const [selected, setSelected] = useState<string | undefined>();
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, details: false });
@@ -48,16 +42,14 @@ const AppInventoryTransferPage: React.FC<AppInventoryTransferPageProps> = ({ add
         const fetchCount = async () => {
             try {
                 const response = await getCountInventoryTransfer();
-                const response_data = response.data;
+                const response_resp = response.resp;
 
-                setCountData({total: response_data.resp.total});
-            } catch (error) {
-                addAlert({ id: generateUUID(), text: 'Error fetching count', type: 'danger', timeout: 3000 });
-            }
+                setCountData({total: response_resp.total});
+            } catch (error) {}
         };
 
         fetchCount();
-    }, [reloadTable, addAlert]);
+    }, [reloadTable]);
     
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
@@ -105,25 +97,25 @@ const AppInventoryTransferPage: React.FC<AppInventoryTransferPageProps> = ({ add
 
             {isModalOpen.add && (
                 <Modal title={translations.add_movement} onClose={() => toggleModal('add', false)} className='max-w-[980px]'>
-                    <CrudPage addAlert={addAlert} type='add' selected_id={selected} onClose={() => toggleModal('add', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                    <CrudPage type='add' selected_id={selected} onClose={() => toggleModal('add', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )} 
 
             {isModalOpen.edit && (
                 <Modal title={translations.edit_movement} onClose={() => toggleModal('edit', false)} className='max-w-[980px]'>
-                    <CrudPage addAlert={addAlert} type='edit' selected_id={selected} onClose={() => toggleModal('edit', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                    <CrudPage type='edit' selected_id={selected} onClose={() => toggleModal('edit', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}  
 
             {isModalOpen.details && (
                 <Modal title={translations.details_movement} onClose={() => toggleModal('details', false)} className='max-w-[980px]'>
-                    <CrudPage addAlert={addAlert} type='details' selected_id={selected} onClose={() => toggleModal('details', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                    <CrudPage type='details' selected_id={selected} onClose={() => toggleModal('details', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}  
 
             {isModalOpen.delete && (
                 <Modal title={translations.delete_movement_sure} onClose={() => toggleModal('delete', false)} className='max-w-[980px]'>
-                    <CrudPage addAlert={addAlert} type='delete' selected_id={selected} onClose={() => toggleModal('delete', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                    <CrudPage type='delete' selected_id={selected} onClose={() => toggleModal('delete', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}         
         </DelayedSuspense>

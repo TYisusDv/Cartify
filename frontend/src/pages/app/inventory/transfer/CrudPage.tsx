@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Add01Icon, BarCode02Icon, Cancel01Icon, LiftTruckIcon, Note04Icon, SearchAreaIcon, StoreLocation01Icon, UserAccountIcon } from 'hugeicons-react';
-import { v4 as uuidv4 } from 'uuid';
-import { AlertType } from '../../../../types/alert';
 import { Inventory } from '../../../../types/modelType';
 import { addInventory, deleteInventory, editInventory, getInventory } from '../../../../services/inventoryService';
 import useTranslations from '../../../../hooks/useTranslations';
-import useFormSubmit from '../../../../hooks/useFormSubmit';
 import Input from '../../../../components/Input';
 import Select from '../../../../components/Select';
 import { CustomChangeEvent } from '../../../../types/componentsType';
+import { addAlert } from '../../../../utils/Alerts';
+import { generateUUID } from '../../../../utils/uuidGen';
+import { extractMessages } from '../../../../utils/formUtils';
 
 interface CrudPageProps {
-    addAlert: (alert: AlertType) => void;
     onClose: () => void;
     handleTableReload?: () => void;
     setSelected?: (value: string | undefined) => void;
@@ -19,7 +18,7 @@ interface CrudPageProps {
     selected_id: string | undefined;
 }
 
-const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReload, setSelected, type, selected_id }) => {
+const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSelected, type, selected_id }) => {
     const { translations } = useTranslations();
     const [formValues, setFormValues] = useState<Inventory>({ id: selected_id, quantity: 0 });
     const [colorPage, setColorPage] = useState<string>('blue');
@@ -38,58 +37,63 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
             const fetchGet = async () => {
                 try {
                     const response = await getInventory(selected_id);
-                    const response_data = response.data;
+                    const response_resp = response.resp;
 
-                    if (!response_data.success) {
-                        addAlert({ id: uuidv4(), text: response_data.message, type: 'danger', timeout: 3000 });
-                        return;
-                    }
-
-                    setFormValues(response_data?.resp);
+                    setFormValues(response_resp);
                 } catch (error) {
-                    addAlert({ id: uuidv4(), text: 'Error fetching inventory', type: 'danger', timeout: 3000 });
                 }
             };
 
             fetchGet();
         }
-    }, [type, addAlert, selected_id]);
-
-    const inventory_type_options = [
-        { value: 1, label: 'Entrada' },
-        { value: 2, label: 'Salida' }
-    ];
-
-    const handleForm = async () => {
-        if (type === 'add') return addInventory(movements);
-        else if (type === 'edit') return editInventory(formValues);
-        else if (type === 'delete') return deleteInventory(selected_id);
-    };
-
-    const { handleSubmit, isLoading } = useFormSubmit(handleForm, addAlert);
+    }, [type, selected_id]);
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const response = await handleSubmit(formValues);
 
-        if (response) {
-            if (!response?.data?.success) {
-                addAlert({ id: uuidv4(), text: response?.data?.resp, type: 'danger', timeout: 3000 });
-                return;
-            }
-
-            addAlert({ id: uuidv4(), text: response?.data?.resp, type: 'primary', timeout: 3000 });
+        try {
+            let response_resp;
+            if (type === 'add'){
+                const response = await addInventory(movements);
+                response_resp = response?.resp;
+            } else if (type === 'edit'){
+                const response = await editInventory(formValues);
+                response_resp = response?.resp;
+            } else if (type === 'delete'){
+                const response = await deleteInventory(selected_id);
+                response_resp = response?.resp;
+            }  
+            
+            addAlert({
+                id: generateUUID(),
+                title: 'Success',
+                msg: response_resp,
+                icon: 'CheckmarkCircle02Icon',
+                timeout: 2000
+            });
+            
             onClose();
 
             if (handleTableReload) handleTableReload();
             if (setSelected) setSelected(undefined);
+        } catch (error) {            
+            const messages = extractMessages(error);
+            messages.forEach(msg => {
+                addAlert({
+                    id: generateUUID(),
+                    title: 'An error has occurred.',
+                    msg: msg,
+                    icon: 'Alert01Icon',
+                    color: 'red',
+                    timeout: 2000
+                });
+            });
         }
     };
 
     const onAddMovementSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formValues.product?.id || formValues.product?.id === '0' || !formValues.location?.id || formValues.location?.id === 0 || !formValues.type?.id || formValues.type?.id === 0 || !formValues.quantity || formValues.quantity <= 0) {
-            addAlert({ id: uuidv4(), text: translations.missing_fields, type: 'danger', timeout: 3000 });
             return;
         }
 
@@ -100,7 +104,6 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
         const updatedMovements = [...movements];
         updatedMovements.splice(index, 1);
         setMovements(updatedMovements);
-        addAlert({ id: uuidv4(), text: 'Movimiento eliminado', type: 'success', timeout: 3000 });
     };
 
     return (
@@ -566,7 +569,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                 <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>
                     <div className='col-span-1 md:col-end-3 w-full'>
                         {(type === 'delete' || type === 'edit' || type === 'add') && (
-                            <button type='submit' className={`btn btn-${colorPage} max-w-48 h-12 float-end`} disabled={isLoading}>
+                            <button type='submit' className={`btn btn-${colorPage} max-w-48 h-12 float-end`}>
                                 {translations[type]}
                             </button>
                         )}

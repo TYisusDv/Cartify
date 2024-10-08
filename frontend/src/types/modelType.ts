@@ -184,16 +184,19 @@ export interface InventoryType {
 //Inventory
 export interface Inventory {
     id?: string;
+    price?: number;
+    cost?: number; 
     quantity?: number;    
     note?: string;
     date_reg?: Date;
     type?: InventoryType;
     product?: Product;
     location?: Location;
-    user?: User;
+    user?: User;      
     location_transfer?: Location;
     user_transfer?: User;
     user_transfer_receives?: User;
+    sale?: Sale
 }
 
 //PaymentMethod
@@ -204,33 +207,13 @@ export interface PaymentMethod {
     status?: boolean | '0' | '1' | 0 | 1;
 }
 
-//Sale details
-export interface SaleDetail {
-    id?: string;
-    price?: number;
-    cost?: number;
-    inventory?: Inventory;
-}
-
 //Sale
 export interface Sale {
-    id?: string;
-    no?: number;
-    subtotal?: number;
-    commission?: number;
-    discount_per?: number;
-    discount?: number;
+    id?: string;    
     total?: number;
-    pay?: number;  
-    change?: number; 
     type?: number;  
-    note?: string;
     date_reg?: Date;  
-    user?: User;
-    client?: Client;  
-    location?: Location;    
-    payment_method?: PaymentMethod;
-    details?: SaleDetail[];
+    client?: Client;
 }
 
 //Sale payment

@@ -8,7 +8,7 @@ export const getProductBrand = async (selected_id: number) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };
 
 export const getCountProductBrands = async () => {
@@ -17,17 +17,17 @@ export const getCountProductBrands = async () => {
       query: 'count',
     }
   });
-  return response;
+  return response.data;
 };
 
 export const addProductBrand = async (form: ProductBrand) => {
   const response = await apiService.post('/manage/product/brands', form);
-  return response;
+  return response.data;
 };
 
 export const editProductBrand = async (form: ProductBrand) => {
   const response = await apiService.put('/manage/product/brands', form);
-  return response;
+  return response.data;
 };
 
 export const deleteProductBrand = async (selected_id: number) => {
@@ -36,5 +36,5 @@ export const deleteProductBrand = async (selected_id: number) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };

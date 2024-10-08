@@ -1,21 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { AlertType } from '../../../types/alert';
-import { handleFileChange } from '../../../utils/formUtils';
+import { extractMessages, handleFileChange } from '../../../utils/formUtils';
 import { Product } from '../../../types/modelType';
 import { addProduct, deleteProduct, editProduct, getProduct } from '../../../services/productsService';
 import { getTax } from '../../../services/taxesService';
-import { Add01Icon, BarCode02Icon, BrandfetchIcon, ComputerVideoIcon, Delete02Icon, DistributionIcon, DollarCircleIcon, InformationCircleIcon, Layers01Icon, LiftTruckIcon, Note04Icon, PercentCircleIcon, ProductLoadingIcon, StoreLocation01Icon, TaxesIcon } from 'hugeicons-react';
+import { Add01Icon, BarCode02Icon, BrandfetchIcon, ComputerVideoIcon, Delete02Icon, DistributionIcon, DollarCircleIcon, InformationCircleIcon, Layers01Icon, LiftTruckIcon, Note04Icon, PercentCircleIcon, ProductLoadingIcon, TaxesIcon } from 'hugeicons-react';
 import { URL_BACKEND } from '../../../services/apiService';
 import useTranslations from '../../../hooks/useTranslations';
-import useFormSubmit from '../../../hooks/useFormSubmit';
 import Input from '../../../components/Input';
 import useMedia from '../../../hooks/useMedia';
 import Select from '../../../components/Select';
 import Switch from '../../../components/Switch';
+import { addAlert } from '../../../utils/Alerts';
+import { generateUUID } from '../../../utils/uuidGen';
 
 interface CrudPageProps {
-    addAlert: (alert: AlertType) => void;
     onClose: () => void;
     toggleModal: (modalType: 'add_brand' | 'add_category' | 'add_supplier' | 'add_tax' | 'product_images', isOpen: boolean) => void;
     handleTableReload?: () => void;
@@ -25,7 +23,7 @@ interface CrudPageProps {
     selected_id: string;
 }
 
-const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, handleTableReload, setSelected, setImageUrl, type, selected_id }) => {
+const CrudPage: React.FC<CrudPageProps> = ({ onClose, toggleModal, handleTableReload, setSelected, setImageUrl, type, selected_id }) => {
     const { translations } = useTranslations();
     const [formValues, setFormValues] = useState<Product>({ id: selected_id, status: true, cost_price: 0, cash_profit: 0, cash_price: 0, credit_profit: 0, credit_price: 0, min_stock: 0 });
     const [activeTab, setActiveTab] = useState<'home' | 'product_images'>('home');
@@ -41,7 +39,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
         capturedImages,
         setCapturedImages,
         canvasRef
-    } = useMedia({ addAlert });
+    } = useMedia();
     const inputImages = useRef<HTMLInputElement | null>(null);
 
     const handleToggleVideo = () => {
@@ -84,68 +82,80 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
             const fetchGet = async () => {
                 try {
                     const response = await getProduct(selected_id);
-                    const response_data = response.data;
+                    const response_resp = response.resp;
 
-                    if (!response_data.success) {
-                        addAlert({ id: uuidv4(), text: response_data.message, type: 'danger', timeout: 3000 });
-                        return;
-                    }
-
-                    setFormValues(response_data?.resp);
-                    setProductImages(response_data?.resp?.product_images);
+                    setFormValues(response_resp);
+                    setProductImages(response_resp.product_images);
                 } catch (error) {
-                    addAlert({ id: uuidv4(), text: 'Error fetching product', type: 'danger', timeout: 3000 });
                 }
             };
 
             fetchGet();
         }
-    }, [type, addAlert, selected_id]);
-
-    const handleForm = async () => {
-        let modFormValues = formValues;
-
-        if (type === 'add' || type === 'edit') {
-            const imagePromises = capturedImages.map(file => {
-                return new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        resolve(reader.result as string);
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file)
-                });
-            });
-
-            const imagesBase64 = await Promise.all(imagePromises);
-
-            modFormValues = {
-                ...formValues,
-                images: imagesBase64,
-            };
-        }
-        if (type === 'add') return addProduct(modFormValues);
-        else if (type === 'edit') return editProduct(modFormValues);
-        else if (type === 'delete') return deleteProduct(selected_id);
-    };
-
-    const { handleSubmit, isLoading } = useFormSubmit(handleForm, addAlert);
+    }, [type, selected_id]);
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const response = await handleSubmit(formValues);
 
-        if (response) {
-            if (!response?.data?.success) {
-                addAlert({ id: uuidv4(), text: response?.data?.resp, type: 'danger', timeout: 3000 });
-                return;
+        try {
+            let modFormValues = formValues;
+
+            if (type === 'add' || type === 'edit') {
+                const imagePromises = capturedImages.map(file => {
+                    return new Promise<string>((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            resolve(reader.result as string);
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file)
+                    });
+                });
+
+                const imagesBase64 = await Promise.all(imagePromises);
+
+                modFormValues = {
+                    ...formValues,
+                    images: imagesBase64,
+                };
             }
 
-            addAlert({ id: uuidv4(), text: response?.data?.resp, type: 'primary', timeout: 3000 });
+            let response_resp;
+            if (type === 'add') {
+                const response = await addProduct(modFormValues);
+                response_resp = response?.resp;
+            } else if (type === 'edit') {
+                const response = await editProduct(modFormValues);
+                response_resp = response?.resp;
+            } else if (type === 'delete' && selected_id) {
+                const response = await deleteProduct(selected_id);
+                response_resp = response?.resp;
+            }
+
+            addAlert({
+                id: generateUUID(),
+                title: 'Success',
+                msg: response_resp,
+                icon: 'CheckmarkCircle02Icon',
+                timeout: 2000
+            });
+
             onClose();
 
             if (handleTableReload) handleTableReload();
             if (setSelected) setSelected('');
+        } catch (error) {
+            const messages = extractMessages(error);
+            messages.forEach(msg => {
+                addAlert({
+                    id: generateUUID(),
+                    title: 'An error has occurred.',
+                    msg: msg,
+                    icon: 'Alert01Icon',
+                    color: 'red',
+                    timeout: 2000
+                });
+            });
         }
     };
 
@@ -154,16 +164,11 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
             if (formValues.tax?.id && formValues.tax?.id.toString() !== '0') {
                 try {
                     const response = await getTax(formValues.tax.id);
-                    const response_data = response.data;
-
-                    if (!response_data.success) {
-                        addAlert({ id: uuidv4(), text: response_data.message, type: 'danger', timeout: 3000 });
-                        return;
-                    }
+                    const response_resp = response.resp;
 
                     setFormValues(prev => ({
                         ...prev,
-                        tax: response_data?.resp
+                        tax: response_resp
                     }));
                 } catch (error) { }
             } else {
@@ -677,7 +682,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, toggleModal, han
                     <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>
                         <div className='col-span-1 md:col-end-3 w-full'>
                             {(type === 'delete' || type === 'edit' || type === 'add') && (
-                                <button type='submit' className={`btn btn-${colorPage} max-w-48 h-12 float-end`} disabled={isLoading}>
+                                <button type='submit' className={`btn btn-${colorPage} max-w-48 h-12 float-end`}>
                                     {translations[type]}
                                 </button>
                             )}

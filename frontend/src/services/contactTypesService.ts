@@ -6,5 +6,5 @@ export const listContactTypes = async () => {
       query: 'list'
     }
   });
-  return response;
+  return response.data;
 };

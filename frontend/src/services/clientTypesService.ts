@@ -6,5 +6,5 @@ export const listClientTypes = async () => {
       query: 'list'
     }
   });
-  return response;
+  return response.data;
 };

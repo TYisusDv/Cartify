@@ -8,7 +8,7 @@ export const getSupplier = async (selected_id: string) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };
 
 export const getCountSuppliers = async () => {
@@ -17,17 +17,17 @@ export const getCountSuppliers = async () => {
       query: 'count',
     }
   });
-  return response;
+  return response.data;
 };
 
 export const addSupplier = async (form: Supplier) => {
   const response = await apiService.post('/manage/suppliers', form);
-  return response;
+  return response.data;
 };
 
 export const editSupplier = async (form: Supplier) => {
   const response = await apiService.put('/manage/suppliers', form);
-  return response;
+  return response.data;
 };
 
 export const deleteSupplier = async (selected_id: string) => {
@@ -36,5 +36,5 @@ export const deleteSupplier = async (selected_id: string) => {
       id: selected_id,
     }
   });
-  return response;
+  return response.data;
 };

@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { AlertType } from '../../../types/alert';
 import { Supplier } from '../../../types/modelType';
 import { addSupplier, deleteSupplier, editSupplier, getSupplier } from '../../../services/suppliersService';
 import { Mail01Icon, RoadLocation01Icon, SmartPhone01Icon, TelephoneIcon, UserCircleIcon, UserIdVerificationIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
-import useFormSubmit from '../../../hooks/useFormSubmit';
 import Input from '../../../components/Input';
+import { extractMessages } from '../../../utils/formUtils';
+import { addAlert } from '../../../utils/Alerts';
+import { generateUUID } from '../../../utils/uuidGen';
 
 interface CrudPageProps {
-    addAlert: (alert: AlertType) => void;
     onClose: () => void;
     handleTableReload?: () => void;
     setSelected?: (value: string) => void;
@@ -17,7 +16,7 @@ interface CrudPageProps {
     selected_id?: string;
 }
 
-const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReload, setSelected, type, selected_id }) => {
+const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSelected, type, selected_id }) => {
     const { translations } = useTranslations();
     const [formValues, setFormValues] = useState<Supplier>({id: selected_id});
     const [activeTab, setActiveTab] = useState<'company' | 'advisor'>('company');
@@ -36,47 +35,59 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
             const fetchGet = async () => {
                 try {
                     const response = await getSupplier(selected_id);
-                    const response_data = response.data;
+                    const response_resp = response.resp;
 
-                    if (!response_data.success) {
-                        addAlert({ id: uuidv4(), text: response_data.message, type: 'danger', timeout: 3000 });
-                        return;
-                    }
-
-                    setFormValues(response_data?.resp);
+                    setFormValues(response_resp);
                 } catch (error) {
-                    addAlert({ id: uuidv4(), text: 'Error fetching supplier', type: 'danger', timeout: 3000 });
                 }
             };
 
             fetchGet();
         }
-    }, [type, addAlert, selected_id]);
-
-    const handleForm = async () => {
-        if (type === 'add') return addSupplier(formValues);
-        if (type === 'edit') return editSupplier(formValues);
-        if (type === 'delete' && selected_id) return deleteSupplier(selected_id);
-    };
-
-    const { handleSubmit, isLoading } = useFormSubmit(handleForm, addAlert);
+    }, [type, selected_id]);
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const response = await handleSubmit(formValues);
-        
-        if(response){
-            if (!response?.data?.success) {
-                addAlert({ id: uuidv4(), text: response?.data?.resp, type: 'danger', timeout: 3000 });
-                return;
+
+        try {
+            let response_resp;
+            if (type === 'add') {
+                const response = await addSupplier(formValues);
+                response_resp = response?.resp;
+            } else if (type === 'edit') {
+                const response = await editSupplier(formValues);
+                response_resp = response?.resp;
+            } else if (type === 'delete' && selected_id) {
+                const response = await deleteSupplier(selected_id);
+                response_resp = response?.resp;
             }
-            
-            addAlert({ id: uuidv4(), text: response?.data?.resp, type: 'primary', timeout: 3000 });
+
+            addAlert({
+                id: generateUUID(),
+                title: 'Success',
+                msg: response_resp,
+                icon: 'CheckmarkCircle02Icon',
+                timeout: 2000
+            });
+
             onClose();
-            if(handleTableReload) handleTableReload();
-            if(setSelected) setSelected('');
-        }        
-    };
+
+            if (handleTableReload) handleTableReload();
+            if (setSelected) setSelected('');
+        } catch (error) {
+            const messages = extractMessages(error);
+            messages.forEach(msg => {
+                addAlert({
+                    id: generateUUID(),
+                    title: 'An error has occurred.',
+                    msg: msg,
+                    icon: 'Alert01Icon',
+                    color: 'red',
+                    timeout: 2000
+                });
+            });
+        }
+    };    
 
     return (
         <div>
@@ -277,7 +288,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                     <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>
                         <div className='col-span-1 md:col-end-3 w-full'>
                         {(type === 'delete' || type === 'edit' || type === 'add') && (
-                            <button type="submit" className={`btn btn-${colorPage} max-w-48 h-12 float-end`} disabled={isLoading}>
+                            <button type="submit" className={`btn btn-${colorPage} max-w-48 h-12 float-end`}>
                                 {translations[type]}
                             </button>
                         )}

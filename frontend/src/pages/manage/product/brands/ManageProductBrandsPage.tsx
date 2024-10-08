@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Add01Icon, BrandfetchIcon, Delete02Icon, Layers01Icon, PencilEdit02Icon } from 'hugeicons-react';
-import { AlertType } from '../../../../types/alert';
-import { v4 as uuidv4 } from 'uuid';
+import { Add01Icon, BrandfetchIcon, Delete02Icon, PencilEdit02Icon } from 'hugeicons-react';
 import { getCountProductBrands } from '../../../../services/productBrandService';
 import useTranslations from '../../../../hooks/useTranslations';
 import DelayedSuspense from '../../../../components/DelayedSuspense';
@@ -11,11 +9,7 @@ import Modal from '../../../../components/Modal';
 import TablePage from './TablePage';
 import CrudPage from './CrudPage';
 
-interface ManageProductBrandsPageProps {
-    addAlert: (alert: AlertType) => void;
-}
-
-const ManageProductBrandsPage: React.FC<ManageProductBrandsPageProps> = ({ addAlert }) => {
+const ManageProductBrandsPage: React.FC = () => {
     const { translations } = useTranslations();
     const [selected, setSelected] = useState<number>(0);
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false });
@@ -39,21 +33,15 @@ const ManageProductBrandsPage: React.FC<ManageProductBrandsPageProps> = ({ addAl
         const fetchCount = async () => {
             try {
                 const response = await getCountProductBrands();
-                const response_data = response.data;
+                const response_resp = response.resp;
 
-                if (!response_data.success) {
-                    addAlert({ id: uuidv4(), text: response_data.message, type: 'danger', timeout: 3000 });
-                    return;
-                }
-
-                setCountData(response_data.resp.total);
+                setCountData(response_resp.total);
             } catch (error) {
-                addAlert({ id: uuidv4(), text: 'Error fetching count', type: 'danger', timeout: 3000 });
             }
         };
 
         fetchCount();
-    }, [reloadTable, addAlert]);
+    }, [reloadTable]);
 
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
@@ -86,19 +74,19 @@ const ManageProductBrandsPage: React.FC<ManageProductBrandsPageProps> = ({ addAl
             </div>
             {isModalOpen.add && (
                 <Modal title={translations.add_product_brand} onClose={() => toggleModal('add', false)}>
-                    <CrudPage addAlert={addAlert} type='add' selected_id={selected} onClose={() => toggleModal('add', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                    <CrudPage type='add' selected_id={selected} onClose={() => toggleModal('add', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}
 
             {isModalOpen.edit && (
                 <Modal title={translations.edit_product_brand} onClose={() => toggleModal('edit', false)}>
-                    <CrudPage addAlert={addAlert} type='edit' selected_id={selected} onClose={() => toggleModal('edit', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                    <CrudPage type='edit' selected_id={selected} onClose={() => toggleModal('edit', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}
 
             {isModalOpen.delete && (
                 <Modal title={translations.delete_product_brand} onClose={() => toggleModal('delete', false)}>
-                    <CrudPage addAlert={addAlert} type='delete' selected_id={selected} onClose={() => toggleModal('delete', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
+                    <CrudPage type='delete' selected_id={selected} onClose={() => toggleModal('delete', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}
         </DelayedSuspense>

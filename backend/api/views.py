@@ -1622,3 +1622,172 @@ class ManagePaymentMethodsAPIView(APIView):
             'resp': 'Deleted successfully.'
         }, status = 200)
 
+#Sale
+class ManageSalesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self, pk) :
+        try:
+            return PaymentMethodsModel.objects.get(pk = pk)
+        except PaymentMethodsModel.DoesNotExist:
+            raise Http404('Payment method not found.')
+
+    def get(self, request):
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':
+            model = PaymentMethodsModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = PaymentMethodsSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            payment_method_id = data.get('id', None)
+
+            payment_method_serializer = GetPaymentMethodSerializer(data = data)  
+            if not payment_method_serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': payment_method_serializer.errors
+                }, status = 400)    
+                    
+            payment_method_instance = self.get_object(pk = payment_method_id)
+            payment_method_serialized = PaymentMethodsSerializer(payment_method_instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': payment_method_serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = PaymentMethodsModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = PaymentMethodsSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = PaymentMethodsModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+        
+        with transaction.atomic():
+            user_id = request.user.id
+            sale = data.get('sale', None)
+            inventory = data.get('inventory', [])
+            sale_payment = data.get('sale_payment', None)
+
+            sale_serializer = AddEditSaleSerializer(data = sale)
+            if not sale_serializer.is_valid():
+                transaction.set_rollback(True)
+                return JsonResponse({'success': False, 'resp': sale_serializer.errors}, status = 400)
+
+            sale_instance = sale_serializer.save()
+
+            for item_inventory in inventory:
+                item_inventory['sale_id'] = sale_instance.id
+                item_inventory['location'] = sale_payment.get('location', None)
+                item_inventory['user_id'] = user_id
+                item_inventory['type_id'] = 3
+
+                inventory_serializer = AddEditInventorySerializer(data = item_inventory)
+                if not inventory_serializer.is_valid():
+                    transaction.set_rollback(True)
+                    return JsonResponse({'success': False, 'resp': inventory_serializer.errors}, status = 400)
+
+                inventory_serializer.save()
+            
+            sale_payment['sale_id'] = sale_instance.id
+            sale_payment['user_id'] = user_id
+
+            sale_payment_serializer = AddEditSalePaymentSerializer(data = sale_payment)
+            if not sale_payment_serializer.is_valid():
+                transaction.set_rollback(True)
+                return JsonResponse({'success': False, 'resp': sale_payment_serializer.errors}, status = 400)
+
+            sale_payment_serializer.save()
+
+            return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        payment_method_id = data.get('id', None)
+
+        payment_method_serializer = GetPaymentMethodSerializer(data = data)  
+        if not payment_method_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': payment_method_serializer.errors
+            }, status = 400)    
+                
+        payment_method_instance = self.get_object(pk = payment_method_id)     
+
+        payment_method_serializer = AddEditPaymentMethodSerializer(payment_method_instance, data = data)
+        if not payment_method_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': payment_method_serializer.errors}, status = 400)
+
+        payment_method_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        payment_method_id = data.get('id', None)
+
+        payment_method_serializer = GetPaymentMethodSerializer(data = data)  
+        if not payment_method_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': payment_method_serializer.errors
+            }, status = 400)    
+                
+        payment_method_instance = self.get_object(pk = payment_method_id)           
+        payment_method_instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
+

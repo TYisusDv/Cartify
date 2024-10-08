@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { getCountProducts } from '../../../services/productsService';
 import { URL_BACKEND } from '../../../services/apiService';
 import { Add01Icon, BarCode02Icon, Delete02Icon, EyeIcon, PencilEdit02Icon, ViewOffSlashIcon } from 'hugeicons-react';
-import { AlertType } from '../../../types/alert';
-import { v4 as uuidv4 } from 'uuid';
 import useTranslations from '../../../hooks/useTranslations';
 import DelayedSuspense from '../../../components/DelayedSuspense';
 import SkeletonLoader from '../../../components/SkeletonLoader';
@@ -18,11 +16,8 @@ import TaxCrudPage from '../taxes/CrudPage';
 import FiltersPage from './filtersPage';
 import ModalPhotos from '../../../components/ModalPhotos';
 
-interface ManageProductsPageProps {
-    addAlert: (alert: AlertType) => void;
-}
 
-const ManageProductsPage: React.FC<ManageProductsPageProps> = ({ addAlert }) => {
+const ManageProductsPage: React.FC = () => {
     const { translations } = useTranslations();
     const [selected, setSelected] = useState<string>('');
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, details: false, add_brand: false, add_category: false, add_supplier: false, add_tax: false, product_images: false });
@@ -54,21 +49,15 @@ const ManageProductsPage: React.FC<ManageProductsPageProps> = ({ addAlert }) => 
         const fetchCount = async () => {
             try {
                 const response = await getCountProducts();
-                const response_data = response.data;
+                const response_resp = response.resp;
 
-                if (!response_data.success) {
-                    addAlert({ id: uuidv4(), text: response_data.message, type: 'danger', timeout: 3000 });
-                    return;
-                }
-
-                setCountData(response_data.resp);
+                setCountData(response_resp.total);
             } catch (error) {
-                addAlert({ id: uuidv4(), text: 'Error fetching count', type: 'danger', timeout: 3000 });
             }
         };
 
         fetchCount();
-    }, [reloadTable, addAlert]);
+    }, [reloadTable]);
 
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
@@ -133,49 +122,49 @@ const ManageProductsPage: React.FC<ManageProductsPageProps> = ({ addAlert }) => 
             </div>
             {isModalOpen.add && (
                 <Modal title={translations.add_product} onClose={() => toggleModal('add', false)} className='max-w-screen-md'>
-                    <CrudPage addAlert={addAlert} type='add' selected_id={selected} onClose={() => toggleModal('add', false)} handleTableReload={handleTableReload} setSelected={setSelected} toggleModal={toggleModal} />
+                    <CrudPage type='add' selected_id={selected} onClose={() => toggleModal('add', false)} handleTableReload={handleTableReload} setSelected={setSelected} toggleModal={toggleModal} />
                 </Modal>
             )}
 
             {isModalOpen.edit && (
                 <Modal title={translations.edit_product} onClose={() => toggleModal('edit', false)} className='max-w-screen-md'>
-                    <CrudPage addAlert={addAlert} type='edit' setImageUrl={setImageUrl} selected_id={selected} onClose={() => toggleModal('edit', false)} handleTableReload={handleTableReload} setSelected={setSelected} toggleModal={toggleModal} />
+                    <CrudPage type='edit' setImageUrl={setImageUrl} selected_id={selected} onClose={() => toggleModal('edit', false)} handleTableReload={handleTableReload} setSelected={setSelected} toggleModal={toggleModal} />
                 </Modal>
             )}
 
             {isModalOpen.delete && (
                 <Modal title={translations.delete_product} onClose={() => toggleModal('delete', false)} className='max-w-screen-md'>
-                    <CrudPage addAlert={addAlert} type='delete' setImageUrl={setImageUrl} selected_id={selected} onClose={() => toggleModal('delete', false)} handleTableReload={handleTableReload} setSelected={setSelected} toggleModal={toggleModal} />
+                    <CrudPage type='delete' setImageUrl={setImageUrl} selected_id={selected} onClose={() => toggleModal('delete', false)} handleTableReload={handleTableReload} setSelected={setSelected} toggleModal={toggleModal} />
                 </Modal>
             )}
 
             {isModalOpen.details && (
                 <Modal title={translations.details_product} onClose={() => toggleModal('details', false)} className='max-w-screen-md'>
-                    <CrudPage addAlert={addAlert} type='details' setImageUrl={setImageUrl} selected_id={selected} onClose={() => toggleModal('details', false)} handleTableReload={handleTableReload} setSelected={setSelected} toggleModal={toggleModal} />
+                    <CrudPage type='details' setImageUrl={setImageUrl} selected_id={selected} onClose={() => toggleModal('details', false)} handleTableReload={handleTableReload} setSelected={setSelected} toggleModal={toggleModal} />
                 </Modal>
             )} 
 
             {isModalOpen.add_brand && (
                 <Modal title={translations.add_product_brand} onClose={() => toggleModal('add_brand', false)}>
-                    <BrandsCrudPage addAlert={addAlert} type='add' onClose={() => toggleModal('add_brand', false)} />
+                    <BrandsCrudPage type='add' onClose={() => toggleModal('add_brand', false)} />
                 </Modal>
             )}  
 
             {isModalOpen.add_category && (
                 <Modal title={translations.add_product_category} onClose={() => toggleModal('add_category', false)}>
-                    <CategoriesCrudPage addAlert={addAlert} type='add' onClose={() => toggleModal('add_category', false)} />
+                    <CategoriesCrudPage type='add' onClose={() => toggleModal('add_category', false)} />
                 </Modal>
             )}   
 
             {isModalOpen.add_supplier && (
                 <Modal title={translations.add_supplier} onClose={() => toggleModal('add_supplier', false)}>
-                    <SuppliersCrudPage addAlert={addAlert} type='add' onClose={() => toggleModal('add_supplier', false)} />
+                    <SuppliersCrudPage type='add' onClose={() => toggleModal('add_supplier', false)} />
                 </Modal>
             )} 
 
             {isModalOpen.add_tax && (
                 <Modal title={translations.add_tax} onClose={() => toggleModal('add_tax', false)}>
-                    <TaxCrudPage addAlert={addAlert} type='add' onClose={() => toggleModal('add_tax', false)} />
+                    <TaxCrudPage type='add' onClose={() => toggleModal('add_tax', false)} />
                 </Modal>
             )} 
 

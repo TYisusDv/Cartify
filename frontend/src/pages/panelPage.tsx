@@ -1,16 +1,11 @@
 import React, { Suspense, useState } from 'react';
 import { Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
-import { AlertType } from '../types/alert';
 import { Analytics02Icon, BarCode02Icon, BrandfetchIcon, CreditCardIcon, DashboardSquare01Icon, DistributionIcon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserGroupIcon } from 'hugeicons-react';
 import useTranslations from '../hooks/useTranslations';
 import SkeletonLoader from '../components/SkeletonLoader';
 import ErrorPage from './errorPage';
 import Modal from '../components/Modal';
 import DropdownMenu from '../components/DropdownMenu';
-
-interface PanelPageProps {
-  addAlert: (alert: AlertType) => void;
-}
 
 const HomePage = React.lazy(() => import('../pages/homePage'));
 const AuthLogoutPage = React.lazy(() => import('../pages/auth/authLogoutPage'));
@@ -28,7 +23,7 @@ const ManageInventoryTypesPage = React.lazy(() => import('./app/inventory/types/
 const ManagePaymentMethodsPage = React.lazy(() => import('./manage/paymentmethods/ManagePaymentMethodsPage'));
 const SettingGeneralPage = React.lazy(() => import('../pages/settings/settingGeneralPage'));
 
-const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
+const PanelPage: React.FC = () => {
   const { translations } = useTranslations();
   const [isModalSettingsOpen, setIsModalSettingsOpen] = useState(false);
   const location = useLocation();
@@ -123,18 +118,18 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
           <Routes>
             <Route path='/' element={<Navigate to='/home' />} />
             <Route path='/home' element={<HomePage />} />
-            <Route path='/app/pos' element={<AppPOSPage addAlert={addAlert} />} />
-            <Route path='/app/inventory' element={<AppInventoryPage addAlert={addAlert} />} />
-            <Route path='/app/inventory/transfer' element={<AppInventoryTransferPage addAlert={addAlert} />} />
+            <Route path='/app/pos' element={<AppPOSPage />} />
+            <Route path='/app/inventory' element={<AppInventoryPage />} />
+            <Route path='/app/inventory/transfer' element={<AppInventoryTransferPage  />} />
             <Route path='/manage/users' element={<ManageUsersPage />} />
-            <Route path='/manage/clients' element={<ManageClientsPage addAlert={addAlert} />} />
-            <Route path='/manage/taxes' element={<ManageTaxesPage addAlert={addAlert} />} />
-            <Route path='/manage/suppliers' element={<ManageSuppliersPage addAlert={addAlert} />} />
-            <Route path='/manage/products' element={<ManageProductsPage addAlert={addAlert} />} />
-            <Route path='/manage/product/brands' element={<ManageProductBrandsPage addAlert={addAlert} />} />
-            <Route path='/manage/product/categories' element={<ManageProductCategoriesPage addAlert={addAlert} />} />
-            <Route path='/manage/inventory/types' element={<ManageInventoryTypesPage addAlert={addAlert} />} />
-            <Route path='/manage/paymentmethods' element={<ManagePaymentMethodsPage addAlert={addAlert} />} />
+            <Route path='/manage/clients' element={<ManageClientsPage  />} />
+            <Route path='/manage/taxes' element={<ManageTaxesPage />} />
+            <Route path='/manage/suppliers' element={<ManageSuppliersPage />} />
+            <Route path='/manage/products' element={<ManageProductsPage />} />
+            <Route path='/manage/product/brands' element={<ManageProductBrandsPage />} />
+            <Route path='/manage/product/categories' element={<ManageProductCategoriesPage />} />
+            <Route path='/manage/inventory/types' element={<ManageInventoryTypesPage />} />
+            <Route path='/manage/paymentmethods' element={<ManagePaymentMethodsPage />} />
             <Route path='/auth/logout' element={<AuthLogoutPage />} />
             <Route path='*' element={<ErrorPage code={404} detail={translations.error_404} />} />
           </Routes>

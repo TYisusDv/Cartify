@@ -147,5 +147,6 @@
     "payment_method": "Metodo de pago",
     "type_of_sale": "Tipo de venta",
     "on_credit": "Credito",
-    "in_cash": "Contado"
+    "in_cash": "Contado",
+    "finish_sale_sure": "¿Está seguro/a de que desea finalizar la venta?"
 }
