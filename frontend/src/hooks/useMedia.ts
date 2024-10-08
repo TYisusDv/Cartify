@@ -42,8 +42,8 @@ const useMedia = ({ addAlert }: UseMediaProps): UseMediaReturn => {
                 videoRef.current.play();
             }
 
-            const videoTrack = mediaStream.getVideoTracks()[0];
-            const { width, height } = videoTrack.getSettings();
+            //const videoTrack = mediaStream.getVideoTracks()[0];
+            //const { width, height } = videoTrack.getSettings();
         } catch (error) {
             addAlert({ id: uuidv4(), text: 'Error accessing camera', type: 'danger', timeout: 3000 });
         }

@@ -52,6 +52,7 @@ export interface TypeID {
 export interface Person {
     id?: string;
     identification_id?: string;
+    identification_images?: string[];
     profile_image?: string;
     alias?: string;
     occupation?: string;
@@ -145,10 +146,17 @@ export interface Tax {
     status?: boolean | '0' | '1' | 0 | 1;
 }
 
+//Product images
+export interface ProductImages {
+    id?: number;
+    image: string;
+}
+
 //Product
 export interface Product {
     id?: string;
     images?: string[];
+    product_images?: ProductImages[];
     barcode?: string;
     name?: string;
     model?: string;
@@ -186,4 +194,60 @@ export interface Inventory {
     location_transfer?: Location;
     user_transfer?: User;
     user_transfer_receives?: User;
+}
+
+//PaymentMethod
+export interface PaymentMethod {
+    id?: number;
+    name?: string;
+    value?: number;
+    status?: boolean | '0' | '1' | 0 | 1;
+}
+
+//Sale details
+export interface SaleDetail {
+    id?: string;
+    price?: number;
+    cost?: number;
+    inventory?: Inventory;
+}
+
+//Sale
+export interface Sale {
+    id?: string;
+    no?: number;
+    subtotal?: number;
+    commission?: number;
+    discount_per?: number;
+    discount?: number;
+    total?: number;
+    pay?: number;  
+    change?: number; 
+    type?: number;  
+    note?: string;
+    date_reg?: Date;  
+    user?: User;
+    client?: Client;  
+    location?: Location;    
+    payment_method?: PaymentMethod;
+    details?: SaleDetail[];
+}
+
+//Sale payment
+export interface SalePayment {
+    id?: string;
+    no?: number;
+    subtotal?: number;
+    commission?: number;
+    discount_per?: number;
+    discount?: number;
+    total?: number;
+    pay?: number;  
+    change?: number;     
+    note?: string;
+    date_reg?: Date;  
+    user?: User;    
+    location?: Location;
+    payment_method?: PaymentMethod;
+    sale?: Sale
 }

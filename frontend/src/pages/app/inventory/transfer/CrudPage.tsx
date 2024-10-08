@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Add01Icon, BarCode02Icon, Cancel01Icon, LiftTruckIcon, Note04Icon, SearchAreaIcon, StoreLocation01Icon } from 'hugeicons-react';
+import { Add01Icon, BarCode02Icon, Cancel01Icon, LiftTruckIcon, Note04Icon, SearchAreaIcon, StoreLocation01Icon, UserAccountIcon } from 'hugeicons-react';
 import { v4 as uuidv4 } from 'uuid';
-import { AlertType } from '../../../types/alert';
-import { Inventory } from '../../../types/modelType';
-import { addInventory, deleteInventory, editInventory, getInventory } from '../../../services/inventoryService';
-import useTranslations from '../../../hooks/useTranslations';
-import useFormSubmit from '../../../hooks/useFormSubmit';
-import Input from '../../../components/Input';
-import Select from '../../../components/Select';
-import { CustomChangeEvent } from '../../../types/componentsType';
+import { AlertType } from '../../../../types/alert';
+import { Inventory } from '../../../../types/modelType';
+import { addInventory, deleteInventory, editInventory, getInventory } from '../../../../services/inventoryService';
+import useTranslations from '../../../../hooks/useTranslations';
+import useFormSubmit from '../../../../hooks/useFormSubmit';
+import Input from '../../../../components/Input';
+import Select from '../../../../components/Select';
+import { CustomChangeEvent } from '../../../../types/componentsType';
 
 interface CrudPageProps {
     addAlert: (alert: AlertType) => void;
@@ -176,10 +176,34 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     endpoint_value='id'
                                     endpoint_text='{name}'
                                     icon={<StoreLocation01Icon size={20} />}
-                                    label={formValues.type?.toString() === '3' ? translations.location_exit : translations.location}
+                                    label={translations.location_exit}
                                 />
                             </div>
                             <div className='col-span-1 z-[8]'>
+                                <Select
+                                    props={{
+                                        id: 'location_transfer',
+                                        name: 'location_transfer',
+                                        onChange: (e: CustomChangeEvent) => {
+                                            setFormValues(prev => ({
+                                                ...prev,
+                                                location_transfer: {
+                                                    id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                                    name: e.object?.name,
+                                                }
+                                            }));
+                                        },
+                                        value: formValues.location_transfer?.id,
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
+                                    endpoint='manage/locations'
+                                    endpoint_value='id'
+                                    endpoint_text='{name}'
+                                    icon={<StoreLocation01Icon size={20} />}
+                                    label={translations.location_entry}
+                                />
+                            </div>
+                            <div className='col-span-1 z-[7]'>
                                 <Select
                                     props={{
                                         id: 'inventory_type',
@@ -201,25 +225,76 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     endpoint_text='{name}'
                                     icon={<SearchAreaIcon size={20} />}
                                     label={translations.type}
+                                    query='list_transfer'
+                                />
+                            </div>
+                            <div className='col-span-1'>
+                                <Input
+                                    props={{
+                                        id: 'note',
+                                        name: 'note',
+                                        value: formValues.note,
+                                        onChange: (e) => setFormValues(prev => ({
+                                            ...prev,
+                                            note: e.target.value || ''
+                                        })),
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
+                                    label={translations.note}
+                                    icon={<Note04Icon className='icon' size={24} />}
+                                    color={colorPage}
+                                    required={false}
+                                />
+                            </div>
+                            <div className='col-span-1 z-[6]'>
+                                <Select
+                                    props={{
+                                        id: 'user_transfer',
+                                        name: 'user_transfer',
+                                        onChange: (e: CustomChangeEvent) => {
+                                            setFormValues(prev => ({
+                                                ...prev,
+                                                user_transfer: {
+                                                    id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                                    first_name: e.object?.first_name,
+                                                }
+                                            }));
+                                        },
+                                        value: formValues.user_transfer?.id,
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
+                                    endpoint='manage/users'
+                                    endpoint_value='id'
+                                    endpoint_text='{first_name}'
+                                    icon={<UserAccountIcon size={20} />}
+                                    label={translations.dealer}
+                                />
+                            </div>
+                            <div className='col-span-1 z-[6]'>
+                                <Select
+                                    props={{
+                                        id: 'user_transfer_receives',
+                                        name: 'user_transfer_receives',
+                                        onChange: (e: CustomChangeEvent) => {
+                                            setFormValues(prev => ({
+                                                ...prev,
+                                                user_transfer_receives: {
+                                                    id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                                    first_name: e.object?.first_name,
+                                                }
+                                            }));
+                                        },
+                                        value: formValues.user_transfer_receives?.id,
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
+                                    endpoint='manage/users'
+                                    endpoint_value='id'
+                                    endpoint_text='{first_name}'
+                                    icon={<UserAccountIcon size={20} />}
+                                    label={translations.person_who_receives}
                                 />
                             </div>
                         </div>
-                        <Input
-                            props={{
-                                id: 'note',
-                                name: 'note',
-                                value: formValues.note,
-                                onChange: (e) => setFormValues(prev => ({
-                                    ...prev,
-                                    note: e.target.value || ''
-                                })),
-                                disabled: ['details', 'delete'].includes(type)
-                            }}
-                            label={translations.note}
-                            icon={<Note04Icon className='icon' size={24} />}
-                            color={colorPage}
-                            required={false}
-                        />
                         <button type='submit' className='btn btn-blue w-full h-10 rounded-xl'><Add01Icon /></button>
                         <div className='flex gap-1'>
                             <div className='overflow-x-auto rounded-lg w-full'>
@@ -233,13 +308,22 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                                 Producto
                                             </th>
                                             <th scope='col' className='px-6 py-3'>
-                                                Ubicacion
+                                                {translations.location_exit}
+                                            </th>
+                                            <th scope='col' className='px-6 py-3'>
+                                                {translations.location_entry}
                                             </th>
                                             <th scope='col' className='px-6 py-3'>
                                                 Tipo
                                             </th>
                                             <th scope='col' className='px-6 py-3'>
                                                 Nota
+                                            </th>
+                                            <th scope='col' className='px-6 py-3'>
+                                                {translations.dealer}
+                                            </th>
+                                            <th scope='col' className='px-6 py-3'>
+                                                {translations.person_who_receives}
                                             </th>
                                             <th scope='col' className='px-6 py-3'></th>
                                         </tr>
@@ -254,10 +338,11 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                                             {movement.product?.name || '-'}
                                                         </td>
                                                         <td className='px-6 py-4'>{movement.location?.name || '-'}</td>
-                                                        <td className='px-6 py-4'>
-                                                            {movement.type?.name || '-'}
-                                                        </td>
+                                                        <td className='px-6 py-4'>{movement.location_transfer?.name || '-'}</td>
+                                                        <td className='px-6 py-4'>{movement.type?.name || '-'}</td>
                                                         <td className='px-6 py-4'>{movement.note || '-'}</td>
+                                                        <td className='px-6 py-4'>{movement.user_transfer?.first_name || '-'}</td>
+                                                        <td className='px-6 py-4'>{movement.user_transfer_receives?.first_name || '-'}</td>
                                                         <td className='px-6 py-4'>
                                                             <button
                                                                 type='button'
@@ -357,11 +442,35 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     endpoint_value='id'
                                     endpoint_text='{name}'
                                     icon={<StoreLocation01Icon size={20} />}
-                                    label={formValues.type?.toString() === '3' ? translations.location_exit : translations.location}
+                                    label={translations.location_exit}
                                 />
                             </div>
                             <div className='col-span-1 z-[8]'>
-                            <Select
+                                <Select
+                                    props={{
+                                        id: 'location_transfer',
+                                        name: 'location_transfer',
+                                        onChange: (e: CustomChangeEvent) => {
+                                            setFormValues(prev => ({
+                                                ...prev,
+                                                location_transfer: {
+                                                    id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                                    name: e.object?.name,
+                                                }
+                                            }));
+                                        },
+                                        value: formValues.location_transfer?.id,
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
+                                    endpoint='manage/locations'
+                                    endpoint_value='id'
+                                    endpoint_text='{name}'
+                                    icon={<StoreLocation01Icon size={20} />}
+                                    label={translations.location_entry}
+                                />
+                            </div>
+                            <div className='col-span-1 z-[7]'>
+                                <Select
                                     props={{
                                         id: 'inventory_type',
                                         name: 'inventory_type',
@@ -382,25 +491,76 @@ const CrudPage: React.FC<CrudPageProps> = ({ addAlert, onClose, handleTableReloa
                                     endpoint_text='{name}'
                                     icon={<SearchAreaIcon size={20} />}
                                     label={translations.type}
+                                    query='list_transfer'
+                                />
+                            </div>                            
+                            <div className='col-span-1'>
+                                <Input
+                                    props={{
+                                        id: 'note',
+                                        name: 'note',
+                                        value: formValues.note,
+                                        onChange: (e) => setFormValues(prev => ({
+                                            ...prev,
+                                            note: e.target.value || ''
+                                        })),
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
+                                    label={translations.note}
+                                    icon={<Note04Icon className='icon' size={24} />}
+                                    color={colorPage}
+                                    required={false}
+                                />
+                            </div>
+                            <div className='col-span-1 z-[6]'>
+                                <Select
+                                    props={{
+                                        id: 'user_transfer',
+                                        name: 'user_transfer',
+                                        onChange: (e: CustomChangeEvent) => {
+                                            setFormValues(prev => ({
+                                                ...prev,
+                                                user_transfer: {
+                                                    id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                                    first_name: e.object?.first_name,
+                                                }
+                                            }));
+                                        },
+                                        value: formValues.user_transfer?.id,
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
+                                    endpoint='manage/users'
+                                    endpoint_value='id'
+                                    endpoint_text='{first_name}'
+                                    icon={<UserAccountIcon size={20} />}
+                                    label={translations.dealer}
+                                />
+                            </div>
+                            <div className='col-span-1 z-[5]'>
+                                <Select
+                                    props={{
+                                        id: 'user_transfer_receives',
+                                        name: 'user_transfer_receives',
+                                        onChange: (e: CustomChangeEvent) => {
+                                            setFormValues(prev => ({
+                                                ...prev,
+                                                user_transfer_receives: {
+                                                    id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                                    first_name: e.object?.first_name,
+                                                }
+                                            }));
+                                        },
+                                        value: formValues.user_transfer_receives?.id,
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
+                                    endpoint='manage/users'
+                                    endpoint_value='id'
+                                    endpoint_text='{first_name}'
+                                    icon={<UserAccountIcon size={20} />}
+                                    label={translations.person_who_receives}
                                 />
                             </div>
                         </div>
-                        <Input
-                            props={{
-                                id: 'note',
-                                name: 'note',
-                                value: formValues.note,
-                                onChange: (e) => setFormValues(prev => ({
-                                    ...prev,
-                                    note: e.target.value || ''
-                                })),
-                                disabled: ['details', 'delete'].includes(type)
-                            }}
-                            label={translations.note}
-                            icon={<Note04Icon className='icon' size={24} />}
-                            color={colorPage}
-                            required={false}
-                        />
                     </div>
                 )}
                 <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>

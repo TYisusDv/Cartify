@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Add01Icon, Delete02Icon, EyeIcon, PencilEdit02Icon, SearchList02Icon } from 'hugeicons-react';
-import { AlertType } from '../../../types/alert';
-import useTranslations from '../../../hooks/useTranslations';
-import DelayedSuspense from '../../../components/DelayedSuspense';
-import SkeletonLoader from '../../../components/SkeletonLoader';
-import Table from '../../../components/Table';
-import Modal from '../../../components/Modal';
+import { AlertType } from '../../../../types/alert';
+import useTranslations from '../../../../hooks/useTranslations';
+import DelayedSuspense from '../../../../components/DelayedSuspense';
+import SkeletonLoader from '../../../../components/SkeletonLoader';
+import Table from '../../../../components/Table';
+import Modal from '../../../../components/Modal';
 import TablePage from './TablePage';
 import CrudPage from './CrudPage';
 import FiltersPage from './filtersPage';
-import { generateUUID } from '../../../utils/uuidGen';
-import { getCountInventory } from '../../../services/inventoryService';
+import { generateUUID } from '../../../../utils/uuidGen';
+import { getCountInventoryTransfer } from '../../../../services/inventoryService';
 
-interface AppInventoryPageProps {
+interface AppInventoryTransferPageProps {
     addAlert: (alert: AlertType) => void;
 }
 
-const AppInventoryPage: React.FC<AppInventoryPageProps> = ({ addAlert }) => {
+const AppInventoryTransferPage: React.FC<AppInventoryTransferPageProps> = ({ addAlert }) => {
     const { translations } = useTranslations();
     const [selected, setSelected] = useState<string | undefined>();
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, details: false });
@@ -33,18 +33,21 @@ const AppInventoryPage: React.FC<AppInventoryPageProps> = ({ addAlert }) => {
 
     const table_header = [
         { name: 'date_reg', headerName: 'Fecha de registro' },
-        { name: 'quantity', headerName: 'Cantidad' },
-        { name: 'product.name', headerName: 'Producto' },
-        { name: 'location.name', headerName: 'Ubicación' },
-        { name: 'type', headerName: 'Tipo' },
-        { name: 'note', headerName: 'Nota' },
+        { name: 'quantity', headerName: translations.quantity },
+        { name: 'product.name', headerName: translations.product },
+        { name: 'location.name', headerName: translations.location_exit },
+        { name: 'location.name', headerName: translations.location_entry },
+        { name: 'type', headerName: translations.type },
+        { name: 'note', headerName: translations.note },
         { name: 'user.first_name', headerName: 'Empleado' },
+        { name: 'user_transfer.first_name', headerName: translations.dealer },
+        { name: 'user_transfer_receives.first_name', headerName: translations.person_who_receives },
     ];
 
     useEffect(() => {
         const fetchCount = async () => {
             try {
-                const response = await getCountInventory();
+                const response = await getCountInventoryTransfer();
                 const response_data = response.data;
 
                 setCountData({total: response_data.resp.total});
@@ -60,7 +63,7 @@ const AppInventoryPage: React.FC<AppInventoryPageProps> = ({ addAlert }) => {
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
             <div className='flex items-center justify-between w-full p-8 animate__animated animate__fadeIn animate__faster'>
                 <div className='flex flex-col'>
-                    <h1 className='text-2xl font-bold dark:text-white'>{translations.inventory}</h1>
+                    <h1 className='text-2xl font-bold dark:text-white'>{translations.inventory} - {translations.inventory_transfer}</h1>
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.app_inventory_info}</span>
                 </div>
                 <div className='flex gap-2'>
@@ -95,6 +98,7 @@ const AppInventoryPage: React.FC<AppInventoryPageProps> = ({ addAlert }) => {
                             />
                         }
                         filters={<FiltersPage />}
+                        query='table_transfer'
                     />
                 </div>
             </div>
@@ -126,4 +130,4 @@ const AppInventoryPage: React.FC<AppInventoryPageProps> = ({ addAlert }) => {
     );
 };
 
-export default AppInventoryPage;
+export default AppInventoryTransferPage;

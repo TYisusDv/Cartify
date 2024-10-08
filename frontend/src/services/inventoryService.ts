@@ -11,10 +11,28 @@ export const getInventory = async (selected_id: string | undefined) => {
   return response;
 };
 
+export const getCountAllInventory = async () => {
+  const response = await apiService.get('/app/inventory', {
+    params: {
+      query: 'count_all',
+    }
+  });
+  return response;
+};
+
 export const getCountInventory = async () => {
   const response = await apiService.get('/app/inventory', {
     params: {
       query: 'count',
+    }
+  });
+  return response;
+};
+
+export const getCountInventoryTransfer = async () => {
+  const response = await apiService.get('/app/inventory', {
+    params: {
+      query: 'count_transfer',
     }
   });
   return response;

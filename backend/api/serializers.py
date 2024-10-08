@@ -119,12 +119,18 @@ class AddEditAddressesSerializer(serializers.ModelSerializer):
         'invalid': 'The person is invalid.',
     })
 
-    def to_internal_value(self, data): 
+    def to_internal_value(self, data):
         if 'city' in data and isinstance(data['city'], dict) and 'id' in data['city']:
             data['city_id'] = data['city']['id']
-
+        
         if 'person' in data and isinstance(data['person'], dict) and 'id' in data['person']:
             data['person_id'] = data['person']['id']
+       
+        if data.get('city_id') in [0, '0']:
+            data['city_id'] = None
+        
+        if data.get('person_id') in [0, '0']:
+            data['person_id'] = None
             
         return super().to_internal_value(data)
     
@@ -135,7 +141,7 @@ class AddEditAddressesSerializer(serializers.ModelSerializer):
 #Identification images
 class IdentificationImagesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = IdentificationImages
+        model = IdentificationImagesModel
         fields = '__all__'
 
 #Person
@@ -156,7 +162,7 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
         'max_length': 'The identification cannot exceed 100 characters.',
     }, max_length = 100)
 
-    profile_image = serializers.ImageField(
+    profile_image = Base64ImageField(
         error_messages = {
             'required': 'The profile image is required.',
             'blank': 'The profile image cannot be blank.',
@@ -170,11 +176,11 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
     )
 
     identification_images = serializers.ListField(
-        child = serializers.ImageField(
-            error_messages={
+        child = Base64ImageField(
+            error_messages = {
                 'invalid': 'One or more identification images are invalid.',
             },
-            validators=[
+            validators = [
                 FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
             ], 
             allow_null = True
@@ -264,37 +270,31 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         identification_images = validated_data.pop('identification_images', [])
-        person_instance = super().create(validated_data)
+        instance = super().create(validated_data)
 
         for image in identification_images:
-            IdentificationImages.objects.create(person = person_instance, image = image)
+            IdentificationImagesModel.objects.create(person = instance, image = image)
 
-        return person_instance
-    
+        return instance
+
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
             if attr == 'profile_image':
                 if value:
                     if instance.profile_image:
-                        instance.profile_image.delete(save = False)
-
-                    setattr(instance, attr, value)
-            elif attr == 'identification_images':
-                if value:  
-                    #existing_images = IdentificationImages.objects.filter(person=instance)
-                    #for image in existing_images:
-                    #    image.image.delete(save=False)
-                    
-                    #existing_images.delete()
-
-                    for image in value:
-                        IdentificationImages.objects.create(person = instance, image = image)
-            else:
+                        instance.profile_image.delete(save=False)
                 setattr(instance, attr, value)
 
+            elif attr == 'identification_images':
+                if value:
+                    for image in value:
+                        IdentificationImagesModel.objects.create(person=instance, image=image)
+            else:
+                setattr(instance, attr, value)
+        
         instance.save()
-
         return instance
+
     
     class Meta:
         model = PersonsModel
@@ -432,7 +432,7 @@ class AddEditClientSerializer(serializers.ModelSerializer):
         'invalid': 'The type is invalid.',
     }, required = False, allow_null = True)
 
-    person_id = serializers.IntegerField(error_messages = {
+    person_id = serializers.UUIDField(error_messages = {
         'required': 'The person is required.',
         'blank': 'The person cannot be blank.',
         'null': 'The person cannot be blank.',
@@ -440,30 +440,32 @@ class AddEditClientSerializer(serializers.ModelSerializer):
     })
 
     def to_internal_value(self, data):
-        type_json = data.get('type', '{}')
-        location_json = data.get('location', '{}')
-            
-        try:
-            data['location'] = json.loads(location_json)
-            data['type'] = json.loads(type_json)
-        except json.JSONDecodeError:
-            pass    
-        
         if 'location' in data and isinstance(data['location'], dict) and 'id' in data['location']:
             data['location_id'] = data['location']['id']
-            
+        
         if 'type' in data and isinstance(data['type'], dict) and 'id' in data['type']:
             data['type_id'] = data['type']['id']
-        else:
+
+        if 'person' in data and isinstance(data['person'], dict) and 'id' in data['person']:
+            data['person_id'] = data['person']['id']
+       
+        if data.get('location_id') in [0, '0']:
+            data['location_id'] = None
+        
+        if data.get('type_id') in [0, '0']:
             data['type_id'] = None
+        
+        if data.get('location_id') in [0, '0']:
+            data['location_id'] = None
             
         return super().to_internal_value(data)
     
+    
     class Meta:
         model = ClientsModel
-        exclude = ['id', 'date_reg']
+        exclude = ['id', 'date_reg', 'location', 'type', 'person']
 
-class DeleteClientSerializer(serializers.ModelSerializer):    
+class GetClientSerializer(serializers.ModelSerializer):    
     id = serializers.IntegerField(error_messages = {
         'required': 'The client is required.',
         'blank': 'The client cannot be blank.',
@@ -925,12 +927,12 @@ class GetInventoryTypeSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = InventoryTypesModel
-        fields = ['id']
- 
+        fields = ['id'] 
 
 #Inventory
 class InventorySerializer(serializers.ModelSerializer):
     product = ProductsSerializer(read_only = True)
+    type = InventoryTypesSerializer(read_only = True)
     location = LocationsSerializer(read_only = True)
     user = UserExcludeSerializer(read_only = True)
     location_transfer = LocationsSerializer(read_only = True)
@@ -977,6 +979,13 @@ class AddEditInventorySerializer(serializers.ModelSerializer):
         'invalid': 'The user is invalid.',
     }, allow_null = False)
 
+    type_id = serializers.IntegerField(error_messages = {
+        'required': 'The type is required.',
+        'blank': 'The type cannot be blank.',
+        'null': 'The type cannot be blank.',
+        'invalid': 'The type is invalid.',
+    }, required = False, allow_null = True)
+
     location_transfer_id = serializers.IntegerField(error_messages = {
         'required': 'The location is required.',
         'blank': 'The location cannot be blank.',
@@ -1001,6 +1010,9 @@ class AddEditInventorySerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         if 'product' in data and isinstance(data['product'], dict) and 'id' in data['product']:
             data['product_id'] = data['product']['id']
+
+        if 'type' in data and isinstance(data['type'], dict) and 'id' in data['type']:
+            data['type_id'] = data['type']['id']
         
         if 'location' in data and isinstance(data['location'], dict) and 'id' in data['location']:
             data['location_id'] = data['location']['id']
@@ -1016,6 +1028,9 @@ class AddEditInventorySerializer(serializers.ModelSerializer):
         
         if data.get('product_id') in [0, '0']:
             data['product_id'] = None
+
+        if data.get('type_id') in [0, '0']:
+            data['type_id'] = None
         
         if data.get('location_id') in [0, '0']:
             data['location_id'] = None
@@ -1033,7 +1048,7 @@ class AddEditInventorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InventoryModel
-        exclude = ['id', 'product', 'location', 'user', 'location_transfer', 'user_transfer', 'user_transfer_receives']
+        exclude = ['id', 'product', 'type', 'location', 'user', 'location_transfer', 'user_transfer', 'user_transfer_receives']
     
     def validate_type(self, value):
         if value not in [1, 2, 3]:
@@ -1052,3 +1067,48 @@ class GetInventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = InventoryModel
         fields = ['id']
+
+#PaymentMethods
+class PaymentMethodsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentMethodsModel
+        fields = '__all__'
+
+class AddEditPaymentMethodSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(error_messages = {
+        'required': 'The name is required.',
+        'blank': 'The name cannot be blank.',
+        'null': 'The name cannot be blank.',
+        'max_length': 'The name cannot exceed 254 characters.',
+    }, allow_blank = False, allow_null = False)
+
+    value = serializers.FloatField(error_messages = {
+        'required': 'The value is required.',
+        'blank': 'The value cannot be blank.',
+        'null': 'The value cannot be blank.',
+        'invalid': 'The value is invalid.',
+    }, required = False)
+
+    status = serializers.BooleanField(error_messages = {
+        'required': 'The status is required.',
+        'blank': 'The status cannot be blank.',
+        'null': 'The status cannot be blank.',
+        'invalid': 'The status is invalid.',
+    }, required = False)
+    
+    class Meta:
+        model = PaymentMethodsModel
+        exclude = ['id']
+
+class GetPaymentMethodSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The payment method is required.',
+        'blank': 'The payment method cannot be blank.',
+        'null': 'The payment method cannot be blank.',
+        'invalid': 'The payment method is invalid.',
+    })
+    
+    class Meta:
+        model = PaymentMethodsModel
+        fields = ['id']
+        

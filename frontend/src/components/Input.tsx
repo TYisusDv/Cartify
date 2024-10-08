@@ -12,12 +12,12 @@ const Input: React.FC<InputProps> = ({ props, icon, label, color = 'blue', requi
     const [hasText, setHasText] = useState(false);
 
     useEffect(() => {
-        if(props?.value !== null && props?.value !== '' && props?.value !== undefined){
+        if(props?.value !== null && props?.value !== '' && props?.value !== undefined && props?.value.toString().length !== 0){
             setHasText(true);
-        }
-
-        if(props?.type === 'date'){
+        } else if(props?.type === 'date'){
             setHasText(true);
+        } else {
+            setHasText(false);
         }
     }, [props?.value, props?.type]);
 
@@ -28,7 +28,9 @@ const Input: React.FC<InputProps> = ({ props, icon, label, color = 'blue', requi
                 {...props}
                 className='input'
             />
-            {icon}
+            <span className='font-medium text-black dark:text-white'>
+                {icon}
+            </span>
         </div>
     );
 };

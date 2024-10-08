@@ -130,5 +130,22 @@
     "manage_inventory_types_info": "Administra tipos de inventario aquí. ¡Agrega, edita y elimina!",
     "inventory_entry": "Entrada",
     "inventory_exit": "Salida",
-    "inventory_transfer": "Traslado"
+    "inventory_transfer": "Traslado",
+    "add_inventory_type": "Agregar tipo de inventario",
+    "edit_inventory_type": "Editar tipo de inventario",
+    "delete_inventory_type": "Eliminar tipo de inventario",
+    "information": "Informacion",
+    "details": "Detalles",
+    "pos": "Punto de venta",
+    "app_pos_info": "Haz una venta de manera eficaz",
+    "sales_credit": "Ventas a credito",
+    "payment_methods": "Metodos de pago",
+    "manage_payment_methods_info": "Administra metodos de pago aquí. ¡Agrega, edita y elimina!",
+    "add_payment_method": "Agregar metodo de pago",
+    "edit_payment_method": "Editar metodo de pago",
+    "delete_payment_method_sure": "¿Está seguro/a de que desea eliminar el metodo de pago?",
+    "payment_method": "Metodo de pago",
+    "type_of_sale": "Tipo de venta",
+    "on_credit": "Credito",
+    "in_cash": "Contado"
 }

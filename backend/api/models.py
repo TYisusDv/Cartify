@@ -98,7 +98,7 @@ class AddressesModel(models.Model):
     class Meta:
         db_table = 'addresses'
 
-class IdentificationImages(models.Model):
+class IdentificationImagesModel(models.Model):
     person = models.ForeignKey(PersonsModel, related_name = 'identification_images', on_delete = models.CASCADE)
     image = models.ImageField(upload_to = upload_to_identifications, null = True, blank = False)
 
@@ -245,3 +245,12 @@ class InventoryModel(models.Model):
 
     class Meta: 
         db_table = 'inventory'
+
+class PaymentMethodsModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    name = models.CharField(null = False, blank = False)
+    value = models.FloatField(default = 0, null = False, blank = False)
+    status = models.BooleanField(default = True, null = False, blank = False)
+    
+    class Meta: 
+        db_table = 'payment_methods'

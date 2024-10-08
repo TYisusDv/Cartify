@@ -6,24 +6,25 @@ import { URL_BACKEND } from '../../../services/apiService';
 interface TablePageProps {
     data?: Array<{ [key: string]: any }>;
     selected: string;
-    toggleModal: (modalType: 'product_images', isOpen: boolean) => void;
+    toggleModal?: (modalType: 'product_images', isOpen: boolean) => void;
     setSelected: (value: string) => void;
-    setImageUrl: (url: string) => void;
+    setImageUrl?: (url: string) => void;
+    className?: string;
 }
 
-const TablePage: React.FC<TablePageProps> = ({ data, selected, toggleModal, setSelected, setImageUrl }) => {
+const TablePage: React.FC<TablePageProps> = ({ data, selected, toggleModal, setSelected, setImageUrl, className }) => {
     const { translations } = useTranslations();
 
     const handleImage = (url: string) => {
         if (setImageUrl) setImageUrl(url);
-        toggleModal('product_images', true);
+        if (toggleModal) toggleModal('product_images', true);
     }
 
     return (
         <tbody>
             {data && data.length > 0 ? (
                 data.map((row, index) => (
-                    <tr key={index} className={`text-sm text-gray-800 bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/80 ${selected === row.id ? 'bg-gray-200/80 dark:bg-slate-700/60' : ''}`} onClick={() => setSelected(row.id)}>
+                    <tr key={index} className={`text-sm text-gray-800 bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/80  ${className} ${selected === row.id ? 'bg-gray-200/80 dark:bg-slate-700/50' : ''}`} onClick={() => setSelected(row.id)}>
                         <td className={`px-6 py-6 ${row?.product_images[0]?.image ? 'pr-0' : ''}`}>
                             {row?.product_images[0]?.image ? <img src={`${URL_BACKEND}${row.product_images[0].image}`} alt='Profile' className='cursor-pointer rounded-full w-12 h-12 min-w-12 min-h-12' onClick={() => {handleImage(row.product_images[0].image)}} /> : '-'}
                         </td>

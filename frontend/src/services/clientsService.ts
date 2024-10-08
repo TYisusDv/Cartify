@@ -1,13 +1,14 @@
 import apiService from './apiService';
+import { Client } from '../types/modelType';
 
-export const addClient = async (form: FormData, ) => {
-  const response = await apiService.post('/manage/clients', form);
+export const addClient = async (client: Client, ) => {
+  const response = await apiService.post('/manage/clients', client);
   return response;
 };
 
 
-export const editClient = async (form: FormData, ) => {
-  const response = await apiService.put('/manage/clients', form);
+export const editClient = async (client: Client, ) => {
+  const response = await apiService.put('/manage/clients', client);
   return response;
 };
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import useTranslations from '../../../hooks/useTranslations';
-import Select from '../../../components/Select';
+import useTranslations from '../../../../hooks/useTranslations';
+import Select from '../../../../components/Select';
 import { BarCode02Icon, SearchAreaIcon, StoreLocation01Icon } from 'hugeicons-react';
 
 interface FiltersPageProps {
@@ -33,6 +33,7 @@ const FiltersPage: React.FC<FiltersPageProps> = ({ formValues, setFormValues }) 
                     endpoint_text='{name}'
                     icon={<SearchAreaIcon size={20} />}
                     label={translations.type}
+                    query='list_transfer'
                 />
             </div>
             <div className='col-span-1 w-full h-full rounded-2xl dark:bg-slate-700'>
@@ -83,4 +84,4 @@ const FiltersPage: React.FC<FiltersPageProps> = ({ formValues, setFormValues }) 
     );
 };
 
-            export default FiltersPage;
+export default FiltersPage;

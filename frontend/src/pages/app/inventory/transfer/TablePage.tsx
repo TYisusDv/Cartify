@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarCode02Icon, Layers01Icon, SearchList02Icon, UserAccountIcon } from 'hugeicons-react';
-import useTranslations from '../../../hooks/useTranslations';
-import { Inventory } from '../../../types/modelType';
+import useTranslations from '../../../../hooks/useTranslations';
+import { Inventory } from '../../../../types/modelType';
 
 interface TablePageProps {
     data?: Inventory[];
@@ -48,6 +48,9 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                             <span className='flex items-center gap-[1px]'>{row.location?.name || '-'}</span>
                         </td>
                         <td className='px-6 py-6'>
+                            <span className='flex items-center gap-[1px]'>{row.location_transfer?.name || '-'}</span>
+                        </td>
+                        <td className='px-6 py-6'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
                                 <SearchList02Icon size={22} />
                                 {row.type?.name || '-'}
@@ -60,6 +63,16 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                         <td className='px-6 py-6'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
                                 <UserAccountIcon size={22} /> {row.user?.first_name || '-'}
+                            </span>
+                        </td>
+                        <td className='px-6 py-6'>
+                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
+                                <UserAccountIcon size={22} /> {row.user_transfer?.first_name || '-'}
+                            </span>
+                        </td>
+                        <td className='px-6 py-6'>
+                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
+                                <UserAccountIcon size={22} /> {row.user_transfer_receives?.first_name || '-'}
                             </span>
                         </td>
                     </tr>

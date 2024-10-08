@@ -63,7 +63,7 @@ const ManageProductsPage: React.FC<ManageProductsPageProps> = ({ addAlert }) => 
 
                 setCountData(response_data.resp);
             } catch (error) {
-                addAlert({ id: uuidv4(), text: 'Error fetching count clients', type: 'danger', timeout: 3000 });
+                addAlert({ id: uuidv4(), text: 'Error fetching count', type: 'danger', timeout: 3000 });
             }
         };
 
@@ -132,25 +132,25 @@ const ManageProductsPage: React.FC<ManageProductsPageProps> = ({ addAlert }) => 
                 </div>
             </div>
             {isModalOpen.add && (
-                <Modal title={translations.add_product} onClose={() => toggleModal('add', false)}>
+                <Modal title={translations.add_product} onClose={() => toggleModal('add', false)} className='max-w-screen-md'>
                     <CrudPage addAlert={addAlert} type='add' selected_id={selected} onClose={() => toggleModal('add', false)} handleTableReload={handleTableReload} setSelected={setSelected} toggleModal={toggleModal} />
                 </Modal>
             )}
 
             {isModalOpen.edit && (
-                <Modal title={translations.edit_product} onClose={() => toggleModal('edit', false)}>
+                <Modal title={translations.edit_product} onClose={() => toggleModal('edit', false)} className='max-w-screen-md'>
                     <CrudPage addAlert={addAlert} type='edit' setImageUrl={setImageUrl} selected_id={selected} onClose={() => toggleModal('edit', false)} handleTableReload={handleTableReload} setSelected={setSelected} toggleModal={toggleModal} />
                 </Modal>
             )}
 
             {isModalOpen.delete && (
-                <Modal title={translations.delete_product} onClose={() => toggleModal('delete', false)}>
+                <Modal title={translations.delete_product} onClose={() => toggleModal('delete', false)} className='max-w-screen-md'>
                     <CrudPage addAlert={addAlert} type='delete' setImageUrl={setImageUrl} selected_id={selected} onClose={() => toggleModal('delete', false)} handleTableReload={handleTableReload} setSelected={setSelected} toggleModal={toggleModal} />
                 </Modal>
             )}
 
             {isModalOpen.details && (
-                <Modal title={translations.details_product} onClose={() => toggleModal('details', false)}>
+                <Modal title={translations.details_product} onClose={() => toggleModal('details', false)} className='max-w-screen-md'>
                     <CrudPage addAlert={addAlert} type='details' setImageUrl={setImageUrl} selected_id={selected} onClose={() => toggleModal('details', false)} handleTableReload={handleTableReload} setSelected={setSelected} toggleModal={toggleModal} />
                 </Modal>
             )} 
@@ -180,7 +180,7 @@ const ManageProductsPage: React.FC<ManageProductsPageProps> = ({ addAlert }) => 
             )} 
 
             {isModalOpen.product_images && (
-                <ModalPhotos title={translations.product_images} onClose={() => toggleModal('product_images', false)}>
+                <ModalPhotos onClose={() => toggleModal('product_images', false)}>
                     <div className='flex w-full h-full justify-center'>
                         <img src={`${URL_BACKEND}${imageUrl}`} alt='Product' className='rounded-2xl' />
                     </div>

@@ -1,7 +1,7 @@
 import React, { Suspense, useState } from 'react';
 import { Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
 import { AlertType } from '../types/alert';
-import { Analytics02Icon, BarCode02Icon, BrandfetchIcon, DashboardSquare01Icon, DistributionIcon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserGroupIcon } from 'hugeicons-react';
+import { Analytics02Icon, BarCode02Icon, BrandfetchIcon, CreditCardIcon, DashboardSquare01Icon, DistributionIcon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserGroupIcon } from 'hugeicons-react';
 import useTranslations from '../hooks/useTranslations';
 import SkeletonLoader from '../components/SkeletonLoader';
 import ErrorPage from './errorPage';
@@ -14,7 +14,9 @@ interface PanelPageProps {
 
 const HomePage = React.lazy(() => import('../pages/homePage'));
 const AuthLogoutPage = React.lazy(() => import('../pages/auth/authLogoutPage'));
+const AppPOSPage = React.lazy(() => import('./app/pos/AppPOSPage'));
 const AppInventoryPage = React.lazy(() => import('./app/inventory/AppInventoryPage'));
+const AppInventoryTransferPage = React.lazy(() => import('./app/inventory/transfer/AppInventoryTransferPage'));
 const ManageUsersPage = React.lazy(() => import('./manage/manageUsersPage'));
 const ManageClientsPage = React.lazy(() => import('./manage/clients/ManageClientsPage'));
 const ManageTaxesPage = React.lazy(() => import('./manage/taxes/ManageTaxesPage'));
@@ -23,6 +25,7 @@ const ManageProductsPage = React.lazy(() => import('./manage/product/ManageProdu
 const ManageProductBrandsPage = React.lazy(() => import('./manage/product/brands/ManageProductBrandsPage'));
 const ManageProductCategoriesPage = React.lazy(() => import('./manage/product/categories/ManageProductCategoriesPage'));
 const ManageInventoryTypesPage = React.lazy(() => import('./app/inventory/types/ManageInventoryTypesPage'));
+const ManagePaymentMethodsPage = React.lazy(() => import('./manage/paymentmethods/ManagePaymentMethodsPage'));
 const SettingGeneralPage = React.lazy(() => import('../pages/settings/settingGeneralPage'));
 
 const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
@@ -64,10 +67,11 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
             <DropdownMenu 
               label={translations.inventory} 
               icon={<SearchList02Icon className='w-7' />}
-              links={['/app/inventory', '/manage/inventory/types']}
+              links={['/app/inventory', '/app/inventory/transfer', '/manage/inventory/types']}
 
             >
                 <li><Link to='/app/inventory' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/app/inventory')}`}><SearchList02Icon size={20} /> {translations.inventory}</Link></li>
+                <li><Link to='/app/inventory/transfer' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/app/inventory/transfer')}`}><SearchList02Icon size={20} /> Traslaciones</Link></li>
                 <li><Link to='/manage/inventory/types' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/inventory/types')}`}><SearchAreaIcon size={20} /> {translations.types}</Link></li>
             </DropdownMenu>
           </li>
@@ -90,7 +94,18 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
 
           </li>
           <li><Link to='/manage/suppliers' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/suppliers')}`}><DistributionIcon />  {translations.suppliers}</Link></li>
-          <li><Link to='/manage/sales' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/sales')}`}><ShoppingBasketSecure03Icon />  {translations.sales}</Link></li>
+          <li>
+            <DropdownMenu
+              label={translations.sales}
+              icon={<ShoppingBasketSecure03Icon className='w-7' />}
+              links={['/manage/sales', '/manage/sales/credit']}
+            >
+              <li><Link to='/manage/sales' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/sales')}`}><ShoppingBasketSecure03Icon size={20} /> {translations.sales}</Link></li>
+              <li><Link to='/manage/sales/credit' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/sales/credit')}`}><ShoppingBasketSecure03Icon size={20} /> {translations.sales_credit}</Link></li>
+              <li><Link to='/manage/paymentmethods' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/paymentmethods')}`}><CreditCardIcon size={20} /> {translations.payment_methods}</Link></li>
+            </DropdownMenu>
+
+          </li>
         </ul>
         <ul className='flex flex-col w-full bottom-0 gap-6 mt-auto'>
           <li className='flex justify-between items-center'>
@@ -108,7 +123,9 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
           <Routes>
             <Route path='/' element={<Navigate to='/home' />} />
             <Route path='/home' element={<HomePage />} />
+            <Route path='/app/pos' element={<AppPOSPage addAlert={addAlert} />} />
             <Route path='/app/inventory' element={<AppInventoryPage addAlert={addAlert} />} />
+            <Route path='/app/inventory/transfer' element={<AppInventoryTransferPage addAlert={addAlert} />} />
             <Route path='/manage/users' element={<ManageUsersPage />} />
             <Route path='/manage/clients' element={<ManageClientsPage addAlert={addAlert} />} />
             <Route path='/manage/taxes' element={<ManageTaxesPage addAlert={addAlert} />} />
@@ -117,6 +134,7 @@ const PanelPage: React.FC<PanelPageProps> = ({ addAlert }) => {
             <Route path='/manage/product/brands' element={<ManageProductBrandsPage addAlert={addAlert} />} />
             <Route path='/manage/product/categories' element={<ManageProductCategoriesPage addAlert={addAlert} />} />
             <Route path='/manage/inventory/types' element={<ManageInventoryTypesPage addAlert={addAlert} />} />
+            <Route path='/manage/paymentmethods' element={<ManagePaymentMethodsPage addAlert={addAlert} />} />
             <Route path='/auth/logout' element={<AuthLogoutPage />} />
             <Route path='*' element={<ErrorPage code={404} detail={translations.error_404} />} />
           </Routes>

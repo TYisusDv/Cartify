@@ -232,19 +232,20 @@ class ManageClientsAPIView(APIView):
             return ClientsModel.objects.get(pk = pk)
         except ClientsModel.DoesNotExist:
             raise Http404('Client not found.')
-        
+
     def get(self, request):
-        query = request.query_params.get('query', None)
-        search = request.query_params.get('search', '')
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
         page_number = request.query_params.get('page', 1)
         order_by = request.query_params.get('order_by', 'id').replace('.', '__')
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
-        
-        if query == 'table':           
+
+        if query == 'table':   
             model = ClientsModel.objects.filter(
                 Q(id__icontains = search)
-            ).select_related('person').prefetch_related('person__addresses')
+            )
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -263,17 +264,25 @@ class ManageClientsAPIView(APIView):
             })
 
         elif query == 'get':
-            client_id = request.query_params.get('id', None)
-            client = ClientsModel.objects.select_related('person').prefetch_related('person__identification_images').prefetch_related('contacts').get(pk = client_id)
-            serialized = ClientsSerializer(client)
+            data_id = data.get('id', None)
+
+            client_serializer = GetClientSerializer(data = data)  
+            if not client_serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': client_serializer.errors
+                }, status = 400)    
+                    
+            client_instance = self.get_object(pk = data_id)
+            client_serialized = ClientsSerializer(client_instance)
             
             return JsonResponse({
                 'success': True,
-                'resp': serialized.data
+                'resp': client_serialized.data
             }) 
         
         elif query == 'count':
-            total = ClientsModel.objects.count()            
+            total = ClientsModel.objects.count()
             
             return JsonResponse({
                 'success': True,
@@ -289,232 +298,82 @@ class ManageClientsAPIView(APIView):
 
     def post(self, request):
         with transaction.atomic():
-            data = request.data.copy()
+            data = request.data
+            person = data.get('person', {})
 
-            try:
-                person = parse_json(request, 'person', '{}')
-                contacts = parse_json(request, 'contacts', '[]')
-            except ValueError as e:
-                return JsonResponse({'success': False, 'resp': str(e)}, status=400)
-
-            person.update({
-                'profile_image': request.FILES.get('profile_image'),
-                'identification_images': [request.FILES[key] for key in request.FILES if key.startswith('identification_images[')]
-            })
-
-            person_serializer = AddEditPersonSerializer(data=person)
+            person_serializer = AddEditPersonSerializer(data = person)
             if not person_serializer.is_valid():
                 transaction.set_rollback(True)
-                return JsonResponse({'success': False, 'resp': person_serializer.errors}, status=400)
+                return JsonResponse({'success': False, 'resp': person_serializer.errors}, status = 400)
 
             person_instance = person_serializer.save()
+
             data['person_id'] = person_instance.id
 
-            address = person.get('addresses', [])[0]
-
-            city = address.get('city', {})
-            city_name = city.get('name', '')
-
-            state = city.get('state', {})
-            state_name = state.get('name', '')
-
-            country = state.get('country', {})
-            country_id = country.get('id', None)
-
-            if not city_name:
-                transaction.set_rollback(True)
-                return JsonResponse({'success': False, 'resp': 'City is required'}, status=400)
-
-            if not state_name:
-                transaction.set_rollback(True)
-                return JsonResponse({'success': False, 'resp': 'State is required'}, status=400)
-            
-            if not country_id:
-                transaction.set_rollback(True)
-                return JsonResponse({'success': False, 'resp': 'Country is required'}, status=400)            
-
-            country_instance, _ = CountriesModel.objects.get_or_create(id=country_id)
-            state_instance, _ = StatesModel.objects.get_or_create(
-                name=state_name.capitalize(),
-                country=country_instance
-            )
-            city_instance, _ = CitiesModel.objects.get_or_create(
-                name=city_name.capitalize(),
-                state=state_instance
-            )
-
-            address['city']['id'] = city_instance.id
-            address['person'] = {}
-            address['person']['id'] = person_instance.id
-
-            address_serializer = AddEditAddressesSerializer(data=address, partial=True)
-            if not address_serializer.is_valid():
-                transaction.set_rollback(True)
-                return JsonResponse({'success': False, 'resp': address_serializer.errors}, status=400)
-            
-            address_instance = address_serializer.save()
-
-            client_serializer = AddEditClientSerializer(data=data)
+            client_serializer = AddEditClientSerializer(data = data)
             if not client_serializer.is_valid():
                 transaction.set_rollback(True)
-                return JsonResponse({'success': False, 'resp': client_serializer.errors}, status=400)
+                return JsonResponse({'success': False, 'resp': client_serializer.errors}, status = 400)
 
-            client_instance = client_serializer.save()
-
-            for contact in contacts:
-                contact['client_id'] = client_instance.id
-                contact_serializer = AddClientContactSerializer(data=contact)
-                if not contact_serializer.is_valid():
-                    transaction.set_rollback(True)
-                    return JsonResponse({'success': False, 'resp': contact_serializer.errors}, status=400)
-                contact_serializer.save()
+            client_serializer.save()
 
             return JsonResponse({'success': True, 'resp': 'Added successfully.'})
 
     def put(self, request):
         with transaction.atomic():
-            data = request.data.copy()
+            data = request.data
+            data_id = data.get('id', None)
 
-            client_id = request.data.get('id', None) 
-            client_instance = self.get_object(client_id)
-            person_instance = client_instance.person 
-            
-            try:
-                person = parse_json(request, 'person', '{}')
-                contacts = parse_json(request, 'contacts', '[]')
-            except ValueError as e:
-                return JsonResponse({'success': False, 'resp': str(e)}, status = 400)
+            client_serializer = GetClientSerializer(data = data)  
+            if not client_serializer.is_valid():
+                transaction.set_rollback(True)
+                return JsonResponse({
+                    'success': False, 
+                    'resp': client_serializer.errors
+                }, status = 400)    
+                    
+            client_instance = self.get_object(pk = data_id)  
+            person_instance = client_instance.person   
 
-            person.update({
-                'profile_image': request.FILES.get('profile_image'),
-                'identification_images': [request.FILES[key] for key in request.FILES if key.startswith('identification_images[')]
-            })
+            person = data.get('person', {})
 
             person_serializer = AddEditPersonSerializer(person_instance, data = person)
             if not person_serializer.is_valid():
                 transaction.set_rollback(True)
                 return JsonResponse({'success': False, 'resp': person_serializer.errors}, status = 400)
 
-            person_instance = person_serializer.save()
+            person_serializer.save()
+
             data['person_id'] = person_instance.id
-
-            address = person.get('addresses', [])[0]
-
-            city = address.get('city', {})
-            city_name = city.get('name', '')
-
-            state = city.get('state', {})
-            state_name = state.get('name', '')
-
-            country = state.get('country', {})
-            country_id = country.get('id', None)
-
-            if not city_name:
-                transaction.set_rollback(True)
-                return JsonResponse({'success': False, 'resp': 'City is required'}, status = 400)
-
-            if not state_name:
-                transaction.set_rollback(True)
-                return JsonResponse({'success': False, 'resp': 'State is required'}, status = 400)
-            
-            if not country_id:
-                transaction.set_rollback(True)
-                return JsonResponse({'success': False, 'resp': 'country is required'}, status = 400)            
-
-            country_instance, _ = CountriesModel.objects.get_or_create(id = country_id)
-            state_instance, _ = StatesModel.objects.get_or_create(
-                name = state_name.capitalize(),
-                country = country_instance
-            )
-            city_instance, _ = CitiesModel.objects.get_or_create(
-                name = city_name.capitalize(),
-                state = state_instance
-            )
-            
-            address['city']['id'] = city_instance.id
-
-            first_address = AddressesModel.objects.filter(person = person_instance).first()
-            address_serializer = AddEditAddressesSerializer(first_address, data = address, partial = True)
-            if not address_serializer.is_valid():
-                transaction.set_rollback(True)
-                return JsonResponse({
-                    'success': False,
-                    'resp': address_serializer.errors
-                }, status = 400)
-            
-            address_serializer.save()
 
             client_serializer = AddEditClientSerializer(client_instance, data = data)
             if not client_serializer.is_valid():
                 transaction.set_rollback(True)
-                return JsonResponse({
-                    'success': False,
-                    'resp': client_serializer.errors
-                }, status = 400)
+                return JsonResponse({'success': False, 'resp': client_serializer.errors}, status = 400)
 
-            client_serializer.save()  
-
-            existing_contacts = list(ClientContactsModel.objects.filter(client = client_instance))
-            new_contacts = contacts
-
-            existing_contact_ids = [contact.id for contact in existing_contacts]
-            new_contact_ids = [contact.get('id') for contact in new_contacts if contact.get('id')]
-
-            for existing_contact in existing_contacts:
-                if existing_contact.id not in new_contact_ids:
-                    existing_contact.delete()
-
-            for contact in new_contacts:
-                contact_id = contact.get('id', None)
-                contact['client_id'] = client_instance.id
-
-                if contact_id and contact_id in existing_contact_ids:
-                    existing_contact_instance = ClientContactsModel.objects.get(id = contact_id)
-                    contact_serializer = AddClientContactSerializer(existing_contact_instance, data = contact, partial = True)
-                    if not contact_serializer.is_valid():
-                        transaction.set_rollback(True)
-                        return JsonResponse({'success': False, 'resp': contact_serializer.errors}, status = 400)
-                    
-                    contact_serializer.save()
-                else:
-                    contact_serializer = AddClientContactSerializer(data = contact)
-                    if not contact_serializer.is_valid():
-                        transaction.set_rollback(True)
-                        return JsonResponse({'success': False, 'resp': contact_serializer.errors}, status = 400)
-                    
-                    contact_serializer.save() 
+            client_serializer.save()
 
             return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
     
     def delete(self, request):
-        with transaction.atomic():
-            try:
-                client_serializer = DeleteClientSerializer(data = request.query_params)  
-                if not client_serializer.is_valid():
-                    transaction.set_rollback(True)
-                    return JsonResponse({
-                        'success': False, 
-                        'resp': client_serializer.errors
-                    }, status = 400)
+        data = request.query_params
 
-                client_id = request.query_params.get('id', None) 
+        data_id = data.get('id', None)
 
-                client = ClientsModel.objects.get(id = client_id) 
-                person = client.person 
-
-                client.delete()
-                person.delete()
+        client_serializer = GetClientSerializer(data = data)  
+        if not client_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': client_serializer.errors,
+            }, status = 400)    
                 
-                return JsonResponse({
-                    'success': True,
-                    'resp': 'Deleted successfully.'
-                }, status = 200)
-            except ClientsModel.DoesNotExist:
-                transaction.set_rollback(True)
-                return JsonResponse({
-                    'success': False,
-                    'resp': 'Client not found.'
-                }, status = 404)
+        client_instance = self.get_object(pk = data_id)           
+        client_instance.person.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
 
 #Product contact types
 class ManageContactTypesAPIView(APIView):
@@ -827,7 +686,7 @@ class ManageProductBrandsAPIView(APIView):
             raise Http404('Product brand not found.')
 
     def get(self, request):
-        data = request.query_params
+        data = request.query_params 
         query = data.get('query', None)
         search = data.get('search', '')
         page_number = request.query_params.get('page', 1)
@@ -837,7 +696,8 @@ class ManageProductBrandsAPIView(APIView):
 
         if query == 'table':
             model = ProductBrandsModel.objects.filter(
-                Q(id__icontains = search)
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
             )
 
             if order == 'desc':
@@ -1307,10 +1167,36 @@ class ManageInventoryTypesAPIView(APIView):
                 'resp': inventory_type_serialized.data
             }) 
         
+        elif query == 'list_all':
+            model = InventoryTypesModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)                
+            )[:10]
+            serialized = InventoryTypesSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+
         elif query == 'list':
             model = InventoryTypesModel.objects.filter(
                 Q(id__icontains = search) |
-                Q(name__icontains = search)
+                Q(name__icontains = search),
+                type__in = [1, 2]
+            )[:10]
+            serialized = InventoryTypesSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+
+        elif query == 'list_transfer':
+            model = InventoryTypesModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search),
+                type = 3
             )[:10]
             serialized = InventoryTypesSerializer(model, many = True)
             
@@ -1408,19 +1294,55 @@ class AppInventoryAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':   
-            type = request.query_params.get('type', None)
+            type_id = request.query_params.get('type[id]', None)
             product_id = request.query_params.get('product[id]', None)
             location_id = request.query_params.get('location[id]', None)
 
             model = InventoryModel.objects.filter(
-                Q(id__icontains = search)
+                Q(id__icontains = search),
+                type__type__in = [1, 2]
             )
             
             if product_id not in [None,  0, '0']:
                 model = model.filter(product_id = product_id)
             
-            if type not in [None,  0, '0']:
-                model = model.filter(type = type)
+            if type_id not in [None,  0, '0']:
+                model = model.filter(type_id = type_id)
+            
+            if location_id not in [None,  0, '0']:
+                model = model.filter(location_id = location_id)
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = InventorySerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        if query == 'table_transfer':   
+            type_id = request.query_params.get('type[id]', None)
+            product_id = request.query_params.get('product[id]', None)
+            location_id = request.query_params.get('location[id]', None)
+
+            model = InventoryModel.objects.filter(
+                Q(id__icontains = search),
+                type__type = 3
+            )
+            
+            if product_id not in [None,  0, '0']:
+                model = model.filter(product_id = product_id)
+            
+            if type_id not in [None,  0, '0']:
+                model = model.filter(type_id = type_id)
             
             if location_id not in [None,  0, '0']:
                 model = model.filter(location_id = location_id)
@@ -1472,16 +1394,22 @@ class AppInventoryAPIView(APIView):
             })
         
         elif query == 'count':
-            total = InventoryModel.objects.count()
-            visible = InventoryModel.objects.filter(status = 1).count()
-            hidden = InventoryModel.objects.filter(status = 0).count()  
+            total = InventoryModel.objects.filter(type__type__in = [1, 2]).count()
             
             return JsonResponse({
                 'success': True,
                 'resp': {
-                    'total': total,
-                    'visible': visible,
-                    'hidden': hidden
+                    'total': total
+                }
+            })    
+
+        elif query == 'count_transfer':
+            total = InventoryModel.objects.filter(type__type = 3).count()
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
                 }
             })      
 
@@ -1495,7 +1423,10 @@ class AppInventoryAPIView(APIView):
             user_id = request.user.id
             data = request.data
             
-            movements = data.get('movements', [])            
+            movements = data.get('movements', [])    
+            if not movements:    
+                return JsonResponse({'success': False, 'resp': 'You need to do a movement'}, status = 400)    
+
             for movement in movements:
                 movement['user_id'] = user_id
 
@@ -1551,3 +1482,143 @@ class AppInventoryAPIView(APIView):
             'success': True,
             'resp': 'Deleted successfully.'
         }, status = 200)
+    
+#Payment Methods
+class ManagePaymentMethodsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self, pk) :
+        try:
+            return PaymentMethodsModel.objects.get(pk = pk)
+        except PaymentMethodsModel.DoesNotExist:
+            raise Http404('Payment method not found.')
+
+    def get(self, request):
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':
+            model = PaymentMethodsModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = PaymentMethodsSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            payment_method_id = data.get('id', None)
+
+            payment_method_serializer = GetPaymentMethodSerializer(data = data)  
+            if not payment_method_serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': payment_method_serializer.errors
+                }, status = 400)    
+                    
+            payment_method_instance = self.get_object(pk = payment_method_id)
+            payment_method_serialized = PaymentMethodsSerializer(payment_method_instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': payment_method_serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = PaymentMethodsModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = PaymentMethodsSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = PaymentMethodsModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+
+        payment_method_serializer = AddEditPaymentMethodSerializer(data = data)
+        if not payment_method_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': payment_method_serializer.errors}, status = 400)
+
+        payment_method_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        payment_method_id = data.get('id', None)
+
+        payment_method_serializer = GetPaymentMethodSerializer(data = data)  
+        if not payment_method_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': payment_method_serializer.errors
+            }, status = 400)    
+                
+        payment_method_instance = self.get_object(pk = payment_method_id)     
+
+        payment_method_serializer = AddEditPaymentMethodSerializer(payment_method_instance, data = data)
+        if not payment_method_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': payment_method_serializer.errors}, status = 400)
+
+        payment_method_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        payment_method_id = data.get('id', None)
+
+        payment_method_serializer = GetPaymentMethodSerializer(data = data)  
+        if not payment_method_serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': payment_method_serializer.errors
+            }, status = 400)    
+                
+        payment_method_instance = self.get_object(pk = payment_method_id)           
+        payment_method_instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
+
