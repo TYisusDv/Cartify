@@ -1093,6 +1093,9 @@ class AddEditSalePaymentSerializer(serializers.ModelSerializer):
         if 'user' in data and isinstance(data['user'], dict) and 'id' in data['user']:
             data['user_id'] = data['user']['id']
         
+        if data.get('no') in [0, '0']:
+            data['no'] = None
+
         if data.get('location_id') in [0, '0']:
             data['location_id'] = None
         

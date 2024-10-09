@@ -1632,6 +1632,20 @@ class ManageSalesAPIView(APIView):
             return PaymentMethodsModel.objects.get(pk = pk)
         except PaymentMethodsModel.DoesNotExist:
             raise Http404('Payment method not found.')
+    
+    @classmethod
+    def get_last_no(self) :
+        try:
+            last_payment = SalePaymentsModel.objects.order_by('-no').first()
+            print(last_payment.no)
+            if last_payment and last_payment.no >= 100000:
+                last_no = last_payment.no + 1
+            else:
+                last_no = 100000
+
+            return last_no
+        except SalePaymentsModel.DoesNotExist:
+            return 100000
 
     def get(self, request):
         data = request.query_params
@@ -1714,8 +1728,12 @@ class ManageSalesAPIView(APIView):
         with transaction.atomic():
             user_id = request.user.id
             sale = data.get('sale', None)
+            type = sale.get('type', None)
             inventory = data.get('inventory', [])
             sale_payment = data.get('sale_payment', None)
+
+            if not type in [1, 2, '1' '2']:
+                return JsonResponse({'success': False, 'resp': 'Type inventory not found.'}, status = 400)
 
             sale_serializer = AddEditSaleSerializer(data = sale)
             if not sale_serializer.is_valid():
@@ -1736,7 +1754,8 @@ class ManageSalesAPIView(APIView):
                     return JsonResponse({'success': False, 'resp': inventory_serializer.errors}, status = 400)
 
                 inventory_serializer.save()
-            
+
+            sale_payment['no'] = self.get_last_no()
             sale_payment['sale_id'] = sale_instance.id
             sale_payment['user_id'] = user_id
 

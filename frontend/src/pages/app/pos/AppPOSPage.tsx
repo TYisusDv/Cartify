@@ -19,6 +19,7 @@ import { getProduct } from '../../../services/productsService';
 import { generateUUID } from '../../../utils/uuidGen';
 import { addSale } from '../../../services/SalesService';
 import { extractMessages } from '../../../utils/formUtils';
+import { addAlert } from '../../../utils/Alerts';
 
 const AppPOSPage: React.FC = () => {
     const { translations } = useTranslations();
@@ -259,8 +260,27 @@ const AppPOSPage: React.FC = () => {
             const response = await addSale(formValues, formValuesDetails, formValuesPayment);
             const response_resp = response?.resp;
             
-        } catch (error) {            
-           
+            addAlert({
+                id: generateUUID(),
+                title: 'Success',
+                msg: response_resp,
+                icon: 'CheckmarkCircle02Icon',
+                timeout: 2000
+            });
+
+            setIsModalOpen({ ...isModalOpen, finish : false })
+        } catch (error) {
+            const messages = extractMessages(error);
+            messages.forEach(msg => {
+                addAlert({
+                    id: generateUUID(),
+                    title: 'An error has occurred.',
+                    msg: msg,
+                    icon: 'Alert01Icon',
+                    color: 'red',
+                    timeout: 2000
+                });
+            });
         }
     };
 
