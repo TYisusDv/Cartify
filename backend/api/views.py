@@ -8,11 +8,13 @@ from rest_framework_simplejwt.serializers import (
 from django.http import Http404, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.core.paginator import Paginator
 from .serializers import *
 from .models import *
 from .utils import *
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 #Login
 class LoginAPIView(APIView):
@@ -1629,17 +1631,17 @@ class ManageSalesAPIView(APIView):
     
     def get_object(self, pk) :
         try:
-            return PaymentMethodsModel.objects.get(pk = pk)
-        except PaymentMethodsModel.DoesNotExist:
-            raise Http404('Payment method not found.')
+            return SalesModel.objects.get(pk = pk)
+        except SalesModel.DoesNotExist:
+            raise Http404('Sale not found.')
     
     @classmethod
     def get_last_no(self) :
         try:
-            last_payment = SalePaymentsModel.objects.order_by('-no').first()
-            print(last_payment.no)
-            if last_payment and last_payment.no >= 100000:
-                last_no = last_payment.no + 1
+            last_payment_no = SalePaymentsModel.objects.aggregate(Max('no'))['no__max']
+            
+            if last_payment_no and last_payment_no >= 100000:
+                last_no = last_payment_no + 1
             else:
                 last_no = 100000
 
@@ -1657,9 +1659,14 @@ class ManageSalesAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':
-            model = PaymentMethodsModel.objects.filter(
+            type = request.query_params.get('type', None)   
+           
+            model = SalesModel.objects.filter(
                 Q(id__icontains = search)
             )
+
+            if type not in [None,  0, '0']:
+                model = model.filter(type = type)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -1668,7 +1675,7 @@ class ManageSalesAPIView(APIView):
             paginator = Paginator(model, show)
             model = paginator.page(page_number)
 
-            serialized = PaymentMethodsSerializer(model, many = True)
+            serialized = SalesSerializer(model, many = True)
 
             return JsonResponse({
                 'success': True,
@@ -1677,38 +1684,8 @@ class ManageSalesAPIView(APIView):
                 'current_page': model.number
             })
 
-        elif query == 'get':
-            payment_method_id = data.get('id', None)
-
-            payment_method_serializer = GetPaymentMethodSerializer(data = data)  
-            if not payment_method_serializer.is_valid():
-                return JsonResponse({
-                    'success': False, 
-                    'resp': payment_method_serializer.errors
-                }, status = 400)    
-                    
-            payment_method_instance = self.get_object(pk = payment_method_id)
-            payment_method_serialized = PaymentMethodsSerializer(payment_method_instance)
-            
-            return JsonResponse({
-                'success': True,
-                'resp': payment_method_serialized.data
-            }) 
-        
-        elif query == 'list':
-            model = PaymentMethodsModel.objects.filter(
-                Q(id__icontains = search) |
-                Q(name__icontains = search)
-            )[:10]
-            serialized = PaymentMethodsSerializer(model, many = True)
-            
-            return JsonResponse({
-                'success': True,
-                'resp': serialized.data
-            })
-        
         elif query == 'count':
-            total = PaymentMethodsModel.objects.count()            
+            total = SalesModel.objects.count()            
             
             return JsonResponse({
                 'success': True,
@@ -1729,12 +1706,14 @@ class ManageSalesAPIView(APIView):
             user_id = request.user.id
             sale = data.get('sale', None)
             type = sale.get('type', None)
+            quantity_of_payments = sale.get('quantity_of_payments', 0)
+            payment_days = sale.get('payment_days', 0)
             inventory = data.get('inventory', [])
             sale_payment = data.get('sale_payment', None)
-
+            
             if not type in [1, 2, '1' '2']:
                 return JsonResponse({'success': False, 'resp': 'Type inventory not found.'}, status = 400)
-
+            
             sale_serializer = AddEditSaleSerializer(data = sale)
             if not sale_serializer.is_valid():
                 transaction.set_rollback(True)
@@ -1758,6 +1737,8 @@ class ManageSalesAPIView(APIView):
             sale_payment['no'] = self.get_last_no()
             sale_payment['sale_id'] = sale_instance.id
             sale_payment['user_id'] = user_id
+            sale_payment['date_reg'] = timezone.now()
+            sale_payment['date_limit'] = timezone.now()
 
             sale_payment_serializer = AddEditSalePaymentSerializer(data = sale_payment)
             if not sale_payment_serializer.is_valid():
@@ -1765,6 +1746,28 @@ class ManageSalesAPIView(APIView):
                 return JsonResponse({'success': False, 'resp': sale_payment_serializer.errors}, status = 400)
 
             sale_payment_serializer.save()
+
+            if type in [2, '2']:
+                quantity_of_payments = int(quantity_of_payments) - 1
+                date_limit = timezone.now()
+                for i in range(quantity_of_payments):
+                    item_sale_payment = {}
+                    item_sale_payment['subtotal'] = (sale_instance.total - sale_payment.get('subtotal', 0)) / quantity_of_payments
+                    item_sale_payment['sale_id'] = sale_instance.id
+                    
+                    if(int(payment_days) == 30 or int(payment_days) == 31):
+                        date_limit += relativedelta(months = 1)
+                    else:
+                        date_limit += timedelta(days = payment_days)
+
+                    item_sale_payment['date_limit'] = date_limit
+
+                    item_sale_payment_serializer = AddEditSalePaymentSerializer(data = item_sale_payment)
+                    if not item_sale_payment_serializer.is_valid():
+                        transaction.set_rollback(True)
+                        return JsonResponse({'success': False, 'resp': item_sale_payment_serializer.errors}, status = 400)
+
+                    item_sale_payment_serializer.save()
 
             return JsonResponse({'success': True, 'resp': 'Added successfully.'})
 
@@ -1810,3 +1813,51 @@ class ManageSalesAPIView(APIView):
             'resp': 'Deleted successfully.'
         }, status = 200)
 
+#Sale payments
+class ManageSalePaymentsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    @classmethod
+    def get_object(self, pk) :
+        try:
+            return SalePaymentsModel.objects.get(pk = pk)
+        except SalePaymentsModel.DoesNotExist:
+            raise Http404('Sale payment not found.')
+
+    def get(self, request):
+        data = request.query_params
+        query = data.get('query', None)
+        data_id = data.get('id', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':
+            type = request.query_params.get('type', None)   
+           
+            model = SalePaymentsModel.objects.filter(
+                Q(id__icontains = search),
+                sale_id = data_id
+            )
+
+            if type not in [None,  0, '0']:
+                model = model.filter(type = type)
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = SalePaymentsSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })

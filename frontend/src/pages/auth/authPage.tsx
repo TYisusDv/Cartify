@@ -20,7 +20,7 @@ const AuthPage: React.FC = () => {
       addAlert({
         id: generateUUID(),
         title: 'Success',
-        msg: response_resp,
+        msg: 'Welcome to Cartify.',
         icon: 'CheckmarkCircle02Icon',
         timeout: 2000
       });

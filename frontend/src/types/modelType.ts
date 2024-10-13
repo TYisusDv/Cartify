@@ -209,11 +209,15 @@ export interface PaymentMethod {
 
 //Sale
 export interface Sale {
-    id?: string;    
+    id?: number;    
     total?: number;
     type?: number;  
+    quantity_of_payments?: number;
+    payment_days?: number;
     date_reg?: Date;  
     client?: Client;
+    sale_payments?: SalePayment[];
+    inventory?: Inventory[];
 }
 
 //Sale payment
@@ -229,6 +233,7 @@ export interface SalePayment {
     change?: number;     
     note?: string;
     date_reg?: Date;  
+    date_limit?: Date;  
     user?: User;    
     location?: Location;
     payment_method?: PaymentMethod;

@@ -21,6 +21,8 @@ const ManageProductBrandsPage = React.lazy(() => import('./manage/product/brands
 const ManageProductCategoriesPage = React.lazy(() => import('./manage/product/categories/ManageProductCategoriesPage'));
 const ManageInventoryTypesPage = React.lazy(() => import('./app/inventory/types/ManageInventoryTypesPage'));
 const ManagePaymentMethodsPage = React.lazy(() => import('./manage/paymentmethods/ManagePaymentMethodsPage'));
+const ManageSalesPage = React.lazy(() => import('./manage/sales/ManageSalesPage'));
+const ManageSalePayments = React.lazy(() => import('./manage/sales/payments/Payments'));
 const SettingGeneralPage = React.lazy(() => import('../pages/settings/settingGeneralPage'));
 
 const PanelPage: React.FC = () => {
@@ -96,7 +98,6 @@ const PanelPage: React.FC = () => {
               links={['/manage/sales', '/manage/sales/credit']}
             >
               <li><Link to='/manage/sales' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/sales')}`}><ShoppingBasketSecure03Icon size={20} /> {translations.sales}</Link></li>
-              <li><Link to='/manage/sales/credit' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/sales/credit')}`}><ShoppingBasketSecure03Icon size={20} /> {translations.sales_credit}</Link></li>
               <li><Link to='/manage/paymentmethods' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/paymentmethods')}`}><CreditCardIcon size={20} /> {translations.payment_methods}</Link></li>
             </DropdownMenu>
 
@@ -130,6 +131,8 @@ const PanelPage: React.FC = () => {
             <Route path='/manage/product/categories' element={<ManageProductCategoriesPage />} />
             <Route path='/manage/inventory/types' element={<ManageInventoryTypesPage />} />
             <Route path='/manage/paymentmethods' element={<ManagePaymentMethodsPage />} />
+            <Route path='/manage/sales' element={<ManageSalesPage />} />
+            <Route path='/manage/sale/payments' element={<ManageSalePayments />} />
             <Route path='/auth/logout' element={<AuthLogoutPage />} />
             <Route path='*' element={<ErrorPage code={404} detail={translations.error_404} />} />
           </Routes>

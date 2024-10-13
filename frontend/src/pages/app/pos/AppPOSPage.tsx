@@ -3,7 +3,7 @@ import useTranslations from '../../../hooks/useTranslations';
 import DelayedSuspense from '../../../components/DelayedSuspense';
 import SkeletonLoader from '../../../components/SkeletonLoader';
 import Input from '../../../components/Input';
-import { Add01Icon, CheckmarkCircle02Icon, CreditCardIcon, Mail01Icon, PercentCircleIcon, Search01Icon, SecurityCheckIcon, ShoppingBasket01Icon, ShoppingCartAdd02Icon, ShoppingCartCheckIn02Icon, StoreLocation01Icon, TelephoneIcon, UserAccountIcon } from 'hugeicons-react';
+import { Add01Icon, CheckmarkCircle02Icon, CreditCardIcon, Mail01Icon, MoreIcon, PercentCircleIcon, Search01Icon, SecurityCheckIcon, ShoppingBasket01Icon, ShoppingCartAdd02Icon, ShoppingCartCheckIn02Icon, StoreLocation01Icon, TelephoneIcon, UserAccountIcon } from 'hugeicons-react';
 import Select from '../../../components/Select';
 import Modal from '../../../components/Modal';
 import Table from '../../../components/Table';
@@ -71,7 +71,7 @@ const AppPOSPage: React.FC = () => {
                     if (existingProductIndex !== -1) {
                         prevDetails[existingProductIndex].quantity! += 1;
                     } else {
-                        prevDetails.push({ quantity: 1, product: resp } );
+                        prevDetails.push({ quantity: 1, product: resp });
                     }
 
                     return [...prevDetails];
@@ -79,7 +79,7 @@ const AppPOSPage: React.FC = () => {
 
                 setFormValues(prev => ({
                     ...prev,
-                    id: generateUUID(),
+                    id: (formValues.id || 0) + 1,
                 }));
             }
         } catch (error) { }
@@ -134,7 +134,7 @@ const AppPOSPage: React.FC = () => {
     useEffect(() => {
         setFormValues({
             ...formValues,
-            id: generateUUID(),
+            id: (formValues.id || 0) + 1,
             total: 0,
         });
 
@@ -259,7 +259,7 @@ const AppPOSPage: React.FC = () => {
         try {
             const response = await addSale(formValues, formValuesDetails, formValuesPayment);
             const response_resp = response?.resp;
-            
+
             addAlert({
                 id: generateUUID(),
                 title: 'Success',
@@ -268,7 +268,7 @@ const AppPOSPage: React.FC = () => {
                 timeout: 2000
             });
 
-            setIsModalOpen({ ...isModalOpen, finish : false })
+            setIsModalOpen({ ...isModalOpen, finish: false })
         } catch (error) {
             const messages = extractMessages(error);
             messages.forEach(msg => {
@@ -495,25 +495,68 @@ const AppPOSPage: React.FC = () => {
                             </div>
                             <hr className='w-full border dark:border-slate-600 my-2' />
                             {formValues.type === 2 && (
-                                <div className='w-full'>
-                                    <Input
-                                        props={{
-                                            id: 'subtotal',
-                                            name: 'subtotal',
-                                            type: 'number',
-                                            value: formValuesPayment.subtotal || 0,
-                                            onChange: (e) => {
-                                                setFormValuesPayment(prev => ({
-                                                    ...prev,
-                                                    subtotal: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
-                                                }));
-                                            },
-                                        }}
-                                        label='Primer pago'
-                                        icon={'Q'}
-                                        required={false}
-                                    />
-                                </div>
+                                <>
+                                    <div className='w-full'>
+                                        <Input
+                                            props={{
+                                                id: 'quantity_of_payments',
+                                                name: 'quantity_of_payments',
+                                                type: 'number',
+                                                value: formValues.quantity_of_payments || 2,
+                                                min: 2,
+                                                onChange: (e) => {
+                                                    setFormValues(prev => ({
+                                                        ...prev,
+                                                        quantity_of_payments: isNaN(parseFloat(e.target.value)) ? 0 : parseInt(e.target.value)
+                                                    }));
+                                                },
+                                            }}
+                                            label='Cantidad de pagos'
+                                            icon={<MoreIcon size={20} />}
+                                            required={false}
+                                        />
+                                    </div>
+                                    <div className='w-full'>
+                                        <Input
+                                            props={{
+                                                id: 'payment_days',
+                                                name: 'payment_days',
+                                                type: 'number',
+                                                value: formValues.payment_days || 0,
+                                                min: 0,
+                                                onChange: (e) => {
+                                                    setFormValues(prev => ({
+                                                        ...prev,
+                                                        payment_days: isNaN(parseFloat(e.target.value)) ? 0 : parseInt(e.target.value)
+                                                    }));
+                                                },
+                                            }}
+                                            label='Cada cuantos dias'
+                                            icon={<MoreIcon size={20} />}
+                                            required={false}
+                                        />
+                                    </div>
+                                    <div className='w-full'>
+                                        <Input
+                                            props={{
+                                                id: 'subtotal',
+                                                name: 'subtotal',
+                                                type: 'number',
+                                                value: formValuesPayment.subtotal || 0,
+                                                min: 0,
+                                                onChange: (e) => {
+                                                    setFormValuesPayment(prev => ({
+                                                        ...prev,
+                                                        subtotal: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                                    }));
+                                                },
+                                            }}
+                                            label='Primer pago'
+                                            icon={'Q'}
+                                            required={false}
+                                        />
+                                    </div>
+                                </>
                             )}
                             <div className='w-full z-[8]'>
                                 <Select
@@ -545,6 +588,7 @@ const AppPOSPage: React.FC = () => {
                                         name: 'discount_per',
                                         type: 'number',
                                         value: formValuesPayment.discount_per || 0,
+                                        min: 0,
                                         onChange: (e) => {
                                             setFormValuesPayment(prev => ({
                                                 ...prev,
@@ -565,6 +609,7 @@ const AppPOSPage: React.FC = () => {
                                         name: 'discount',
                                         type: 'number',
                                         value: formValuesPayment.discount || 0,
+                                        min: 0,
                                         onChange: (e) => {
                                             setFormValuesPayment(prev => ({
                                                 ...prev,
@@ -585,6 +630,7 @@ const AppPOSPage: React.FC = () => {
                                         name: 'pay',
                                         type: 'number',
                                         value: formValuesPayment.pay || 0,
+                                        min: 0,
                                         onChange: (e) => {
                                             setFormValuesPayment(prev => ({
                                                 ...prev,
@@ -609,7 +655,7 @@ const AppPOSPage: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                        <button type='submit' className={`btn btn-blue w-full h-12`} onClick={() => setIsModalOpen({ ...isModalOpen, finish : true })} disabled={(formValues.total || 0) <= 0 || (formValuesPayment.change || 0) < 0}>
+                        <button type='submit' className={`btn btn-blue w-full h-12`} onClick={() => setIsModalOpen({ ...isModalOpen, finish: true })} disabled={(formValues.total || 0) <= 0 || (formValuesPayment.change || 0) < 0}>
                             <CheckmarkCircle02Icon size={22} />
                         </button>
                     </div>
@@ -671,7 +717,7 @@ const AppPOSPage: React.FC = () => {
             )}
 
             {isModalOpen.finish && (
-                <Modal title={translations.finish_sale_sure} onClose={() => setIsModalOpen({ ...isModalOpen, finish : false })}>
+                <Modal title={translations.finish_sale_sure} onClose={() => setIsModalOpen({ ...isModalOpen, finish: false })}>
                     <form onSubmit={onSubmit} autoComplete='off'>
                         <button type='submit' className={`btn btn-blue w-full h-12`} disabled={(formValues.total || 0) <= 0 || (formValuesPayment.change || 0) < 0}>
                             <CheckmarkCircle02Icon size={22} /> Finish

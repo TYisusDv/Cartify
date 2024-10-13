@@ -4,7 +4,7 @@ import { getTable } from '../services/componentsService';
 import Input from "./Input";
 import useTranslations from "../hooks/useTranslations";
 import { extractMessages } from '../utils/formUtils';
-import { generateUUID } from '../utils/uuidGen';
+import { generateKey, generateUUID } from '../utils/uuidGen';
 import { addAlert } from '../utils/Alerts';
 
 interface Header {
@@ -25,14 +25,15 @@ interface TableProps {
     order_by?: string;
     order?: string;
     query?: string;
+    id?: string | number;
 }
 
-const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, filters, order_by = 'id', order = 'desc', query = 'table' }) => {
+const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, filters, order_by = 'id', order = 'desc', query = 'table', id }) => {
     const { translations } = useTranslations();
     const [data, setData] = useState<DataRow[]>([]);
     const itemsPerPage = 10;
     const [totalPages, setTotalPages] = useState(1);
-    const [formValues, setFormValues] = useState({ query: query, page: 1, show: itemsPerPage, search: '', order_by: order_by, order: order });
+    const [formValues, setFormValues] = useState({ query: query, id: id, page: 1, show: itemsPerPage, search: '', order_by: order_by, order: order });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -68,6 +69,10 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
     };
 
     const toggleOrder = (column: string) => {
+        if (column === '') {
+            return;
+        }
+
         setFormValues(prev => ({
             ...prev,
             order_by: column,
@@ -108,9 +113,9 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
                     <table className="w-full text-sm text-left">
                         <thead className="select-none text-sm text-black uppercase bg-gray-200 dark:bg-slate-600 dark:text-white">
                             <tr>
-                                {header.map((header) => (
+                                {header.map((header, index) => (
                                     <th
-                                        key={header.name}
+                                        key={generateKey(index)}
                                         scope="col"
                                         className="px-6 py-3 cursor-pointer"
                                         onClick={() => toggleOrder(header.name)}

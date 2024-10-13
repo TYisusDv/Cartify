@@ -235,6 +235,8 @@ class SalesModel(models.Model):
     id = models.AutoField(primary_key = True)
     total = models.FloatField(default = 0, null = False, blank = False)
     type = models.IntegerField(default = 1, null = False, blank = False)
+    quantity_of_payments = models.IntegerField(default = 1, null = False, blank = False)
+    payment_days = models.IntegerField(null = True, blank = False)
     date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
     client = models.ForeignKey(ClientsModel, null = False, blank = False, related_name='client_sales', on_delete = models.RESTRICT)
 
@@ -243,7 +245,7 @@ class SalesModel(models.Model):
 
 class SalePaymentsModel(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-    no = models.IntegerField(unique = True, null = True, blank = True)
+    no = models.IntegerField(unique = True, null = True, blank = False)
     subtotal = models.FloatField(default = 0, null = False, blank = False)
     commission = models.FloatField(default = 0, null = False, blank = False)
     discount_per = models.FloatField(default = 0, null = False, blank = False)
@@ -252,11 +254,12 @@ class SalePaymentsModel(models.Model):
     pay = models.FloatField(default = 0, null = False, blank = False)
     change = models.FloatField(default = 0, null = False, blank = False)
     note = models.CharField(max_length = 100, null = True, blank = False)
-    date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
-    user = models.ForeignKey(User, null = False, blank = False, related_name='sales_payments_user', on_delete = models.RESTRICT)
-    location = models.ForeignKey(LocationsModel, null = False, blank = False, related_name='sales_payments_location', on_delete = models.RESTRICT)
-    payment_method = models.ForeignKey(PaymentMethodsModel, null = False, blank = False, related_name='sales_payments_payment_method', on_delete = models.RESTRICT)
-    sale = models.ForeignKey(SalesModel, null = False, blank = False, related_name='sales_payments_sale', on_delete = models.RESTRICT)
+    date_reg = models.DateTimeField(null = True, blank = False)
+    date_limit = models.DateTimeField(null = True, blank = False)
+    user = models.ForeignKey(User, null = True, blank = False, related_name='sale_payments_user', on_delete = models.RESTRICT)
+    location = models.ForeignKey(LocationsModel, null = True, blank = False, related_name='sale_payments_location', on_delete = models.RESTRICT)
+    payment_method = models.ForeignKey(PaymentMethodsModel, null = True, blank = False, related_name='sale_payments_payment_method', on_delete = models.RESTRICT)
+    sale = models.ForeignKey(SalesModel, null = False, blank = False, related_name='sale_payments_sale', on_delete = models.RESTRICT)
     
     class Meta: 
         db_table = 'sales_payments'

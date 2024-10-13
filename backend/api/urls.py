@@ -24,4 +24,5 @@ urlpatterns = [
     path('manage/inventory/types', ManageInventoryTypesAPIView.as_view(), name='manage-inventory-types'),
     path('manage/paymentmethods', ManagePaymentMethodsAPIView.as_view(), name='manage-paymentmethods'),
     path('manage/sales', ManageSalesAPIView.as_view(), name='manage-sales'),
+    path('manage/sale/payments', ManageSalePaymentsAPIView.as_view(), name='manage-sale-payments'),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
