@@ -5,16 +5,18 @@ from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer,
     TokenRefreshSerializer
 )
-from django.http import Http404, JsonResponse
+from django.http import Http404, JsonResponse, HttpResponse
+from django.template.loader import render_to_string
 from django.contrib.auth import authenticate, login
 from django.db import transaction
-from django.db.models import Q, Max
+from django.db.models import Q, F, Max, Sum, ExpressionWrapper, FloatField
 from django.core.paginator import Paginator
 from .serializers import *
 from .models import *
 from .utils import *
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
+import pdfkit, uuid
 
 #Login
 class LoginAPIView(APIView):
@@ -1624,31 +1626,245 @@ class ManagePaymentMethodsAPIView(APIView):
             'resp': 'Deleted successfully.'
         }, status = 200)
 
+#Sale payments
+class ManageSalePaymentsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    @classmethod
+    def get_object(cls, pk) :
+        try:
+            return SalePaymentsModel.objects.get(pk = pk)
+        except SalePaymentsModel.DoesNotExist:
+            raise Http404('Sale payment not found.')
+    
+    @classmethod
+    def get_object_pending(cls, sale_id):
+        try:
+            sale_payments = SalePaymentsModel.objects.filter(sale_id = sale_id)
+            
+            pending_payment = sale_payments.filter(
+                Q(total__lt = F('subtotal'))
+                | Q(total__isnull=True)
+            ).order_by('date_limit').first()
+            
+            if not pending_payment:
+                raise Http404('No expired or pending sale payments found.')        
+            
+            return pending_payment
+        
+        except SalePaymentsModel.DoesNotExist:
+            raise Http404('Sale payment not found.')
+
+    @classmethod
+    def get_max_no(cls) :
+        try:
+            max_payment_no = SalePaymentsModel.objects.aggregate(Max('no'))['no__max']
+            
+            if max_payment_no and max_payment_no >= 100000:
+                max_no = max_payment_no + 1
+            else:
+                max_no = 100000
+
+            return max_no
+        except SalePaymentsModel.DoesNotExist:
+            return 100000
+        
+    def get(self, request):
+        data = request.query_params
+        query = data.get('query', None)
+        data_id = data.get('id', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':
+            type = request.query_params.get('type', None)   
+           
+            model = SalePaymentsModel.objects.filter(
+                Q(id__icontains = search),
+                sale_id = data_id
+            )
+
+            if type not in [None,  0, '0']:
+                model = model.filter(type = type)
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = SalePaymentsSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+        
+        elif query == 'get':
+            salePaymentSerializer = GetSalePaymentSerializer(data = data)  
+            if not salePaymentSerializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': salePaymentSerializer.errors
+                }, status = 400)    
+                    
+            instance = self.get_object(pk = data_id)
+            serialized = SalePaymentsSerializer(instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            }) 
+        
+        elif query == 'count':
+            total = SalePaymentsModel.objects.filter(
+                sale_id = data_id
+            ).count()
+
+            sale = ManageSalesAPIView.get_object(data_id)
+
+            remaining = SalePaymentsModel.objects.filter(
+                sale_id = data_id
+            ).aggregate(
+                total = Sum(
+                    ExpressionWrapper(
+                        (F('total') - F('commission')) + F('discount'),
+                        output_field = FloatField()
+                    )
+                )
+            )['total']
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total,
+                    'total_payment': sale.total,
+                    'remaining': sale.total - remaining
+                }
+            })     
+
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        with transaction.atomic():
+            user = request.user
+            data = request.data
+            sale_id = data.get('sale_id', 0)
+            subtotal = data.get('subtotal', 0)
+            
+            data['no'] = self.get_max_no()
+            data['date_reg'] = timezone.now()
+            data['user_id'] = user.id
+            
+            payment_pending = self.get_object_pending(sale_id)
+            payment_subtotal = payment_pending.subtotal
+            
+            subtotal_fin = payment_subtotal - subtotal
+            subtotal_fin = round_if_close_to_zero(subtotal_fin, threshold = 0.5)
+
+            if subtotal_fin > 0:
+                item_sale_payment = {
+                    'subtotal': subtotal_fin,
+                    'sale_id': sale_id,
+                    'date_limit': payment_pending.date_limit 
+                }
+
+                item_sale_payment_serializer = AddEditSalePaymentSerializer(data = item_sale_payment)
+                if not item_sale_payment_serializer.is_valid():
+                    transaction.set_rollback(True)
+                    return JsonResponse({'success': False, 'resp': item_sale_payment_serializer.errors}, status = 400)
+
+                item_sale_payment_serializer.save()
+
+                sale_payment_serializer = AddEditSalePaymentSerializer(payment_pending, data = data, payment_method_required = True)
+                if not sale_payment_serializer.is_valid():
+                    transaction.set_rollback(True)
+                    return JsonResponse({'success': False, 'resp': sale_payment_serializer.errors}, status = 400)
+
+                sale_payment_serializer.save()
+            elif subtotal_fin <= 0:
+                sale_payment_serializer = AddEditSalePaymentSerializer(payment_pending, data = data, payment_method_required = True)
+                if not sale_payment_serializer.is_valid():
+                    transaction.set_rollback(True)
+                    return JsonResponse({'success': False, 'resp': sale_payment_serializer.errors}, status = 400)
+
+                sale_payment_serializer.save()
+
+                remaining_subtotal = abs(subtotal_fin)
+                while remaining_subtotal > 0:
+                    r_payment_pending = self.get_object_pending(sale_id)
+                    r_payment_subtotal = r_payment_pending.subtotal
+            
+                    r_subtotal_fin = r_payment_subtotal - remaining_subtotal
+                    r_subtotal_fin = round_if_close_to_zero(r_subtotal_fin, threshold = 0.5)
+
+                    if r_subtotal_fin <= 0:
+                        remaining_subtotal = abs(r_subtotal_fin)
+                        r_item_sale_payment = {
+                            'subtotal': 0,
+                            'date_reg': timezone.now(),
+                            'user_id': user.id
+                        }
+                    else:
+                        remaining_subtotal = 0
+                        r_item_sale_payment = {
+                            'subtotal': r_subtotal_fin
+                        }
+                    
+                    r_item_sale_payment['sale_id'] = sale_id                    
+
+                    r_item_sale_payment_serializer = AddEditSalePaymentSerializer(r_payment_pending, data = r_item_sale_payment)
+                    if not r_item_sale_payment_serializer.is_valid():
+                        transaction.set_rollback(True)
+                        return JsonResponse({'success': False, 'resp': r_item_sale_payment_serializer.errors}, status = 400)
+
+                    r_item_sale_payment_serializer.save()
+
+            return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data  
+        data_id = data.get('id', None)   
+
+        salePaymentSerializer = GetSalePaymentSerializer(data = data)  
+        if not salePaymentSerializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': salePaymentSerializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)
+        
+        sale_payment_serializer = AddEditSalePaymentSerializer(instance, data = data, payment_method_required = True)
+        if not sale_payment_serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': sale_payment_serializer.errors}, status = 400)
+        
+        sale_payment_serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+
 #Sale
 class ManageSalesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
+    @classmethod
     def get_object(self, pk) :
         try:
             return SalesModel.objects.get(pk = pk)
         except SalesModel.DoesNotExist:
             raise Http404('Sale not found.')
     
-    @classmethod
-    def get_last_no(self) :
-        try:
-            last_payment_no = SalePaymentsModel.objects.aggregate(Max('no'))['no__max']
-            
-            if last_payment_no and last_payment_no >= 100000:
-                last_no = last_payment_no + 1
-            else:
-                last_no = 100000
-
-            return last_no
-        except SalePaymentsModel.DoesNotExist:
-            return 100000
-
     def get(self, request):
         data = request.query_params
         query = data.get('query', None)
@@ -1662,7 +1878,9 @@ class ManageSalesAPIView(APIView):
             type = request.query_params.get('type', None)   
            
             model = SalesModel.objects.filter(
-                Q(id__icontains = search)
+                Q(id__icontains = search) |
+                Q(client__person__firstname__icontains = search) |
+                Q(client__person__lastname__icontains = search)
             )
 
             if type not in [None,  0, '0']:
@@ -1683,7 +1901,6 @@ class ManageSalesAPIView(APIView):
                 'total_pages': paginator.num_pages,
                 'current_page': model.number
             })
-
         elif query == 'count':
             total = SalesModel.objects.count()            
             
@@ -1734,13 +1951,13 @@ class ManageSalesAPIView(APIView):
 
                 inventory_serializer.save()
 
-            sale_payment['no'] = self.get_last_no()
+            sale_payment['no'] = ManageSalePaymentsAPIView.get_max_no()
             sale_payment['sale_id'] = sale_instance.id
             sale_payment['user_id'] = user_id
             sale_payment['date_reg'] = timezone.now()
             sale_payment['date_limit'] = timezone.now()
 
-            sale_payment_serializer = AddEditSalePaymentSerializer(data = sale_payment)
+            sale_payment_serializer = AddEditSalePaymentSerializer(data = sale_payment, payment_method_required = True)
             if not sale_payment_serializer.is_valid():
                 transaction.set_rollback(True)
                 return JsonResponse({'success': False, 'resp': sale_payment_serializer.errors}, status = 400)
@@ -1771,93 +1988,46 @@ class ManageSalesAPIView(APIView):
 
             return JsonResponse({'success': True, 'resp': 'Added successfully.'})
 
-    def put(self, request):
-        data = request.data
-
-        payment_method_id = data.get('id', None)
-
-        payment_method_serializer = GetPaymentMethodSerializer(data = data)  
-        if not payment_method_serializer.is_valid():
-            return JsonResponse({
-                'success': False, 
-                'resp': payment_method_serializer.errors
-            }, status = 400)    
-                
-        payment_method_instance = self.get_object(pk = payment_method_id)     
-
-        payment_method_serializer = AddEditPaymentMethodSerializer(payment_method_instance, data = data)
-        if not payment_method_serializer.is_valid():
-            return JsonResponse({'success': False, 'resp': payment_method_serializer.errors}, status = 400)
-
-        payment_method_serializer.save()
-
-        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+#PDF
+class PDFGeneratorAPIView(APIView):
+    authentication_classes = []
+    permission_classes = []
     
-    def delete(self, request):
-        data = request.query_params
-
-        payment_method_id = data.get('id', None)
-
-        payment_method_serializer = GetPaymentMethodSerializer(data = data)  
-        if not payment_method_serializer.is_valid():
-            return JsonResponse({
-                'success': False, 
-                'resp': payment_method_serializer.errors
-            }, status = 400)    
-                
-        payment_method_instance = self.get_object(pk = payment_method_id)           
-        payment_method_instance.delete()
-        
-        return JsonResponse({
-            'success': True,
-            'resp': 'Deleted successfully.'
-        }, status = 200)
-
-#Sale payments
-class ManageSalePaymentsAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    
-    @classmethod
-    def get_object(self, pk) :
-        try:
-            return SalePaymentsModel.objects.get(pk = pk)
-        except SalePaymentsModel.DoesNotExist:
-            raise Http404('Sale payment not found.')
-
     def get(self, request):
         data = request.query_params
-        query = data.get('query', None)
-        data_id = data.get('id', None)
-        search = data.get('search', '')
-        page_number = request.query_params.get('page', 1)
-        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
-        order = request.query_params.get('order', 'desc')
-        show = request.query_params.get('show', 10)
+        payment_id = data.get('id', None)
 
-        if query == 'table':
-            type = request.query_params.get('type', None)   
-           
-            model = SalePaymentsModel.objects.filter(
-                Q(id__icontains = search),
-                sale_id = data_id
-            )
+        instance_payment = ManageSalePaymentsAPIView.get_object(payment_id)
+        instance_sale = instance_payment.sale
+        sale_serialized = SalesSerializer(instance_sale).data
 
-            if type not in [None,  0, '0']:
-                model = model.filter(type = type)
+        for item in sale_serialized['inventory']:
+            item['total'] = item['price'] * item['quantity']
 
-            if order == 'desc':
-                order_by = f'-{order_by}'
+        options = {
+            'encoding': 'UTF-8',
+            'page-width': '80mm', 
+            'page-height': '200mm',
+            'margin-top': '0mm',
+            'margin-right': '0mm',
+            'margin-bottom': '0mm',
+            'margin-left': '0mm',
+            "enable-local-file-access": ""
+        }
 
-            model = model.order_by(order_by)
-            paginator = Paginator(model, show)
-            model = paginator.page(page_number)
+        data = {
+            'uuid': uuid.uuid4(),
+            'payment': instance_payment,
+            'sale': sale_serialized
+        }
 
-            serialized = SalePaymentsSerializer(model, many = True)
+        html = render_to_string('pdf/payment.html', context = data)
 
-            return JsonResponse({
-                'success': True,
-                'resp': serialized.data,
-                'total_pages': paginator.num_pages,
-                'current_page': model.number
-            })
+        #return HttpResponse(html)
+
+        pdf_bytes = pdfkit.from_string(html, False, options=options)
+
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename=factura.pdf'
+
+        return response 

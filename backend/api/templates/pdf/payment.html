@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ticket de Venta</title>
+  <link rel="stylesheet" type="text/css" href="http://127.0.0.1:8000/static/css/payment.css?v={{uuid}}">
+</head>
+<body>
+  <div class="payment">
+    <div class="logo-content">
+      <div class="logo"></div>
+    </div>
+    <div class="company-info">
+      <p class="font-bold">GRUPO INNOVACIÓN EMPRESARIAL SOCIEDAD ANÓNIMA</p>
+      <p>MI HOGAR ELECTRODOMÉSTICOS</p>
+      <p>4 Calle 4-60 zona 2 san lorenzo el cubo</p>
+    </div>
+    <div class="company-more">
+      <div class="item">
+        <p>NIT:</p> <span>120047551</span>
+      </div>
+      <div class="item">
+        <p>TELEFONO:</p> <span>5134-9923</span>
+      </div>
+      <div class="item">
+        <p>SUCURSAL:</p> <span>{{payment.location.name}}</span>
+      </div>
+      <div class="item">
+        <p>ATENDIO:</p> <span>{{payment.user.first_name}}</span>
+      </div>
+    </div>
+    <div class="company-more" style="margin-top: 5mm;">
+      <div class="item">
+        <p>Cliente:</p> <span>{{sale.client.person.firstname}} {{sale.client.person.middlename}} {{sale.client.person.lastname}} {{sale.client.person.second_lastname}}</span>
+      </div>
+      <div class="item">
+        <p>Telefono del cliente:</p> <span>{{sale.client.person.phone}}</span>
+      </div>
+    </div>
+    <div class="payment-info">
+      <div class="item">
+        <p>No. Recibo:</p> <span>{{payment.no}}</span>
+      </div>
+      <div class="item">
+        <p>Fecha:</p> <span>{{payment.date_reg}}</span>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Producto</th>
+          <th>Precio</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in sale.inventory %}
+        <tr>
+          <td>{{item.quantity}}</td>
+          <td>{{item.product.name}}</td>
+          <td>{{item.price}}</td>
+          <td>{{item.total}}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <td></td>
+          <td class="font-bold">TOTAL</td>
+          <td></td>
+          <td>{{sale.total}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="pay">
+      <div class="item">
+        <p>{% if sale.type == 2 %}Abono:{% else %}Subtotal:{% endif %}</p> <span>Q{{payment.subtotal}}</span>
+      </div>
+      <div class="item">
+        <p>{{payment.payment_method.name}}:</p> <span>Q{{payment.commission}}</span>
+      </div>
+      <div class="item">
+        <p>Descuento:</p> <span>Q{{payment.discount}}</span>
+      </div>
+      <div class="item">
+        <p>Total:</p> <span>Q{{payment.total}}</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

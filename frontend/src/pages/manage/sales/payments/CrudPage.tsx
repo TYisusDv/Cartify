@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { ProductBrand, SalePayment } from '../../../../types/modelType';
-import { addProductBrand, deleteProductBrand, editProductBrand, getProductBrand } from '../../../../services/productBrandService';
-import { CreditCardIcon, PercentCircleIcon, ProfileIcon } from 'hugeicons-react';
+import { SalePayment } from '../../../../types/modelType';
+import { CreditCardIcon, PercentCircleIcon } from 'hugeicons-react';
 import useTranslations from '../../../../hooks/useTranslations';
 import Input from '../../../../components/Input';
-import Switch from '../../../../components/Switch';
 import { addAlert } from '../../../../utils/Alerts';
 import { generateUUID } from '../../../../utils/uuidGen';
 import { extractMessages } from '../../../../utils/formUtils';
 import Select from '../../../../components/Select';
 import { CustomChangeEvent } from '../../../../types/componentsType';
+import { addPayment, editPayment, getPayment } from '../../../../services/SalesService';
 
 interface CrudPageProps {
+    saleId: number | undefined;
     onClose: () => void;
     handleTableReload?: () => void;
     setSelected?: (value: string | undefined) => void;
@@ -19,9 +19,10 @@ interface CrudPageProps {
     selected_id?: string | undefined;
 }
 
-const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSelected, type, selected_id }) => {
+const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload, setSelected, type, selected_id }) => {
     const { translations } = useTranslations();
-    const [formValues, setFormValues] = useState<SalePayment>({ id: selected_id });
+    const [updateFlag, setUpdateFlag] = useState(false);
+    const [formValues, setFormValues] = useState<SalePayment>({ id: selected_id, sale_id: saleId });
     const [colorPage, setColorPage] = useState<'blue' | 'orange' | 'red' | 'yellow'>('blue');
 
     useEffect(() => {
@@ -36,7 +37,14 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
         if ((type === 'details' || type === 'delete' || type === 'edit') && selected_id) {
             const fetchGet = async () => {
                 try {
+                    const response = await getPayment(formValues);
+                    const response_resp = response.resp;
 
+                    setFormValues(() => {
+                        let response = response_resp;
+                        response['sale_id'] = saleId;
+                        return response;
+                    });
                 } catch (error) {
                 }
             };
@@ -50,7 +58,13 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
 
         try {
             let response_resp = translations.success;
-
+            if (type === 'add') {
+                const response = await addPayment(formValues);
+                response_resp = response?.resp;
+            } else if (type === 'edit') {
+                const response = await editPayment(formValues);
+                response_resp = response?.resp;
+            }
 
             addAlert({
                 id: generateUUID(),
@@ -79,6 +93,83 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
         }
     };
 
+    useEffect(() => {
+        if (['add'].includes(type)) {
+            if (!updateFlag) return;
+
+            const discount_per = formValues.discount_per || 0;
+
+            if (discount_per >= 0) {
+                const newDiscount = (discount_per * ((formValues.subtotal || 0) + (formValues.commission || 0))) / 100;
+
+                setFormValues(prev => ({
+                    ...prev,
+                    discount: parseFloat(newDiscount.toFixed(2))
+                }));
+            }
+
+            setUpdateFlag(false);
+        }
+    }, [formValues.discount_per]);
+
+    useEffect(() => {
+        if (['add'].includes(type)) {
+            if (!updateFlag) return;
+
+            const discount = formValues.discount || 0;
+
+            if (discount >= 0) {
+                const newDiscountPer = (discount * 100) / ((formValues.subtotal || 0) + (formValues.commission || 0));
+
+                setFormValues(prev => ({
+                    ...prev,
+                    discount_per: parseFloat(newDiscountPer.toFixed(2))
+                }));
+            }
+
+            setUpdateFlag(false);
+        }
+    }, [formValues.discount]);
+
+    useEffect(() => {
+        if (['add'].includes(type)) {
+            setFormValues((prevFormValues) => {
+                const { subtotal = 0, discount = 0, payment_method, pay = 0 } = prevFormValues;
+
+                let cart_subtotal = subtotal;
+
+                const cart_commission = ((payment_method?.value || 0) * cart_subtotal) / 100;
+
+                const cart_total = cart_subtotal + cart_commission - discount;
+                const cart_change = pay - cart_total;
+
+                const roundedCartTotal = parseFloat(cart_total.toFixed(2));
+                const roundedCartSubtotal = parseFloat(cart_subtotal.toFixed(2));
+                const roundedCartCommission = parseFloat(cart_commission.toFixed(2));
+                const roundedCartChange = parseFloat(cart_change.toFixed(2));
+
+                if (
+                    roundedCartSubtotal !== prevFormValues.subtotal ||
+                    roundedCartTotal !== prevFormValues.total ||
+                    roundedCartCommission !== prevFormValues.commission ||
+                    roundedCartChange !== prevFormValues.change
+                ) {
+                    return {
+                        ...prevFormValues,
+                        subtotal: roundedCartSubtotal,
+                        total: roundedCartTotal,
+                        commission: roundedCartCommission,
+                        change: roundedCartChange,
+                    };
+                }
+
+                return prevFormValues;
+            });
+        }
+    }, [
+        formValues
+    ]);
+
     return (
         <form autoComplete='off' onSubmit={onSubmit}>
             <div className='flex flex-col gap-2 w-full'>
@@ -89,16 +180,19 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                         type: 'number',
                         value: formValues.subtotal || 0,
                         min: 0,
+                        step: 0.01,
                         onChange: (e) => {
                             setFormValues(prev => ({
                                 ...prev,
                                 subtotal: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
                             }));
                         },
+                        disabled: ['details', 'delete'].includes(type)
                     }}
-                    label='Cuanto abonara?'
+                    label={['add'].includes(type) ? 'Cuanto abonara?' : 'Total a abonar'}
                     icon={'Q'}
                     required={false}
+                    color={colorPage}
                 />
                 <div className='w-full z-[8]'>
                     <Select
@@ -115,6 +209,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                                 }));
                             },
                             value: formValues.payment_method?.id,
+                            disabled: ['details', 'delete'].includes(type)
                         }}
                         endpoint='manage/paymentmethods'
                         endpoint_value='id'
@@ -123,67 +218,177 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                         label={translations.payment_method}
                     />
                 </div>
-                <Input
-                    props={{
-                        id: 'discount_per',
-                        name: 'discount_per',
-                        type: 'number',
-                        value: formValues.discount_per || 0,
-                        min: 0,
-                        onChange: (e) => {
-                            setFormValues(prev => ({
-                                ...prev,
-                                discount_per: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
-                            }));
-                            //setUpdateFlag(true);
-                        },
-                    }}
-                    label='Descuento'
-                    icon={<PercentCircleIcon className='icon' size={24} />}
-                    required={false}
-                />
-                <Input
-                    props={{
-                        id: 'discount',
-                        name: 'discount',
-                        type: 'number',
-                        value: formValues.discount || 0,
-                        min: 0,
-                        onChange: (e) => {
-                            setFormValues(prev => ({
-                                ...prev,
-                                discount: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
-                            }));
-                            //setUpdateFlag(true);
-                        },
-                    }}
-                    label='Descuento'
-                    icon={'Q'}
-                    required={false}
-                />
-                <Input
-                    props={{
-                        id: 'pay',
-                        name: 'pay',
-                        type: 'number',
-                        value: formValues.pay || 0,
-                        min: 0,
-                        onChange: (e) => {
-                            setFormValues(prev => ({
-                                ...prev,
-                                pay: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
-                            }));
-                        },
-                    }}
-                    label='Con cuanto pago?'
-                    icon={'Q'}
-                    required={false}
-                />
+                {['edit', 'details'].includes(type) && (
+                    <Input
+                        props={{
+                            id: 'commission',
+                            name: 'commission',
+                            type: 'number',
+                            value: formValues.commission || 0,
+                            min: 0,
+                            step: 0.01,
+                            onChange: (e) => {
+                                setFormValues(prev => ({
+                                    ...prev,
+                                    commission: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                }));
+                            },
+                            disabled: ['details', 'delete'].includes(type)
+                        }}
+                        label='Commision'
+                        icon={'Q'}
+                        required={false}
+                        color={colorPage}
+                    />
+                )}
+                <div className='flex gap-2'>
+                    <Input
+                        props={{
+                            id: 'discount_per',
+                            name: 'discount_per',
+                            type: 'number',
+                            value: formValues.discount_per || 0,
+                            min: 0,
+                            step: 0.01,
+                            onChange: (e) => {
+                                setFormValues(prev => ({
+                                    ...prev,
+                                    discount_per: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                }));
+                                setUpdateFlag(true);
+                            },
+                            disabled: ['details', 'delete'].includes(type)
+                        }}
+                        label='Descuento'
+                        icon={<PercentCircleIcon className='icon' size={24} />}
+                        required={false}
+                        color={colorPage}
+                    />
+                    <Input
+                        props={{
+                            id: 'discount',
+                            name: 'discount',
+                            type: 'number',
+                            value: formValues.discount || 0,
+                            min: 0,
+                            step: 0.01,
+                            onChange: (e) => {
+                                setFormValues(prev => ({
+                                    ...prev,
+                                    discount: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                }));
+                                setUpdateFlag(true);
+                            },
+                            disabled: ['details', 'delete'].includes(type)
+                        }}
+                        label='Descuento'
+                        icon={'Q'}
+                        required={false}
+                        color={colorPage}
+                    />
+                </div>
+                {['edit', 'details'].includes(type) && (
+                    <Input
+                        props={{
+                            id: 'total',
+                            name: 'total',
+                            type: 'number',
+                            value: formValues.total || 0,
+                            min: 0,
+                            step: 0.01,
+                            onChange: (e) => {
+                                setFormValues(prev => ({
+                                    ...prev,
+                                    total: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                }));
+                            },
+                            disabled: ['details', 'delete'].includes(type)
+                        }}
+                        label='Total abonado'
+                        icon={'Q'}
+                        required={false}
+                        color={colorPage}
+                    />
+                )}
+                <div className='flex gap-2'>
+                    <Input
+                        props={{
+                            id: 'pay',
+                            name: 'pay',
+                            type: 'number',
+                            value: formValues.pay || 0,
+                            min: 0,
+                            step: 0.01,
+                            onChange: (e) => {
+                                setFormValues(prev => ({
+                                    ...prev,
+                                    pay: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                }));
+                            },
+                            disabled: ['details', 'delete'].includes(type)
+                        }}
+                        label='Con cuanto pago?'
+                        icon={'Q'}
+                        required={false}
+                        color={colorPage}
+                    />
+                    {['edit', 'details'].includes(type) && (
+                        <Input
+                            props={{
+                                id: 'change',
+                                name: 'change',
+                                type: 'number',
+                                value: formValues.change || 0,
+                                min: 0,
+                                step: 0.01,
+                                onChange: (e) => {
+                                    setFormValues(prev => ({
+                                        ...prev,
+                                        change: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                    }));
+                                },
+                                disabled: ['details', 'delete'].includes(type)
+                            }}
+                            label='Cambio'
+                            icon={'Q'}
+                            required={false}
+                            color={colorPage}
+                        />
+                    )}
+                </div>
             </div>
-            <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>
-                <div className='col-span-1 md:col-end-3 w-full'>
+            <div className='grid grid-cols-1 md:grid-cols-2 mt-3'>
+                {['add'].includes(type) && (
+                    <>
+                        <div className='col-span-1 flex flex-col text-lg border-t-0 py-2 dark:border-slate-600 dark:text-slate-300'>
+                            <div className='flex justify-between gap-1'>
+                                <h2 className='font-bold dark:text-white'>Subtotal:</h2>
+                                <span className='font-medium'>Q{formValues.subtotal || 0}</span>
+                            </div>
+                            <div className='flex justify-between gap-1'>
+                                <h2 className='font-bold dark:text-white'>Comisión:</h2>
+                                <span className='font-medium'>Q{formValues.commission || 0}</span>
+                            </div>
+                            <div className='flex justify-between gap-1'>
+                                <h2 className='font-bold dark:text-white'>Descuento:</h2>
+                                <span className='font-medium'>Q{formValues.discount || 0}</span>
+                            </div>
+                        </div>
+                        <div className='col-span-1 flex flex-col items-end text-lg border-t-0 py-2 dark:border-slate-600 dark:text-slate-300'>
+                            <div className='flex flex-col items-end'>
+                                <h2 className='font-bold dark:text-white'>Total:</h2>
+                                <span className='font-medium'>Q{formValues.total || 0}</span>
+                            </div>
+                            <div className='flex flex-col items-end'>
+                                <h2 className='font-bold dark:text-white'>Cambio:</h2>
+                                <span className='font-medium'>Q{formValues.change || 0}</span>
+                            </div>
+                        </div>
+                    </>
+                )}
+                <div className='col-span-1 md:col-span-2 w-full mt-2'>
                     {(type === 'delete' || type === 'edit' || type === 'add') && (
-                        <button type='submit' className={`btn btn-${colorPage} max-w-48 h-12 float-end`}>
+                        <button type='submit' className={`btn btn-${colorPage} max-w-full h-12`}>
                             {translations[type]}
                         </button>
                     )}

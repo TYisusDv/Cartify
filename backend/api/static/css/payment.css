@@ -1,0 +1,117 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.logo {
+    width: 50mm;
+    height: 50mm;
+    background-image: url('/static/images/logo.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.payment {
+    display: flex;
+    flex-direction: column;
+    padding: 3mm;
+    box-sizing: border-box;
+}
+
+.payment .logo-content {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.payment .company-info {
+    display: flex;
+    flex-direction: column;
+    margin-top: -5mm;
+}
+
+.payment .company-info p {
+    text-align: center;
+}
+
+.payment .company-info p:first-child {
+    margin-top: 0;
+}
+
+.payment .company-more {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2mm;
+}
+
+.payment .company-more .item {
+    display: flex;
+    justify-content: space-between;
+}
+
+.payment .company-more .item p {
+    font-weight: bold;
+}
+
+.payment .company-more .item span {
+    margin-left: 2mm;
+}
+
+.payment .payment-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6mm;
+}
+
+.payment .payment-info .item p {
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th {
+    text-align: left;
+    border-bottom: 1px solid #000;
+}
+
+table th,
+table td {
+    padding: 5px;
+}
+
+.payment .pay {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 5mm;
+}
+
+.payment .pay .item {
+    display: flex;
+    width: 100%;
+}
+
+.payment .pay .item p {
+    width: 50%;
+    text-align: end;
+    font-weight: bold;
+}
+
+.payment .pay .item span {
+    width: 50%;
+    text-align: end;
+    margin-left: 2mm;
+}

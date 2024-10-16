@@ -496,45 +496,47 @@ const AppPOSPage: React.FC = () => {
                             <hr className='w-full border dark:border-slate-600 my-2' />
                             {formValues.type === 2 && (
                                 <>
-                                    <div className='w-full'>
-                                        <Input
-                                            props={{
-                                                id: 'quantity_of_payments',
-                                                name: 'quantity_of_payments',
-                                                type: 'number',
-                                                value: formValues.quantity_of_payments || 2,
-                                                min: 2,
-                                                onChange: (e) => {
-                                                    setFormValues(prev => ({
-                                                        ...prev,
-                                                        quantity_of_payments: isNaN(parseFloat(e.target.value)) ? 0 : parseInt(e.target.value)
-                                                    }));
-                                                },
-                                            }}
-                                            label='Cantidad de pagos'
-                                            icon={<MoreIcon size={20} />}
-                                            required={false}
-                                        />
-                                    </div>
-                                    <div className='w-full'>
-                                        <Input
-                                            props={{
-                                                id: 'payment_days',
-                                                name: 'payment_days',
-                                                type: 'number',
-                                                value: formValues.payment_days || 0,
-                                                min: 0,
-                                                onChange: (e) => {
-                                                    setFormValues(prev => ({
-                                                        ...prev,
-                                                        payment_days: isNaN(parseFloat(e.target.value)) ? 0 : parseInt(e.target.value)
-                                                    }));
-                                                },
-                                            }}
-                                            label='Cada cuantos dias'
-                                            icon={<MoreIcon size={20} />}
-                                            required={false}
-                                        />
+                                    <div className='grid grid-cols-2 gap-2'>
+                                        <div className='col-span-1 w-full'>
+                                            <Input
+                                                props={{
+                                                    id: 'quantity_of_payments',
+                                                    name: 'quantity_of_payments',
+                                                    type: 'number',
+                                                    value: formValues.quantity_of_payments || 2,
+                                                    min: 2,
+                                                    onChange: (e) => {
+                                                        setFormValues(prev => ({
+                                                            ...prev,
+                                                            quantity_of_payments: isNaN(parseFloat(e.target.value)) ? 0 : parseInt(e.target.value)
+                                                        }));
+                                                    },
+                                                }}
+                                                label='Cantidad de pagos'
+                                                icon={<MoreIcon size={20} />}
+                                                required={false}
+                                            />
+                                        </div>
+                                        <div className='col-span-1 w-full'>
+                                            <Input
+                                                props={{
+                                                    id: 'payment_days',
+                                                    name: 'payment_days',
+                                                    type: 'number',
+                                                    value: formValues.payment_days || 0,
+                                                    min: 0,
+                                                    onChange: (e) => {
+                                                        setFormValues(prev => ({
+                                                            ...prev,
+                                                            payment_days: isNaN(parseFloat(e.target.value)) ? 0 : parseInt(e.target.value)
+                                                        }));
+                                                    },
+                                                }}
+                                                label='Cada cuantos dias'
+                                                icon={<MoreIcon size={20} />}
+                                                required={false}
+                                            />
+                                        </div>
                                     </div>
                                     <div className='w-full'>
                                         <Input
@@ -581,47 +583,49 @@ const AppPOSPage: React.FC = () => {
                                     label={translations.payment_method}
                                 />
                             </div>
-                            <div className='w-full'>
-                                <Input
-                                    props={{
-                                        id: 'discount_per',
-                                        name: 'discount_per',
-                                        type: 'number',
-                                        value: formValuesPayment.discount_per || 0,
-                                        min: 0,
-                                        onChange: (e) => {
-                                            setFormValuesPayment(prev => ({
-                                                ...prev,
-                                                discount_per: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
-                                            }));
-                                            setUpdateFlag(true);
-                                        },
-                                    }}
-                                    label='Descuento'
-                                    icon={<PercentCircleIcon className='icon' size={24} />}
-                                    required={false}
-                                />
-                            </div>
-                            <div className='w-full'>
-                                <Input
-                                    props={{
-                                        id: 'discount',
-                                        name: 'discount',
-                                        type: 'number',
-                                        value: formValuesPayment.discount || 0,
-                                        min: 0,
-                                        onChange: (e) => {
-                                            setFormValuesPayment(prev => ({
-                                                ...prev,
-                                                discount: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
-                                            }));
-                                            setUpdateFlag(true);
-                                        },
-                                    }}
-                                    label='Descuento'
-                                    icon={'Q'}
-                                    required={false}
-                                />
+                            <div className='grid grid-cols-2 gap-2'>
+                                <div className='col-span-1 w-full'>
+                                    <Input
+                                        props={{
+                                            id: 'discount_per',
+                                            name: 'discount_per',
+                                            type: 'number',
+                                            value: formValuesPayment.discount_per || 0,
+                                            min: 0,
+                                            onChange: (e) => {
+                                                setFormValuesPayment(prev => ({
+                                                    ...prev,
+                                                    discount_per: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                                }));
+                                                setUpdateFlag(true);
+                                            },
+                                        }}
+                                        label='Descuento'
+                                        icon={<PercentCircleIcon className='icon' size={24} />}
+                                        required={false}
+                                    />
+                                </div>
+                                <div className='col-span-1 w-full'>
+                                    <Input
+                                        props={{
+                                            id: 'discount',
+                                            name: 'discount',
+                                            type: 'number',
+                                            value: formValuesPayment.discount || 0,
+                                            min: 0,
+                                            onChange: (e) => {
+                                                setFormValuesPayment(prev => ({
+                                                    ...prev,
+                                                    discount: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                                }));
+                                                setUpdateFlag(true);
+                                            },
+                                        }}
+                                        label='Descuento'
+                                        icon={'Q'}
+                                        required={false}
+                                    />
+                                </div>
                             </div>
                             <div className='w-full'>
                                 <Input

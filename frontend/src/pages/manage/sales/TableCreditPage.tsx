@@ -40,25 +40,7 @@ const TableCreditPage: React.FC<TableCreditPageProps> = ({ data, selected, setSe
                             <span className='flex items-center gap-1'><Invoice03Icon size={22} /> {row.id || '-'}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
-                                <CreditCardIcon size={22} />
-                                {row.sale_payments?.[0]?.payment_method?.name || '-'}
-                            </span>
-                        </td>
-                        <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'><Note01Icon size={22} /> {row.sale_payments?.[0]?.note || '-'}</span>
-                        </td>
-                        <td className='px-6 py-4'>
                             <span className='flex items-center gap-1'>Q {row.total || '-'}</span>
-                        </td>
-                        <td className='px-6 py-4'>
-                            
-                        </td>
-                        <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'><MoreIcon size={22} /> {row.quantity_of_payments || '-'}</span>
-                        </td>
-                        <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'><Invoice04Icon size={22} /> {row.payment_days || '-'}</span>
                         </td>
                         <td className='px-6 py-4'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>

@@ -151,5 +151,8 @@
     "finish_sale_sure": "¿Está seguro/a de que desea finalizar la venta?",
     "manage_sales_info": "Administra las ventas aquí. ¡Agrega, edita y elimina!",
     "manage_sale_payments": "Pagos de la venta",
-    "manage_sale_payments_info": "Administra los pagos de la venta aquí. ¡Agrega y edita!"
+    "manage_sale_payments_info": "Administra los pagos de la venta aquí. ¡Agrega y edita!",
+    "add_payment": "Agregar pago",
+    "edit_payment": "Editar pago",
+    "details_payment": "Detalles del pago"
 }

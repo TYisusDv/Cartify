@@ -237,5 +237,6 @@ export interface SalePayment {
     user?: User;    
     location?: Location;
     payment_method?: PaymentMethod;
-    sale?: Sale
+    sale?: Sale;
+    sale_id?: number;
 }

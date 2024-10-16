@@ -51,7 +51,7 @@ const ManageProductsPage: React.FC = () => {
                 const response = await getCountProducts();
                 const response_resp = response.resp;
 
-                setCountData(response_resp.total);
+                setCountData(response_resp);
             } catch (error) {
             }
         };

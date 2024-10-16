@@ -95,7 +95,7 @@ const PanelPage: React.FC = () => {
             <DropdownMenu
               label={translations.sales}
               icon={<ShoppingBasketSecure03Icon className='w-7' />}
-              links={['/manage/sales', '/manage/sales/credit']}
+              links={['/manage/sales', '/manage/paymentmethods']}
             >
               <li><Link to='/manage/sales' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/sales')}`}><ShoppingBasketSecure03Icon size={20} /> {translations.sales}</Link></li>
               <li><Link to='/manage/paymentmethods' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/paymentmethods')}`}><CreditCardIcon size={20} /> {translations.payment_methods}</Link></li>

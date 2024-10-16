@@ -25,4 +25,5 @@ urlpatterns = [
     path('manage/paymentmethods', ManagePaymentMethodsAPIView.as_view(), name='manage-paymentmethods'),
     path('manage/sales', ManageSalesAPIView.as_view(), name='manage-sales'),
     path('manage/sale/payments', ManageSalePaymentsAPIView.as_view(), name='manage-sale-payments'),
+    path('pdf/payment', PDFGeneratorAPIView.as_view(), name='pdf-payment'),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

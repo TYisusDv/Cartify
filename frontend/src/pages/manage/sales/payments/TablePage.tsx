@@ -46,13 +46,13 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                             <span className='flex items-center gap-1'><Note01Icon size={22} /> {row.note || '-'}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'>Q {row.subtotal ? row.subtotal.toFixed(2) : '-'}</span>
+                            <span className='flex items-center gap-1'>Q {row.subtotal ? row.subtotal.toFixed(2) : 0}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'>Q {row.total ? row.total.toFixed(2) : '-'}</span>
+                            <span className='flex items-center gap-1'>Q {row.total ? (((row.total || 0) - (row.commission || 0)) + (row.discount || 0)).toFixed(2)  : '-'}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'>Q {((row.subtotal || 0) - (row.total || 0)) < 0 ? 0 : ((row.subtotal || 0) - (row.total || 0)).toFixed(2)}</span>
+                            <span className='flex items-center gap-1'>Q {((row.subtotal || 0) - (((row.total || 0) - (row.commission || 0)) + (row.discount || 0))).toFixed(2)}</span>
                         </td>
                         <td className='px-6 py-4'>
                             <div className='flex flex-col gap-2'>
@@ -69,7 +69,7 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                                         }).replace(',', '')
                                         : '-'}                                    
                                 </span>        
-                                { ((row.subtotal || 0) - (row.total || 0)) > 0 && (
+                                { ((row.subtotal || 0) - (((row.total || 0) - (row.commission || 0)) + (row.discount || 0))) > 0 && (
                                     <span className={`inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold rounded-xl ${(calculateDaysRemaining(row.date_limit) || 0) < 0 ? 'bg-red-500' : (calculateDaysRemaining(row.date_limit) || 0) <= 3 ? 'bg-yellow-500' : 'bg-green-500'}`}>
                                         <Calendar01Icon size={22} />
                                         {calculateDaysRemaining(row.date_limit)} dias.                        

@@ -1150,6 +1150,13 @@ class SalePaymentsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AddEditSalePaymentSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        payment_method_required = kwargs.pop('payment_method_required', False)
+
+        super(AddEditSalePaymentSerializer, self).__init__(*args, **kwargs)
+
+        self.fields['payment_method_id'].required = payment_method_required
+
     no = serializers.IntegerField(error_messages = {
         'required': 'The no is required.',
         'blank': 'The no cannot be blank.',
@@ -1269,7 +1276,7 @@ class AddEditSalePaymentSerializer(serializers.ModelSerializer):
         exclude = ['id', 'location', 'payment_method', 'sale', 'user']
 
 class GetSalePaymentSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(error_messages = {
+    id = serializers.UUIDField(error_messages = {
         'required': 'The payment method is required.',
         'blank': 'The payment method cannot be blank.',
         'null': 'The payment method cannot be blank.',
