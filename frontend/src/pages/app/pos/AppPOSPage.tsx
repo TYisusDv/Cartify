@@ -27,10 +27,16 @@ const AppPOSPage: React.FC = () => {
     const [selectedClient, setSelectedClient] = useState(0);
     const [selectedProduct, setSelectedProduct] = useState('');
     const [reloadTableClient, setReloadTableClient] = useState(0);
-    const [formValues, setFormValues] = useState<Sale>({
-        client: { id: selectedClient },
-        type: 1,
+    const [formValues, setFormValues] = useState<Sale>(() => {
+        const savedForm = sessionStorage.getItem('posValues');
+        return savedForm ? JSON.parse(savedForm) : {        
+            client: { 
+                id: selectedClient 
+            },
+            type: 1,
+        };
     });
+
     const [formValuesPayment, setFormValuesPayment] = useState<SalePayment>({
         no: 0,
         subtotal: 0,
@@ -42,9 +48,18 @@ const AppPOSPage: React.FC = () => {
         change: 0,
         payment_method: undefined,
     });
-    const [formValuesDetails, setFormValuesDetails] = useState<Inventory[]>([]);
+
+    const [formValuesDetails, setFormValuesDetails] = useState<Inventory[]>(() => {
+        const savedForm = sessionStorage.getItem('posDetailsValues');
+        return savedForm ? JSON.parse(savedForm) : [];
+    });
 
     const [updateFlag, setUpdateFlag] = useState(false);
+
+    useEffect(() => {
+        sessionStorage.setItem('posValues', JSON.stringify(formValues));
+        sessionStorage.setItem('posDetailsValues', JSON.stringify(formValuesDetails));
+    }, [formValues, formValuesDetails]);
 
     const handleTableReloadClient = () => {
         setReloadTableClient(prev => prev + 1);
@@ -253,22 +268,46 @@ const AppPOSPage: React.FC = () => {
         setUpdateFlag(false);
     }, [formValuesPayment.discount]);
 
+    const handleInvoice = (id: string) => {
+        window.open(`${URL_BACKEND}/pdf/payment?id=${id}`, '_blank');
+    }
+
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
             const response = await addSale(formValues, formValuesDetails, formValuesPayment);
             const response_resp = response?.resp;
+            
+            handleInvoice(response_resp.id);
 
             addAlert({
                 id: generateUUID(),
                 title: 'Success',
-                msg: response_resp,
+                msg: response_resp.msg,
                 icon: 'CheckmarkCircle02Icon',
                 timeout: 2000
             });
 
             setIsModalOpen({ ...isModalOpen, finish: false })
+            setFormValues({        
+                client: { 
+                    id: selectedClient 
+                },
+                type: 1,
+            });
+            setFormValuesPayment({
+                no: 0,
+                subtotal: 0,
+                commission: 0,
+                discount_per: 0,
+                discount: 0,
+                total: 0,
+                pay: 0,
+                change: 0,
+                payment_method: undefined,
+            });
+            setFormValuesDetails([]);
         } catch (error) {
             const messages = extractMessages(error);
             messages.forEach(msg => {

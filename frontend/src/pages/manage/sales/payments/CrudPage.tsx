@@ -9,6 +9,7 @@ import { extractMessages } from '../../../../utils/formUtils';
 import Select from '../../../../components/Select';
 import { CustomChangeEvent } from '../../../../types/componentsType';
 import { addPayment, editPayment, getPayment } from '../../../../services/SalesService';
+import { URL_BACKEND } from '../../../../services/apiService';
 
 interface CrudPageProps {
     saleId: number | undefined;
@@ -53,11 +54,15 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
         }
     }, [type, selected_id]);
 
+    const handleInvoice = (id: string) => {
+        window.open(`${URL_BACKEND}/pdf/payment?id=${id}`, '_blank');
+    }
+
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            let response_resp = translations.success;
+            let response_resp;
             if (type === 'add') {
                 const response = await addPayment(formValues);
                 response_resp = response?.resp;
@@ -65,11 +70,12 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                 const response = await editPayment(formValues);
                 response_resp = response?.resp;
             }
-
+            
+            handleInvoice(response_resp.id);
             addAlert({
                 id: generateUUID(),
                 title: 'Success',
-                msg: response_resp,
+                msg: response_resp.msg,
                 icon: 'CheckmarkCircle02Icon',
                 timeout: 2000
             });

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Add01Icon, Delete02Icon, EyeIcon, Invoice02Icon, Invoice03Icon, MinusSignIcon, PencilEdit02Icon, ShoppingBasketSecure03Icon } from 'hugeicons-react';
+import { Add01Icon, EyeIcon, Invoice02Icon, Invoice03Icon, Invoice04Icon, MinusSignIcon, PencilEdit02Icon, ShoppingBasketSecure03Icon } from 'hugeicons-react';
 import useTranslations from '../../../../hooks/useTranslations';
 import DelayedSuspense from '../../../../components/DelayedSuspense';
 import SkeletonLoader from '../../../../components/SkeletonLoader';
@@ -9,6 +9,7 @@ import TablePage from './TablePage';
 import CrudPage from './CrudPage';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getCountPayments } from '../../../../services/SalesService';
+import { URL_BACKEND } from '../../../../services/apiService';
 
 const Payments: React.FC = () => {
     const { translations } = useTranslations();
@@ -53,6 +54,10 @@ const Payments: React.FC = () => {
         { name: 'user.first_name', headerName: 'Empleado' },
     ];
 
+    const handleInvoice = () => {
+        window.open(`${URL_BACKEND}/pdf/payment?id=${selected}`, '_blank');
+    }
+
     useEffect(() => {
         const fetchCount = async () => {
             try {
@@ -75,6 +80,7 @@ const Payments: React.FC = () => {
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_sale_payments_info}</span>
                 </div>
                 <div className='flex gap-2'>
+                    <button className='bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={handleInvoice} disabled={selected === undefined}><Invoice04Icon /></button>
                     <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === undefined}><PencilEdit02Icon /></button>
                     <button className='bg-orange-500 text-white border-2 border-orange-500 hover:bg-orange-500/20 hover:text-orange-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-orange-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('details', true)} disabled={selected === undefined}><EyeIcon /></button>
                     <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('add', true)}><Add01Icon /></button>

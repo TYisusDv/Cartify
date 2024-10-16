@@ -28,7 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 PDFKIT_CONFIG = {
     'WKHTMLTOPDF_CMD': '/usr/bin/wkhtmltopdf',
 }

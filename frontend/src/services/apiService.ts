@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { getRefreshToken, getToken, removeRefreshToken, removeToken, saveToken } from '../utils/authUtils'; 
 
-export const URL_BACKEND = 'http://127.0.0.1:8000/v1'
+export const URL_BACKEND = process.env.REACT_APP_URL_BACKEND;
+
 const apiService = axios.create({
   baseURL: URL_BACKEND,
 });

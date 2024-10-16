@@ -16,7 +16,7 @@ from .models import *
 from .utils import *
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
-import pdfkit, uuid
+import uuid, qrcode, io
 
 #Login
 class LoginAPIView(APIView):
@@ -627,7 +627,7 @@ class ManageTaxesAPIView(APIView):
 
     def post(self, request):
         data = request.data
-
+    
         tax_serializer = AddEditTaxSerializer(data = data)
         if not tax_serializer.is_valid():
             return JsonResponse({'success': False, 'resp': tax_serializer.errors}, status = 400)
@@ -1761,6 +1761,7 @@ class ManageSalePaymentsAPIView(APIView):
             data = request.data
             sale_id = data.get('sale_id', 0)
             subtotal = data.get('subtotal', 0)
+            invoice_id = None
             
             data['no'] = self.get_max_no()
             data['date_reg'] = timezone.now()
@@ -1776,7 +1777,7 @@ class ManageSalePaymentsAPIView(APIView):
                 item_sale_payment = {
                     'subtotal': subtotal_fin,
                     'sale_id': sale_id,
-                    'date_limit': payment_pending.date_limit 
+                    'date_limit': payment_pending.date_limit + timedelta(minutes = 1)
                 }
 
                 item_sale_payment_serializer = AddEditSalePaymentSerializer(data = item_sale_payment)
@@ -1791,14 +1792,16 @@ class ManageSalePaymentsAPIView(APIView):
                     transaction.set_rollback(True)
                     return JsonResponse({'success': False, 'resp': sale_payment_serializer.errors}, status = 400)
 
-                sale_payment_serializer.save()
+                sale_payment_instance = sale_payment_serializer.save()
+                invoice_id = sale_payment_instance.id
             elif subtotal_fin <= 0:
                 sale_payment_serializer = AddEditSalePaymentSerializer(payment_pending, data = data, payment_method_required = True)
                 if not sale_payment_serializer.is_valid():
                     transaction.set_rollback(True)
                     return JsonResponse({'success': False, 'resp': sale_payment_serializer.errors}, status = 400)
 
-                sale_payment_serializer.save()
+                sale_payment_instance = sale_payment_serializer.save()
+                invoice_id = sale_payment_instance.id
 
                 remaining_subtotal = abs(subtotal_fin)
                 while remaining_subtotal > 0:
@@ -1830,7 +1833,13 @@ class ManageSalePaymentsAPIView(APIView):
 
                     r_item_sale_payment_serializer.save()
 
-            return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+            return JsonResponse({
+                'success': True, 
+                'resp': {
+                    'id': invoice_id,
+                    'msg': 'Added successfully.'
+                }
+            })
 
     def put(self, request):
         data = request.data  
@@ -1849,9 +1858,15 @@ class ManageSalePaymentsAPIView(APIView):
         if not sale_payment_serializer.is_valid():
             return JsonResponse({'success': False, 'resp': sale_payment_serializer.errors}, status = 400)
         
-        sale_payment_serializer.save()
+        sale_payment_instance = sale_payment_serializer.save()
 
-        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+        return JsonResponse({
+            'success': True, 
+            'resp': {
+                'id': sale_payment_instance.id,
+                'msg': 'Edited successfully.'
+            }
+        })
 
 #Sale
 class ManageSalesAPIView(APIView):
@@ -1927,6 +1942,7 @@ class ManageSalesAPIView(APIView):
             payment_days = sale.get('payment_days', 0)
             inventory = data.get('inventory', [])
             sale_payment = data.get('sale_payment', None)
+            invoice_id = None
             
             if not type in [1, 2, '1' '2']:
                 return JsonResponse({'success': False, 'resp': 'Type inventory not found.'}, status = 400)
@@ -1962,7 +1978,8 @@ class ManageSalesAPIView(APIView):
                 transaction.set_rollback(True)
                 return JsonResponse({'success': False, 'resp': sale_payment_serializer.errors}, status = 400)
 
-            sale_payment_serializer.save()
+            sale_payment_instance = sale_payment_serializer.save()
+            invoice_id = sale_payment_instance.id
 
             if type in [2, '2']:
                 quantity_of_payments = int(quantity_of_payments) - 1
@@ -1986,7 +2003,13 @@ class ManageSalesAPIView(APIView):
 
                     item_sale_payment_serializer.save()
 
-            return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+            return JsonResponse({
+                'success': True, 
+                'resp': {
+                    'id': invoice_id,
+                    'msg': 'Added successfully.'
+                }
+            })
 
 #PDF
 class PDFGeneratorAPIView(APIView):
@@ -1998,36 +2021,61 @@ class PDFGeneratorAPIView(APIView):
         payment_id = data.get('id', None)
 
         instance_payment = ManageSalePaymentsAPIView.get_object(payment_id)
+
+        #payment_date_utc = instance_payment.date_reg.strftime('%Y-%m-%dT%H:%M:%SZ')
+
         instance_sale = instance_payment.sale
         sale_serialized = SalesSerializer(instance_sale).data
+
+        sale_serialized['sale_payments'] = sorted(
+            sale_serialized['sale_payments'],
+            key = lambda x: x['date_limit']
+        )
 
         for item in sale_serialized['inventory']:
             item['total'] = item['price'] * item['quantity']
 
-        options = {
-            'encoding': 'UTF-8',
-            'page-width': '80mm', 
-            'page-height': '200mm',
-            'margin-top': '0mm',
-            'margin-right': '0mm',
-            'margin-bottom': '0mm',
-            'margin-left': '0mm',
-            "enable-local-file-access": ""
-        }
+        for item in sale_serialized['sale_payments']:
+            item['subtotal'] = round(item['subtotal'], 2)
+            item['total_without'] = round((item['total'] - item['commission']) + item['discount'], 2)
+            item['date_limit_formatted'] = format_date_local(item['date_limit'])
+
+        current_url = request.build_absolute_uri() 
+
+        qr = qrcode.QRCode(
+            version = 1,
+            error_correction = qrcode.constants.ERROR_CORRECT_L,
+            box_size = 10,
+            border = 4,
+        )
+        qr.add_data(current_url)
+        qr.make(fit = True)
+
+        qr_img = io.BytesIO()
+        img = qr.make_image(fill='black', back_color='white')
+        img.save(qr_img, format='PNG')
+        qr_img.seek(0)
+
+        qr_base64 = base64.b64encode(qr_img.getvalue()).decode('utf-8')       
 
         data = {
             'uuid': uuid.uuid4(),
             'payment': instance_payment,
-            'sale': sale_serialized
+            'payment_date_utc': format_date_local(instance_payment.date_reg),
+            'sale': sale_serialized,
+            'qr': qr_base64
         }
 
         html = render_to_string('pdf/payment.html', context = data)
-
         #return HttpResponse(html)
-
-        pdf_bytes = pdfkit.from_string(html, False, options=options)
-
-        response = HttpResponse(pdf_bytes, content_type='application/pdf')
-        response['Content-Disposition'] = 'inline; filename=factura.pdf'
-
-        return response 
+        
+        pdf_bytes = convert_html_to_pdf(html)
+        if pdf_bytes:
+            response = HttpResponse(pdf_bytes, content_type='application/pdf')
+            response['Content-Disposition'] = 'inline; filename=factura.pdf'
+            return response
+        
+        return JsonResponse({
+            'success': False, 
+            'resp': 'Error generating PDF.'
+        }, status = 500)
