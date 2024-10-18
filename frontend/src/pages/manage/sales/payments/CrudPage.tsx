@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SalePayment } from '../../../../types/modelType';
-import { CreditCardIcon, PercentCircleIcon } from 'hugeicons-react';
+import { Calendar02Icon, CreditCardIcon, Note01Icon, PercentCircleIcon } from 'hugeicons-react';
 import useTranslations from '../../../../hooks/useTranslations';
 import Input from '../../../../components/Input';
 import { addAlert } from '../../../../utils/Alerts';
@@ -70,7 +70,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                 const response = await editPayment(formValues);
                 response_resp = response?.resp;
             }
-            
+
             handleInvoice(response_resp.id);
             addAlert({
                 id: generateUUID(),
@@ -211,6 +211,8 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                                     payment_method: {
                                         id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
                                         value: e.object?.value,
+                                        allow_discount: e.object?.allow_discount,
+                                        allow_note: e.object?.allow_note,
                                     }
                                 }));
                             },
@@ -247,52 +249,72 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                         color={colorPage}
                     />
                 )}
-                <div className='flex gap-2'>
+                {formValues.payment_method?.allow_discount && (
+                    <div className='grid grid-cols-2 gap-2'>
+                        <div className='col-span-1 w-full'>
+                            <Input
+                                props={{
+                                    id: 'discount_per',
+                                    name: 'discount_per',
+                                    type: 'number',
+                                    value: formValues.discount_per || 0,
+                                    min: 0,
+                                    onChange: (e) => {
+                                        setFormValues(prev => ({
+                                            ...prev,
+                                            discount_per: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                        }));
+                                        setUpdateFlag(true);
+                                    },
+                                    disabled: ['details', 'delete'].includes(type)
+                                }}
+                                label='Descuento'
+                                icon={<PercentCircleIcon className='icon' size={24} />}
+                                required={false}
+                            />
+                        </div>
+                        <div className='col-span-1 w-full'>
+                            <Input
+                                props={{
+                                    id: 'discount',
+                                    name: 'discount',
+                                    type: 'number',
+                                    value: formValues.discount || 0,
+                                    min: 0,
+                                    onChange: (e) => {
+                                        setFormValues(prev => ({
+                                            ...prev,
+                                            discount: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                        }));
+                                        setUpdateFlag(true);
+                                    },
+                                    disabled: ['details', 'delete'].includes(type)
+                                }}
+                                label='Descuento'
+                                icon={'Q'}
+                                required={false}
+                            />
+                        </div>
+                    </div>
+                )}
+                {formValues.payment_method?.allow_note && (
                     <Input
                         props={{
-                            id: 'discount_per',
-                            name: 'discount_per',
-                            type: 'number',
-                            value: formValues.discount_per || 0,
-                            min: 0,
-                            step: 0.01,
+                            name: 'note',
+                            value: formValues.note || '',
                             onChange: (e) => {
                                 setFormValues(prev => ({
                                     ...prev,
-                                    discount_per: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                    note: e.target.value
                                 }));
-                                setUpdateFlag(true);
                             },
                             disabled: ['details', 'delete'].includes(type)
                         }}
-                        label='Descuento'
-                        icon={<PercentCircleIcon className='icon' size={24} />}
+                        label='Nota'
+                        icon={<Note01Icon />}
                         required={false}
-                        color={colorPage}
                     />
-                    <Input
-                        props={{
-                            id: 'discount',
-                            name: 'discount',
-                            type: 'number',
-                            value: formValues.discount || 0,
-                            min: 0,
-                            step: 0.01,
-                            onChange: (e) => {
-                                setFormValues(prev => ({
-                                    ...prev,
-                                    discount: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
-                                }));
-                                setUpdateFlag(true);
-                            },
-                            disabled: ['details', 'delete'].includes(type)
-                        }}
-                        label='Descuento'
-                        icon={'Q'}
-                        required={false}
-                        color={colorPage}
-                    />
-                </div>
+                )}
                 {['edit', 'details'].includes(type) && (
                     <Input
                         props={{
@@ -362,6 +384,29 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                         />
                     )}
                 </div>
+                {['edit', 'details'].includes(type) && (
+                    <Input
+                        props={{
+                            id: 'date_limit',
+                            name: 'date_limit',
+                            type: 'datetime-local',
+                            value: formValues.date_limit
+                                ? new Date(formValues.date_limit).toISOString().slice(0, 16)
+                                : '',
+                            onChange: (e) => {
+                                setFormValues(prev => ({
+                                    ...prev,
+                                    date_limit: e.target.value ? new Date(e.target.value).toISOString() : undefined
+                                }));
+                            },
+                            disabled: ['details', 'delete'].includes(type)
+                        }}
+                        label='Fecha limite'
+                        icon={<Calendar02Icon />}
+                        required={false}
+                        color={colorPage}
+                    />
+                )}
             </div>
             <div className='grid grid-cols-1 md:grid-cols-2 mt-3'>
                 {['add'].includes(type) && (

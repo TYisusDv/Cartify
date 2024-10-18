@@ -1,7 +1,7 @@
 import React from 'react';
 import useTranslations from '../../../hooks/useTranslations';
 import Select from '../../../components/Select';
-import { MoreIcon } from 'hugeicons-react';
+import { MoreIcon, StoreLocation01Icon } from 'hugeicons-react';
 
 interface FiltersPageProps {
     formValues?: any;
@@ -21,7 +21,6 @@ const FiltersPage: React.FC<FiltersPageProps> = ({ formValues, setFormValues, se
             <div className='col-span-1 w-full h-full rounded-2xl dark:bg-slate-700'>
                 <Select
                     props={{
-                        id: 'type_of_sale',
                         name: 'type_of_sale',
                         onChange: (e) => {
                             setValue(isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value));
@@ -37,6 +36,30 @@ const FiltersPage: React.FC<FiltersPageProps> = ({ formValues, setFormValues, se
                     myOptions={type_of_sales_options}
                     icon={<MoreIcon size={20} />}
                     label={translations.type_of_sale}
+                />
+            </div>
+            <div className='col-span-1 w-full h-full rounded-2xl dark:bg-slate-700'>
+                <Select
+                    props={{
+                        id: 'location',
+                        name: 'location',
+                        onChange: (e) => {
+                            if (setFormValues) {
+                                setFormValues((prev: any) => ({
+                                    ...prev,
+                                    location: {
+                                        id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                    }
+                                }));
+                            };
+                        },
+                        value: formValues.location?.id,
+                    }}
+                    endpoint='manage/locations'
+                    endpoint_value='id'
+                    endpoint_text='{name}'
+                    icon={<StoreLocation01Icon size={20} />}
+                    label={translations.location}
                 />
             </div>
         </>

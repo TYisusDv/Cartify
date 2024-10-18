@@ -50,6 +50,7 @@ const Payments: React.FC = () => {
         { name: 'subtotal', headerName: 'Total a pagar' },
         { name: 'total', headerName: 'Total pagado' },
         { name: '', headerName: 'Total restante' },
+        { name: 'location.name', headerName: 'Sucursal' },
         { name: 'date_limit', headerName: 'Fecha limite' },        
         { name: 'user.first_name', headerName: 'Empleado' },
     ];

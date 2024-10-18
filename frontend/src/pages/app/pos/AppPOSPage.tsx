@@ -3,7 +3,7 @@ import useTranslations from '../../../hooks/useTranslations';
 import DelayedSuspense from '../../../components/DelayedSuspense';
 import SkeletonLoader from '../../../components/SkeletonLoader';
 import Input from '../../../components/Input';
-import { Add01Icon, CheckmarkCircle02Icon, CreditCardIcon, Mail01Icon, MoreIcon, PercentCircleIcon, Search01Icon, SecurityCheckIcon, ShoppingBasket01Icon, ShoppingCartAdd02Icon, ShoppingCartCheckIn02Icon, StoreLocation01Icon, TelephoneIcon, UserAccountIcon } from 'hugeicons-react';
+import { Add01Icon, CheckmarkCircle02Icon, CreditCardIcon, Mail01Icon, MoreIcon, Note01Icon, PercentCircleIcon, Search01Icon, SecurityCheckIcon, ShoppingBasket01Icon, ShoppingCartAdd02Icon, ShoppingCartCheckIn02Icon, StoreLocation01Icon, TelephoneIcon, UserAccountIcon } from 'hugeicons-react';
 import Select from '../../../components/Select';
 import Modal from '../../../components/Modal';
 import Table from '../../../components/Table';
@@ -29,9 +29,9 @@ const AppPOSPage: React.FC = () => {
     const [reloadTableClient, setReloadTableClient] = useState(0);
     const [formValues, setFormValues] = useState<Sale>(() => {
         const savedForm = sessionStorage.getItem('posValues');
-        return savedForm ? JSON.parse(savedForm) : {        
-            client: { 
-                id: selectedClient 
+        return savedForm ? JSON.parse(savedForm) : {
+            client: {
+                id: selectedClient
             },
             type: 1,
         };
@@ -278,7 +278,7 @@ const AppPOSPage: React.FC = () => {
         try {
             const response = await addSale(formValues, formValuesDetails, formValuesPayment);
             const response_resp = response?.resp;
-            
+
             handleInvoice(response_resp.id);
 
             addAlert({
@@ -290,9 +290,9 @@ const AppPOSPage: React.FC = () => {
             });
 
             setIsModalOpen({ ...isModalOpen, finish: false })
-            setFormValues({        
-                client: { 
-                    id: selectedClient 
+            setFormValues({
+                client: {
+                    id: selectedClient
                 },
                 type: 1,
             });
@@ -498,14 +498,14 @@ const AppPOSPage: React.FC = () => {
                                         id: 'location',
                                         name: 'location',
                                         onChange: (e: CustomChangeEvent) => {
-                                            setFormValuesPayment(prev => ({
+                                            setFormValues(prev => ({
                                                 ...prev,
                                                 location: {
                                                     id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
                                                 }
                                             }));
                                         },
-                                        value: formValuesPayment.location?.id,
+                                        value: formValues.location?.id,
                                     }}
                                     endpoint='manage/locations'
                                     endpoint_value='id'
@@ -610,6 +610,8 @@ const AppPOSPage: React.FC = () => {
                                                 payment_method: {
                                                     id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
                                                     value: e.object?.value,
+                                                    allow_discount: e.object?.allow_discount,
+                                                    allow_note: e.object?.allow_note,
                                                 }
                                             }));
                                         },
@@ -622,50 +624,70 @@ const AppPOSPage: React.FC = () => {
                                     label={translations.payment_method}
                                 />
                             </div>
-                            <div className='grid grid-cols-2 gap-2'>
-                                <div className='col-span-1 w-full'>
+                            {formValuesPayment.payment_method?.allow_discount && (
+                                <div className='grid grid-cols-2 gap-2'>
+                                    <div className='col-span-1 w-full'>
+                                        <Input
+                                            props={{
+                                                id: 'discount_per',
+                                                name: 'discount_per',
+                                                type: 'number',
+                                                value: formValuesPayment.discount_per || 0,
+                                                min: 0,
+                                                onChange: (e) => {
+                                                    setFormValuesPayment(prev => ({
+                                                        ...prev,
+                                                        discount_per: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                                    }));
+                                                    setUpdateFlag(true);
+                                                },
+                                            }}
+                                            label='Descuento'
+                                            icon={<PercentCircleIcon className='icon' size={24} />}
+                                            required={false}
+                                        />
+                                    </div>
+                                    <div className='col-span-1 w-full'>
+                                        <Input
+                                            props={{
+                                                id: 'discount',
+                                                name: 'discount',
+                                                type: 'number',
+                                                value: formValuesPayment.discount || 0,
+                                                min: 0,
+                                                onChange: (e) => {
+                                                    setFormValuesPayment(prev => ({
+                                                        ...prev,
+                                                        discount: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                                    }));
+                                                    setUpdateFlag(true);
+                                                },
+                                            }}
+                                            label='Descuento'
+                                            icon={'Q'}
+                                            required={false}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                            {formValuesPayment.payment_method?.allow_note && (
                                     <Input
                                         props={{
-                                            id: 'discount_per',
-                                            name: 'discount_per',
-                                            type: 'number',
-                                            value: formValuesPayment.discount_per || 0,
-                                            min: 0,
+                                            name: 'note',
+                                            value: formValuesPayment.note || '',
                                             onChange: (e) => {
                                                 setFormValuesPayment(prev => ({
                                                     ...prev,
-                                                    discount_per: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                                    note: e.target.value
                                                 }));
-                                                setUpdateFlag(true);
                                             },
                                         }}
-                                        label='Descuento'
-                                        icon={<PercentCircleIcon className='icon' size={24} />}
+                                        label='Nota'
+                                        icon={<Note01Icon />}
                                         required={false}
                                     />
-                                </div>
-                                <div className='col-span-1 w-full'>
-                                    <Input
-                                        props={{
-                                            id: 'discount',
-                                            name: 'discount',
-                                            type: 'number',
-                                            value: formValuesPayment.discount || 0,
-                                            min: 0,
-                                            onChange: (e) => {
-                                                setFormValuesPayment(prev => ({
-                                                    ...prev,
-                                                    discount: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
-                                                }));
-                                                setUpdateFlag(true);
-                                            },
-                                        }}
-                                        label='Descuento'
-                                        icon={'Q'}
-                                        required={false}
-                                    />
-                                </div>
-                            </div>
+                                )
+                            }
                             <div className='w-full'>
                                 <Input
                                     props={{

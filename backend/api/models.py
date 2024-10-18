@@ -227,6 +227,8 @@ class PaymentMethodsModel(models.Model):
     name = models.CharField(null = False, blank = False)
     value = models.FloatField(default = 0, null = False, blank = False)
     status = models.BooleanField(default = True, null = False, blank = False)
+    allow_discount = models.BooleanField(default = True, null = False, blank = False)
+    allow_note = models.BooleanField(default = True, null = False, blank = False)
     
     class Meta: 
         db_table = 'payment_methods'
@@ -238,7 +240,9 @@ class SalesModel(models.Model):
     quantity_of_payments = models.IntegerField(default = 1, null = False, blank = False)
     payment_days = models.IntegerField(null = True, blank = False)
     date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
-    client = models.ForeignKey(ClientsModel, null = False, blank = False, related_name='client_sales', on_delete = models.RESTRICT)
+    client = models.ForeignKey(ClientsModel, null = False, blank = False, on_delete = models.RESTRICT)
+    location = models.ForeignKey(LocationsModel, null = False, blank = False, on_delete = models.RESTRICT)
+    user = models.ForeignKey(User, null = False, blank = False, on_delete = models.RESTRICT)
 
     class Meta: 
         db_table = 'sales'

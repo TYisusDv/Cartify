@@ -144,6 +144,32 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                     label={translations.visible}
                     color={colorPage}
                 />
+                <Switch
+                    props={{
+                        name: 'allow_discount',
+                        checked: !!(formValues.allow_discount === true || formValues.allow_discount === 1 || formValues.allow_discount === '1'),
+                        onChange: (e) => setFormValues(prev => ({
+                            ...prev,
+                            allow_discount: e.target.checked ? true : false
+                        })),
+                        disabled: ['details', 'delete'].includes(type)
+                    }}
+                    label='Permitir descuento'
+                    color={colorPage}
+                />
+                <Switch
+                    props={{
+                        name: 'allow_note',
+                        checked: !!(formValues.allow_note === true || formValues.allow_note === 1 || formValues.allow_note === '1'),
+                        onChange: (e) => setFormValues(prev => ({
+                            ...prev,
+                            allow_note: e.target.checked ? true : false
+                        })),
+                        disabled: ['details', 'delete'].includes(type)
+                    }}
+                    label='Permitir nota / referencia'
+                    color={colorPage}
+                />
             </div>
             <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>
                 <div className='col-span-1 md:col-end-3 w-full'>

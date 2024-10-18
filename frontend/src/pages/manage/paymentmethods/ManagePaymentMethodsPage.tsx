@@ -28,6 +28,8 @@ const ManagePaymentMethodsPage: React.FC = () => {
     const table_header = [
         { name: 'name', headerName: translations.name },
         { name: 'value', headerName: translations.value_per },
+        { name: 'allow_discount', headerName: 'Permitir descuento' },
+        { name: 'allow_note', headerName: 'Permitir nota' },
         { name: 'status', headerName: translations.status },
     ];
 

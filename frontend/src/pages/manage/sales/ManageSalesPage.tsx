@@ -7,7 +7,6 @@ import SkeletonLoader from '../../../components/SkeletonLoader';
 import Table from '../../../components/Table';
 import TablePage from './TablePage';
 import FiltersPage from './filtersPage';
-import TableCreditPage from './TableCreditPage';
 import { Link } from 'react-router-dom';
 
 const ManageSalesPage: React.FC = () => {
@@ -17,24 +16,6 @@ const ManageSalesPage: React.FC = () => {
     const [reloadTable, setReloadTable] = useState(0);
     const [countData, setCountData] = useState(0);
     const [typeOfSale, setTypeOfSale] = useState(0);
-
-    const initialTableHeader = [
-        { name: 'date_reg', headerName: 'Fecha de registro' },
-        { name: 'id', headerName: 'No. Factura' },
-        { name: 'id', headerName: 'Metodo de pago' },
-        { name: 'id', headerName: 'Nota y referencia' },
-        { name: 'total', headerName: 'Total' },
-        { name: 'id', headerName: 'Sucursal' },
-        { name: 'client.person.firstname', headerName: 'Cliente' },
-        { name: 'id', headerName: 'Empleado' },
-        { name: 'id', headerName: 'Productos' }
-    ];
-
-    const [tableHeader, setTableHeader] = useState(initialTableHeader);
-
-    const initialTbody = <TablePage selected={selected} setSelected={setSelected} />
-    
-    const [tableTbody, setTableTbody] = useState(initialTbody);
 
     const handleTableReload = () => {
         setReloadTable(prev => prev + 1);
@@ -58,24 +39,15 @@ const ManageSalesPage: React.FC = () => {
         fetchCount();
     }, [reloadTable]);
 
-    useEffect(() => {
-        if(typeOfSale === 2){
-            setTableHeader([
-                { name: 'date_reg', headerName: 'Fecha de registro' },
-                { name: 'id', headerName: 'Estado de factura' },
-                { name: 'id', headerName: 'No. Factura' },
-                { name: 'total', headerName: 'Total' },
-                { name: 'id', headerName: 'Sucursal' },
-                { name: 'client.person.firstname', headerName: 'Cliente' },
-                { name: 'id', headerName: 'Empleado' },
-                { name: 'id', headerName: 'Productos' }
-            ]);
-            setTableTbody(<TableCreditPage selected={selected} setSelected={setSelected} />);
-        } else {
-            setTableHeader(initialTableHeader);
-            setTableTbody(initialTbody);            
-        }
-    }, [typeOfSale, selected]);
+    const table_header = [
+        { name: 'date_reg', headerName: 'Fecha de registro' },
+        { name: 'id', headerName: 'No. Factura' },
+        { name: 'total', headerName: 'Total' },
+        { name: 'location.name', headerName: 'Sucursal' },
+        { name: 'client.person.firstname', headerName: 'Cliente' },
+        { name: 'user.first_name', headerName: 'Empleado' },
+        { name: '', headerName: 'Productos' }
+    ];
 
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
@@ -85,9 +57,7 @@ const ManageSalesPage: React.FC = () => {
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_sales_info}</span>
                 </div>
                 <div className='flex gap-2'>
-                    <button className='bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('delete', true)} disabled={selected === 0}><Delete02Icon /></button>
                     <Link to={`/manage/sale/payments?id=${selected}`}><button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === 0}><Invoice02Icon /></button></Link>
-                    <button className='bg-orange-500 text-white border-2 border-orange-500 hover:bg-orange-500/20 hover:text-orange-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-orange-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('details', true)} disabled={selected === 0}><EyeIcon /></button>
                     <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('add', true)}><Add01Icon /></button>
                 </div>
             </div>
@@ -106,8 +76,8 @@ const ManageSalesPage: React.FC = () => {
                 <div className='w-full mt-6'>
                     <Table endpoint='manage/sales' 
                         reloadTable={reloadTable} 
-                        header={tableHeader} 
-                        tbody={tableTbody} 
+                        header={table_header} 
+                        tbody={<TablePage selected={selected} setSelected={setSelected} />} 
                         filters={
                             <FiltersPage
                                 setValue={setTypeOfSale}

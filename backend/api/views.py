@@ -1891,6 +1891,7 @@ class ManageSalesAPIView(APIView):
 
         if query == 'table':
             type = request.query_params.get('type', None)   
+            location_id = request.query_params.get('location[id]', None)   
            
             model = SalesModel.objects.filter(
                 Q(id__icontains = search) |
@@ -1900,6 +1901,9 @@ class ManageSalesAPIView(APIView):
 
             if type not in [None,  0, '0']:
                 model = model.filter(type = type)
+            
+            if location_id not in [None,  0, '0']:
+                model = model.filter(location_id = location_id)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -1940,9 +1944,12 @@ class ManageSalesAPIView(APIView):
             type = sale.get('type', None)
             quantity_of_payments = sale.get('quantity_of_payments', 0)
             payment_days = sale.get('payment_days', 0)
+            location = sale.get('location', None)
             inventory = data.get('inventory', [])
             sale_payment = data.get('sale_payment', None)
             invoice_id = None
+
+            sale['user_id'] = user_id
             
             if not type in [1, 2, '1' '2']:
                 return JsonResponse({'success': False, 'resp': 'Type inventory not found.'}, status = 400)
@@ -1956,7 +1963,7 @@ class ManageSalesAPIView(APIView):
 
             for item_inventory in inventory:
                 item_inventory['sale_id'] = sale_instance.id
-                item_inventory['location'] = sale_payment.get('location', None)
+                item_inventory['location'] = location
                 item_inventory['user_id'] = user_id
                 item_inventory['type_id'] = 3
 
@@ -1970,6 +1977,7 @@ class ManageSalesAPIView(APIView):
             sale_payment['no'] = ManageSalePaymentsAPIView.get_max_no()
             sale_payment['sale_id'] = sale_instance.id
             sale_payment['user_id'] = user_id
+            sale_payment['location'] = location
             sale_payment['date_reg'] = timezone.now()
             sale_payment['date_limit'] = timezone.now()
 

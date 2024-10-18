@@ -205,6 +205,8 @@ export interface PaymentMethod {
     name?: string;
     value?: number;
     status?: boolean | '0' | '1' | 0 | 1;
+    allow_discount?: boolean | '0' | '1' | 0 | 1;
+    allow_note?: boolean | '0' | '1' | 0 | 1;
 }
 
 //Sale
@@ -216,6 +218,8 @@ export interface Sale {
     payment_days?: number;
     date_reg?: Date;  
     client?: Client;
+    location?: Location;
+    user?: User;
     sale_payments?: SalePayment[];
     inventory?: Inventory[];
 }
@@ -233,7 +237,7 @@ export interface SalePayment {
     change?: number;     
     note?: string;
     date_reg?: Date;  
-    date_limit?: Date;  
+    date_limit?: string;  
     user?: User;    
     location?: Location;
     payment_method?: PaymentMethod;

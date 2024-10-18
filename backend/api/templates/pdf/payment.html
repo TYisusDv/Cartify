@@ -72,16 +72,16 @@
     </table>
     <div class="pay">
       <div class="item">
-        <p>{% if sale.type == 2 %}Abono:{% else %}Subtotal:{% endif %}</p> <span>Q{{payment.subtotal}}</span>
+        <p>{% if sale.type == 2 %}Abono:{% else %}Subtotal:{% endif %}</p> <span>Q{{payment.subtotal|floatformat:2}}</span>
       </div>
       <div class="item">
-        <p>{{payment.payment_method.name}}:</p> <span>Q{{payment.commission}}</span>
+        <p>{{payment.payment_method.name}}:</p> <span>Q{{payment.commission|floatformat:2}}</span>
       </div>
       <div class="item">
-        <p>Descuento:</p> <span>Q{{payment.discount}}</span>
+        <p>Descuento:</p> <span>Q{{payment.discount|floatformat:2}}</span>
       </div>
       <div class="item">
-        <p>Total:</p> <span>Q{{payment.total}}</span>
+        <p>Total:</p> <span>Q{{payment.total|floatformat:2}}</span>
       </div>
     </div>
     {% if sale.type == 2 %}
@@ -99,8 +99,8 @@
         {% for item in sale.sale_payments %}
         <tr>
           <td>{% if item.no %}{{item.no}}{% else %}-{% endif %}</td>
-          <td>Q{{item.subtotal}}</td>
-          <td>Q{{item.total_without}}</td>
+          <td>Q{{item.subtotal|floatformat:2}}</td>
+          <td>Q{{item.total_without|floatformat:2}}</td>
           <td>{{item.date_limit_formatted}}</td>
         </tr>
         {% endfor %}

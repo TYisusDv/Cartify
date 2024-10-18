@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
+from django.utils.timezone import localtime
 from .models import *
 import json, base64
 
@@ -913,6 +914,20 @@ class AddEditPaymentMethodSerializer(serializers.ModelSerializer):
         'invalid': 'The value is invalid.',
     }, required = False)
 
+    allow_discount = serializers.BooleanField(error_messages = {
+        'required': 'The allow discount is required.',
+        'blank': 'The allow discount cannot be blank.',
+        'null': 'The allow discount cannot be blank.',
+        'invalid': 'The allow discount is invalid.',
+    }, required = False)
+
+    allow_note = serializers.BooleanField(error_messages = {
+        'required': 'The allow note is required.',
+        'blank': 'The allow note cannot be blank.',
+        'null': 'The allow note cannot be blank.',
+        'invalid': 'The allow note is invalid.',
+    }, required = False)
+
     status = serializers.BooleanField(error_messages = {
         'required': 'The status is required.',
         'blank': 'The status cannot be blank.',
@@ -1145,6 +1160,14 @@ class SalePaymentsSerializer(serializers.ModelSerializer):
     location = LocationsSerializer(read_only = True)
     user = UserExcludeSerializer(read_only = True)
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        
+        if instance.date_limit:
+            representation['date_limit'] = instance.date_limit.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+        
+        return representation
+    
     class Meta:
         model = SalePaymentsModel
         fields = '__all__'
@@ -1162,6 +1185,12 @@ class AddEditSalePaymentSerializer(serializers.ModelSerializer):
         'blank': 'The no cannot be blank.',
         'null': 'The no cannot be blank.',
         'invalid': 'The no is invalid.',
+    }, required = False)
+
+    note = serializers.CharField(error_messages = {
+        'required': 'The note is required.',
+        'blank': 'The note cannot be blank.',
+        'null': 'The note cannot be blank.',
     }, required = False)
 
     subtotal = serializers.FloatField(error_messages = {
@@ -1292,6 +1321,8 @@ class SalesSerializer(serializers.ModelSerializer):
     client = ClientsSerializer(read_only = True)
     sale_payments = SalePaymentsSerializer(source = 'sale_payments_sale', many = True, read_only = True)
     inventory = InventorySerializer(source = 'inventory_sale', many = True, read_only = True)
+    location = LocationsSerializer(read_only = True)
+    user = UserExcludeSerializer(read_only = True)
 
     class Meta:
         model = SalesModel
@@ -1333,18 +1364,44 @@ class AddEditSaleSerializer(serializers.ModelSerializer):
         'invalid': 'The client is invalid.',
     })
 
+    location_id = serializers.IntegerField(error_messages = {
+        'required': 'The location is required.',
+        'blank': 'The location cannot be blank.',
+        'null': 'The location cannot be blank.',
+        'invalid': 'The location is invalid.',
+    })
+
+    user_id = serializers.IntegerField(error_messages = {
+        'required': 'The user is required.',
+        'blank': 'The user cannot be blank.',
+        'null': 'The user cannot be blank.',
+        'invalid': 'The user is invalid.',
+    })
+
     def to_internal_value(self, data):
         if 'client' in data and isinstance(data['client'], dict) and 'id' in data['client']:
             data['client_id'] = data['client']['id']
         
+        if 'location' in data and isinstance(data['location'], dict) and 'id' in data['location']:
+            data['location_id'] = data['location']['id']
+        
+        if 'user' in data and isinstance(data['user'], dict) and 'id' in data['user']:
+            data['user_id'] = data['user']['id']
+    
         if data.get('client_id') in [0, '0']:
             data['client_id'] = None
+        
+        if data.get('location_id') in [0, '0']:
+            data['location_id'] = None
+        
+        if data.get('user_id') in [0, '0']:
+            data['user_id'] = None
 
         return super().to_internal_value(data)
     
     class Meta:
         model = SalesModel
-        exclude = ['id', 'client']
+        exclude = ['id', 'client', 'location', 'user']
 
 class GetSaleSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(error_messages = {

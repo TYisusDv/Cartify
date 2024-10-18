@@ -35,23 +35,14 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                         </td>
                         <td className='px-6 py-4'>
                             <span className='flex items-center gap-1'><Invoice03Icon size={22} /> {row.id || '-'}</span>
-                        </td>
-                        <td className='px-6 py-4'>
-                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
-                                <CreditCardIcon size={22} />
-                                {row.sale_payments?.[0]?.payment_method?.name || '-'}
-                            </span>
-                        </td>
-                        <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'><Note01Icon size={22} /> {row.sale_payments?.[0]?.note || '-'}</span>
-                        </td>
+                        </td>                        
                         <td className='px-6 py-4'>
                             <span className='flex items-center gap-1'>Q {row.total || '-'}</span>
                         </td>
                         <td className='px-6 py-4'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
                                 <StoreLocation01Icon size={22} />
-                                {row.sale_payments?.[0]?.location?.name || '-'}
+                                {row.location?.name || '-'}
                             </span>
                         </td>
                         <td className='px-6 py-4'>
@@ -60,7 +51,7 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                         <td className='px-6 py-4'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
                                 <UserIcon size={22} />
-                                {row.sale_payments?.[0]?.user?.first_name || '-'}
+                                {row.user?.first_name || '-'}
                             </span>
                         </td>
                         <td className='px-6 py-4'>

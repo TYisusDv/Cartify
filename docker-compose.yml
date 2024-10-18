@@ -6,11 +6,13 @@ services:
     volumes:
       - ./backend:/app
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     env_file:
       - ./.env
     depends_on:
       - db
+    networks:
+      - cartify_network
     
   frontend:
     build: 
@@ -19,16 +21,26 @@ services:
     volumes:
       - ./frontend:/app
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     env_file:
       - ./.env
+    networks:
+      - cartify_network
 
   db:
     image: postgres:16
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
     env_file:
       - ./.env
+    networks:
+      - cartify_network
 
 volumes:
   postgres_data:
+
+networks:
+  cartify_network:
+    driver: bridge
