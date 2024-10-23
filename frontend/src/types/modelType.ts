@@ -230,11 +230,12 @@ export interface SalePayment {
     no?: number;
     subtotal?: number;
     commission?: number;
+    surcharge?: number;
     discount_per?: number;
     discount?: number;
     total?: number;
     pay?: number;  
-    change?: number;     
+    change?: number;
     note?: string;
     date_reg?: Date;  
     date_limit?: string;  
@@ -243,4 +244,11 @@ export interface SalePayment {
     payment_method?: PaymentMethod;
     sale?: Sale;
     sale_id?: number;
+}
+
+//Sale receipt
+export interface SaleReceipt {
+    id?: number;
+    prompter?: string;
+    description?: string;
 }

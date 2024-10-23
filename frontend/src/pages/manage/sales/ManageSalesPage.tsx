@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getCountSuppliers } from '../../../services/suppliersService';
-import { Add01Icon, Delete02Icon, DistributionIcon, EyeIcon, Invoice02Icon, PencilEdit02Icon } from 'hugeicons-react';
+import { Invoice02Icon, ShoppingBasketSecure03Icon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import DelayedSuspense from '../../../components/DelayedSuspense';
 import SkeletonLoader from '../../../components/SkeletonLoader';
@@ -15,7 +15,6 @@ const ManageSalesPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, details: false });
     const [reloadTable, setReloadTable] = useState(0);
     const [countData, setCountData] = useState(0);
-    const [typeOfSale, setTypeOfSale] = useState(0);
 
     const handleTableReload = () => {
         setReloadTable(prev => prev + 1);
@@ -58,14 +57,13 @@ const ManageSalesPage: React.FC = () => {
                 </div>
                 <div className='flex gap-2'>
                     <Link to={`/manage/sale/payments?id=${selected}`}><button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === 0}><Invoice02Icon /></button></Link>
-                    <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('add', true)}><Add01Icon /></button>
                 </div>
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t-2 border-b-2 border-gray-100 py-6 dark:border-slate-600'>
                     <div className='col-span-1 flex items-center gap-3 pb-0 dark:border-slate-600'>
                         <div className='flex justify-center items-center h-12 w-12 bg-gray-200 rounded-full dark:bg-slate-600 dark:text-white'>
-                            <DistributionIcon />
+                            <ShoppingBasketSecure03Icon />
                         </div>
                         <div>
                             <h2 className='text-sm u font-semibold text-gray-600 dark:text-slate-400'>Total</h2>
@@ -78,11 +76,7 @@ const ManageSalesPage: React.FC = () => {
                         reloadTable={reloadTable} 
                         header={table_header} 
                         tbody={<TablePage selected={selected} setSelected={setSelected} />} 
-                        filters={
-                            <FiltersPage
-                                setValue={setTypeOfSale}
-                            />
-                        }
+                        filters={<FiltersPage />}
                     />
                 </div>
             </div>            

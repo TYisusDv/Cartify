@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { isAuthenticated } from './utils/authUtils';
 import { getTheme } from './utils/themeUtils';
@@ -6,8 +6,8 @@ import PreLoader from './components/PreLoader';
 import DelayedSuspense from './components/DelayedSuspense';
 import AlertsList from './components/AlertList';
 
-const AuthPage = React.lazy(() => import('./pages/auth/authPage'));
-const PanelPage = React.lazy(() => import('./pages/panelPage'));
+const AuthPage = React.lazy(() => import('./controllers/authPage'));
+const PanelPage = React.lazy(() => import('./controllers/panelPage'));
 
 function App() {
   const applyTheme = useCallback((theme: string) => {

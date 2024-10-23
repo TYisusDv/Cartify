@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SalePayment } from '../../../../types/modelType';
-import { Calendar02Icon, CreditCardIcon, Note01Icon, PercentCircleIcon } from 'hugeicons-react';
+import { Calendar02Icon, CreditCardIcon, Note01Icon, PercentCircleIcon, StoreLocation01Icon } from 'hugeicons-react';
 import useTranslations from '../../../../hooks/useTranslations';
 import Input from '../../../../components/Input';
 import { addAlert } from '../../../../utils/Alerts';
@@ -106,7 +106,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
             const discount_per = formValues.discount_per || 0;
 
             if (discount_per >= 0) {
-                const newDiscount = (discount_per * ((formValues.subtotal || 0) + (formValues.commission || 0))) / 100;
+                const newDiscount = (discount_per * ((formValues.subtotal || 0) + (formValues.surcharge || 0) + (formValues.commission || 0))) / 100;
 
                 setFormValues(prev => ({
                     ...prev,
@@ -125,7 +125,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
             const discount = formValues.discount || 0;
 
             if (discount >= 0) {
-                const newDiscountPer = (discount * 100) / ((formValues.subtotal || 0) + (formValues.commission || 0));
+                const newDiscountPer = (discount * 100) / ((formValues.subtotal || 0) + (formValues.surcharge || 0) + (formValues.commission || 0));
 
                 setFormValues(prev => ({
                     ...prev,
@@ -140,24 +140,26 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
     useEffect(() => {
         if (['add'].includes(type)) {
             setFormValues((prevFormValues) => {
-                const { subtotal = 0, discount = 0, payment_method, pay = 0 } = prevFormValues;
+                const { subtotal = 0, discount = 0, payment_method, pay = 0, surcharge = 0 } = prevFormValues;
 
                 let cart_subtotal = subtotal;
 
-                const cart_commission = ((payment_method?.value || 0) * cart_subtotal) / 100;
+                const cart_commission = ((payment_method?.value || 0) * (cart_subtotal + surcharge)) / 100;
 
-                const cart_total = cart_subtotal + cart_commission - discount;
+                const cart_total = cart_subtotal + cart_commission + surcharge - discount;
                 const cart_change = pay - cart_total;
 
                 const roundedCartTotal = parseFloat(cart_total.toFixed(2));
                 const roundedCartSubtotal = parseFloat(cart_subtotal.toFixed(2));
                 const roundedCartCommission = parseFloat(cart_commission.toFixed(2));
+                const roundedCartSurcharge = parseFloat(surcharge.toFixed(2));
                 const roundedCartChange = parseFloat(cart_change.toFixed(2));
 
                 if (
                     roundedCartSubtotal !== prevFormValues.subtotal ||
                     roundedCartTotal !== prevFormValues.total ||
                     roundedCartCommission !== prevFormValues.commission ||
+                    roundedCartSurcharge !== prevFormValues.surcharge ||
                     roundedCartChange !== prevFormValues.change
                 ) {
                     return {
@@ -165,6 +167,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                         subtotal: roundedCartSubtotal,
                         total: roundedCartTotal,
                         commission: roundedCartCommission,
+                        surcharge: roundedCartSurcharge,
                         change: roundedCartChange,
                     };
                 }
@@ -179,6 +182,28 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
     return (
         <form autoComplete='off' onSubmit={onSubmit}>
             <div className='flex flex-col gap-2 w-full'>
+                <div className='w-full z-10'>
+                    <Select
+                        props={{
+                            id: 'location',
+                            name: 'location',
+                            onChange: (e: CustomChangeEvent) => {
+                                setFormValues(prev => ({
+                                    ...prev,
+                                    location: {
+                                        id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                    }
+                                }));
+                            },
+                            value: formValues.location?.id,
+                        }}
+                        endpoint='manage/locations'
+                        endpoint_value='id'
+                        endpoint_text='{name}'
+                        icon={<StoreLocation01Icon size={20} />}
+                        label={translations.location}
+                    />
+                </div>
                 <Input
                     props={{
                         id: 'subtotal',
@@ -208,6 +233,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                             onChange: (e: CustomChangeEvent) => {
                                 setFormValues(prev => ({
                                     ...prev,
+                                    note: undefined,
                                     payment_method: {
                                         id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
                                         value: e.object?.value,
@@ -226,6 +252,26 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                         label={translations.payment_method}
                     />
                 </div>
+                <Input
+                    props={{
+                        name: 'surcharge',
+                        type: 'number',
+                        value: formValues.surcharge || 0,
+                        min: 0,
+                        step: 0.01,
+                        onChange: (e) => {
+                            setFormValues(prev => ({
+                                ...prev,
+                                surcharge: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                            }));
+                        },
+                        disabled: ['details', 'delete'].includes(type)
+                    }}
+                    label='Recargo'
+                    icon={'Q'}
+                    required={false}
+                    color={colorPage}
+                />
                 {['edit', 'details'].includes(type) && (
                     <Input
                         props={{
@@ -271,6 +317,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                                 label='Descuento'
                                 icon={<PercentCircleIcon className='icon' size={24} />}
                                 required={false}
+                                color={colorPage}
                             />
                         </div>
                         <div className='col-span-1 w-full'>
@@ -293,6 +340,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                                 label='Descuento'
                                 icon={'Q'}
                                 required={false}
+                                color={colorPage}
                             />
                         </div>
                     </div>
@@ -301,7 +349,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                     <Input
                         props={{
                             name: 'note',
-                            value: formValues.note || '',
+                            value: formValues.note,
                             onChange: (e) => {
                                 setFormValues(prev => ({
                                     ...prev,
@@ -313,6 +361,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                         label='Nota'
                         icon={<Note01Icon />}
                         required={false}
+                        color={colorPage}
                     />
                 )}
                 {['edit', 'details'].includes(type) && (
@@ -415,6 +464,10 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                             <div className='flex justify-between gap-1'>
                                 <h2 className='font-bold dark:text-white'>Subtotal:</h2>
                                 <span className='font-medium'>Q{formValues.subtotal || 0}</span>
+                            </div>
+                            <div className='flex justify-between gap-1'>
+                                <h2 className='font-bold dark:text-white'>Recargo:</h2>
+                                <span className='font-medium'>Q{formValues.surcharge || 0}</span>
                             </div>
                             <div className='flex justify-between gap-1'>
                                 <h2 className='font-bold dark:text-white'>Comisión:</h2>

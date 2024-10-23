@@ -13,7 +13,7 @@ def parse_json(request, key, default):
 def round_if_close_to_zero(value, threshold = 0.5):
     return 0 if abs(value) <= threshold else value
 
-def format_date_local(payment_date_utc):
+def format_datetime_local(payment_date_utc):
     local_timezone = pytz.timezone('America/Mexico_City')
 
     if isinstance(payment_date_utc, str):
@@ -22,6 +22,19 @@ def format_date_local(payment_date_utc):
     if isinstance(payment_date_utc, datetime):
         payment_date_local = payment_date_utc.astimezone(local_timezone)
         payment_date_formatted = payment_date_local.strftime('%d/%m/%Y %I:%M %p')
+        return payment_date_formatted
+    
+    return None
+
+def format_date_local(payment_date_utc):
+    local_timezone = pytz.timezone('America/Mexico_City')
+
+    if isinstance(payment_date_utc, str):
+        payment_date_utc = datetime.fromisoformat(payment_date_utc.replace('Z', '+00:00'))
+
+    if isinstance(payment_date_utc, datetime):
+        payment_date_local = payment_date_utc.astimezone(local_timezone)
+        payment_date_formatted = payment_date_local.strftime('%d/%m/%Y')
         return payment_date_formatted
     
     return None

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Add01Icon, BrandfetchIcon, Delete02Icon, PencilEdit02Icon } from 'hugeicons-react';
+import { Add01Icon, Delete02Icon, PencilEdit02Icon, SearchAreaIcon } from 'hugeicons-react';
 import { getCountInventoryTypes } from '../../../../services/inventoryTypesService';
 import useTranslations from '../../../../hooks/useTranslations';
 import DelayedSuspense from '../../../../components/DelayedSuspense';
@@ -60,7 +60,7 @@ const ManageInventoryTypesPage: React.FC = () => {
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t-2 border-b-2 border-gray-100 py-6 dark:border-slate-600'>
                     <div className='col-span-1 flex items-center gap-3 pb-0 dark:border-slate-600'>
                         <div className='flex justify-center items-center h-12 w-12 bg-gray-200 rounded-full dark:bg-slate-600 dark:text-white'>
-                            <BrandfetchIcon />
+                            <SearchAreaIcon />
                         </div>
                         <div>
                             <h2 className='text-sm u font-semibold text-gray-600 dark:text-slate-400'>Total</h2>

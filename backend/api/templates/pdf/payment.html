@@ -12,14 +12,14 @@
     <div class="company-info">
       <p class="font-bold">GRUPO INNOVACIÓN EMPRESARIAL SOCIEDAD ANÓNIMA</p>
       <p class="font-bold" style="margin-top: 10px;">MI HOGAR ELECTRODOMÉSTICOS</p>
-      <p>4 Calle 4-60 zona 2 san lorenzo el cubo</p>
+      <p>{{address.description}}</p>
     </div>
     <div class="company-more">
       <div class="item">
-        <p>Nit:</p> <span>120047551</span>
+        <p>Nit:</p> <span>{{nit.description}}</span>
       </div>
       <div class="item">
-        <p>Tel:</p> <span>5134-9923</span>
+        <p>Tel:</p> <span>{{tel.description}}</span>
       </div>
       <div class="item">
         <p>Sucursal:</p> <span>{{payment.location.name}}</span>
@@ -62,7 +62,7 @@
           <td>Q{{item.total}}</td>
         </tr>
         {% endfor %}
-        <tr>
+        <tr style="border-top: 1px solid black;">
           <td></td>
           <td class="font-bold">TOTAL</td>
           <td></td>
@@ -74,6 +74,11 @@
       <div class="item">
         <p>{% if sale.type == 2 %}Abono:{% else %}Subtotal:{% endif %}</p> <span>Q{{payment.subtotal|floatformat:2}}</span>
       </div>
+      {% if sale.type == 2 %}
+      <div class="item">
+        <p>Recargo:</p> <span>Q{{payment.surcharge|floatformat:2}}</span>
+      </div>
+      {% endif %}
       <div class="item">
         <p>{{payment.payment_method.name}}:</p> <span>Q{{payment.commission|floatformat:2}}</span>
       </div>

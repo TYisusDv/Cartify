@@ -49,10 +49,10 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                             <span className='flex items-center gap-1'>Q {row.subtotal ? row.subtotal.toFixed(2) : 0}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'>Q {row.total ? (((row.total || 0) - (row.commission || 0)) + (row.discount || 0)).toFixed(2)  : '-'}</span>
+                            <span className='flex items-center gap-1'>Q {row.total ? (((row.total || 0) - (row.commission || 0) - (row.surcharge || 0)) + (row.discount || 0)).toFixed(2)  : '-'}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'>Q {((row.subtotal || 0) - (((row.total || 0) - (row.commission || 0)) + (row.discount || 0))).toFixed(2)}</span>
+                            <span className='flex items-center gap-1'>Q {((row.subtotal || 0) - (((row.total || 0) - (row.commission || 0) - (row.surcharge || 0)) + (row.discount || 0))).toFixed(2)}</span>
                         </td>
                         <td className='px-6 py-4'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
@@ -94,7 +94,7 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                 ))
             ) : (
                 <tr>
-                    <td colSpan={2} className='px-6 py-4 text-center dark:text-white'>{translations.no_data}</td>
+                    <td colSpan={10} className='px-6 py-4 text-center dark:text-white'>{translations.no_data}</td>
                 </tr>
             )}
         </tbody>

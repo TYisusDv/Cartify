@@ -79,7 +79,7 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                 ))
             ) : (
                 <tr>
-                    <td colSpan={8} className='px-6 py-6 text-center dark:text-white'>{translations.no_data}</td>
+                    <td colSpan={10} className='px-6 py-6 text-center dark:text-white'>{translations.no_data}</td>
                 </tr>
             )}
         </tbody>

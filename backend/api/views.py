@@ -1117,6 +1117,7 @@ class ManageInventoryTypesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
+    @classmethod
     def get_object(self, pk) :
         try:
             return InventoryTypesModel.objects.get(pk = pk)
@@ -1282,9 +1283,22 @@ class AppInventoryAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
+    @classmethod
     def get_object(self, pk) :
         try:
             return InventoryModel.objects.get(pk = pk)
+        except InventoryModel.DoesNotExist:
+            raise Http404('Inventory not found.')
+        
+    
+    @classmethod
+    def get_product_entries(cls, product_id):
+        try:
+            total_entries = InventoryModel.objects.filter(product_id = product_id, type_inventory = 1).aggregate(total_quantity = Sum('quantity'))['total_quantity'] or 0            
+            total_exits = InventoryModel.objects.filter(product_id = product_id, type_inventory = 2).aggregate(total_quantity = Sum('quantity'))['total_quantity'] or 0
+            
+            total_inventory = total_entries - total_exits
+            return total_inventory
         except InventoryModel.DoesNotExist:
             raise Http404('Inventory not found.')
 
@@ -1432,7 +1446,21 @@ class AppInventoryAPIView(APIView):
                 return JsonResponse({'success': False, 'resp': 'You need to do a movement'}, status = 400)    
 
             for movement in movements:
+                product = movement.get('product', {})
+                product_id = product.get('id', None)
+                product_name = product.get('name', None)
+                type_movement = movement.get('type', {})
+                type_id = type_movement.get('id', None)
+
+                type_movement_instance = ManageInventoryTypesAPIView.get_object(type_id)
+                type_inventory = type_movement_instance.type
+                if type_inventory == 2:
+                    if self.get_product_entries(product_id) < movement.get('quantity', 0):
+                        transaction.set_rollback(True)
+                        return JsonResponse({'success': False, 'resp': f'There is not enough {product_name} product in the location.'}, status = 400)
+
                 movement['user_id'] = user_id
+                movement['type_inventory'] = type_inventory
 
                 inventory_serializer = AddEditInventorySerializer(data = movement)
                 if not inventory_serializer.is_valid():
@@ -1735,7 +1763,7 @@ class ManageSalePaymentsAPIView(APIView):
             ).aggregate(
                 total = Sum(
                     ExpressionWrapper(
-                        (F('total') - F('commission')) + F('discount'),
+                        (F('total') - F('commission') - F('surcharge')) + F('discount'),
                         output_field = FloatField()
                     )
                 )
@@ -2019,6 +2047,140 @@ class ManageSalesAPIView(APIView):
                 }
             })
 
+#Sale receipt
+class ManageSaleReceiptAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    @classmethod
+    def get_object(self, pk) :
+        try:
+            return SaleReceiptModel.objects.get(pk = pk)
+        except SaleReceiptModel.DoesNotExist:
+            raise Http404('Sale receipt not found.')
+    
+    @classmethod
+    def get_object_prompter(self, prompter) :
+        try:
+            return SaleReceiptModel.objects.get(prompter = prompter)
+        except SaleReceiptModel.DoesNotExist:
+            raise Http404('Sale receipt prompter not found.')
+
+    def get(self, request):
+        data = request.query_params
+        data_id = data.get('id', None)
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':
+            model = SaleReceiptModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = SaleReceiptSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            sale_receipt_serializer = GetSaleReceiptSerializer(data = data)  
+            if not sale_receipt_serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': sale_receipt_serializer.errors
+                }, status = 400)    
+                    
+            sale_receipt_instance = self.get_object(pk = data_id)
+            sale_receipt_serialized = SaleReceiptSerializer(sale_receipt_instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': sale_receipt_serialized.data
+            }) 
+        
+        elif query == 'count':
+            total = SaleReceiptModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+
+        serializer = AddEditSaleReceiptSerializer(data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        sale_receipt_id = data.get('id', None)
+
+        serializer = GetSaleReceiptSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = sale_receipt_id)     
+
+        serializer = AddEditSaleReceiptSerializer(instance, data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        sale_receipt_id = data.get('id', None)
+
+        serializer = GetSaleReceiptSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = sale_receipt_id)           
+        instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
+
 #PDF
 class PDFGeneratorAPIView(APIView):
     authentication_classes = []
@@ -2045,7 +2207,7 @@ class PDFGeneratorAPIView(APIView):
 
         for item in sale_serialized['sale_payments']:
             item['subtotal'] = round(item['subtotal'], 2)
-            item['total_without'] = round((item['total'] - item['commission']) + item['discount'], 2)
+            item['total_without'] = round((item['total'] - item['commission'] - item['surcharge']) + item['discount'], 2)
             item['date_limit_formatted'] = format_date_local(item['date_limit'])
 
         current_url = request.build_absolute_uri() 
@@ -2069,9 +2231,12 @@ class PDFGeneratorAPIView(APIView):
         data = {
             'uuid': uuid.uuid4(),
             'payment': instance_payment,
-            'payment_date_utc': format_date_local(instance_payment.date_reg),
+            'payment_date_utc': format_datetime_local(instance_payment.date_reg),
             'sale': sale_serialized,
-            'qr': qr_base64
+            'qr': qr_base64,
+            'address': ManageSaleReceiptAPIView.get_object_prompter('address'),
+            'nit': ManageSaleReceiptAPIView.get_object_prompter('nit'),
+            'tel': ManageSaleReceiptAPIView.get_object_prompter('tel')
         }
 
         html = render_to_string('pdf/payment.html', context = data)

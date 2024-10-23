@@ -252,6 +252,7 @@ class SalePaymentsModel(models.Model):
     no = models.IntegerField(unique = True, null = True, blank = False)
     subtotal = models.FloatField(default = 0, null = False, blank = False)
     commission = models.FloatField(default = 0, null = False, blank = False)
+    surcharge = models.FloatField(default = 0, null = False, blank = False)
     discount_per = models.FloatField(default = 0, null = False, blank = False)
     discount = models.FloatField(default = 0, null = False, blank = False)
     total = models.FloatField(default = 0, null = False, blank = False)
@@ -268,6 +269,14 @@ class SalePaymentsModel(models.Model):
     class Meta: 
         db_table = 'sales_payments'
 
+class SaleReceiptModel(models.Model):
+    id = models.AutoField(primary_key = True, editable = False)
+    prompter = models.CharField(max_length = 50, unique = True, null = False, blank = False)
+    description = models.CharField(null = False, blank = False)
+    
+    class Meta: 
+        db_table = 'sale_receipt'
+
 class InventoryTypesModel(models.Model):
     id = models.AutoField(primary_key = True)
     name = models.CharField(max_length = 100, null = False, blank = False)
@@ -282,6 +291,7 @@ class InventoryModel(models.Model):
     cost = models.FloatField(default = 0, null = False, blank = False)
     quantity = models.FloatField(default = 0, null = False, blank = False)
     note = models.CharField(max_length = 100, null = True, blank = False)
+    type_inventory = models.IntegerField(null = False, blank = False)
     date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
     type = models.ForeignKey(InventoryTypesModel, on_delete = models.RESTRICT)
     product = models.ForeignKey(ProductsModel, on_delete = models.RESTRICT)

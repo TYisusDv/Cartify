@@ -6,10 +6,9 @@ import { MoreIcon, StoreLocation01Icon } from 'hugeicons-react';
 interface FiltersPageProps {
     formValues?: any;
     setFormValues?: (values: any) => void;
-    setValue: (value: number) => void;
 }
 
-const FiltersPage: React.FC<FiltersPageProps> = ({ formValues, setFormValues, setValue }) => {
+const FiltersPage: React.FC<FiltersPageProps> = ({ formValues, setFormValues }) => {
     const { translations } = useTranslations();
     const type_of_sales_options = [
         { value: 1, label: 'Contado' },
@@ -23,7 +22,6 @@ const FiltersPage: React.FC<FiltersPageProps> = ({ formValues, setFormValues, se
                     props={{
                         name: 'type_of_sale',
                         onChange: (e) => {
-                            setValue(isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value));
                             if (setFormValues) {
                                 setFormValues((prev: any) => ({
                                     ...prev,

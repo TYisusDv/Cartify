@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { login } from '../../services/authService';
-import { AuthLoginValues } from '../../types/auth';
+import { login } from '../services/authService';
+import { AuthLoginValues } from '../types/auth';
 import { UserAccountIcon, LockPasswordIcon } from 'hugeicons-react';
-import { saveRefreshToken, saveToken } from '../../utils/authUtils';
-import Input from '../../components/Input';
-import { extractMessages } from '../../utils/formUtils';
-import { addAlert } from '../../utils/Alerts';
-import { generateUUID } from '../../utils/uuidGen';
+import { saveRefreshToken, saveToken } from '../utils/authUtils';
+import Input from '../components/Input';
+import { extractMessages } from '../utils/formUtils';
+import { addAlert } from '../utils/Alerts';
+import { generateUUID } from '../utils/uuidGen';
 
 const AuthPage: React.FC = () => {
   const [formValues, setFormValues] = useState<AuthLoginValues>({ username: '', password: '' });
+  
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -78,6 +79,7 @@ const AuthPage: React.FC = () => {
                     id: 'password',
                     name: 'password',
                     value: formValues.password,
+                    type: 'password',
                     onChange: (e) => setFormValues(prev => ({
                       ...prev,
                       password: e.target.value || ''
@@ -90,7 +92,7 @@ const AuthPage: React.FC = () => {
             </div>
             <div className='grid grid-cols-1 md:grid-cols-2 w-full gap-2 mt-6'>
               <div className='col-span-1 md:col-end-3'>
-                <button className='btn'>Log in</button>
+                <button className='btn btn-blue'>Log in</button>
               </div>
             </div>
           </form>

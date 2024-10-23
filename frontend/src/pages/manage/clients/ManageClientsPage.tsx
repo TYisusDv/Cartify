@@ -14,7 +14,7 @@ const ManageClientsPage: React.FC = () => {
     const [selected, setSelected] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, details: false });
     const [reloadTable, setReloadTable] = useState(0);
-    const [countData, setCountData] = useState({total: 0, visible: 0, hidden: 0});
+    const [countData, setCountData] = useState({total: 0});
 
     const handleTableReload = () => {
         setReloadTable(prev => prev + 1);
@@ -42,7 +42,7 @@ const ManageClientsPage: React.FC = () => {
                 const response = await getCountClients();
                 const response_resp = response.resp;
 
-                setCountData(response_resp.total);
+                setCountData(response_resp);
             } catch (error) {
             }
         };

@@ -1031,6 +1031,13 @@ class AddEditInventorySerializer(serializers.ModelSerializer):
         'max_length': 'The note cannot exceed 100 characters.',
     }, required= False, max_length = 100, allow_blank = True, allow_null = True)
 
+    type_inventory = serializers.IntegerField(error_messages = {
+        'required': 'The type inventory is required.',
+        'blank': 'The type inventory cannot be blank.',
+        'null': 'The type inventory cannot be blank.',
+        'invalid': 'The type inventory is invalid.',
+    })
+
     product_id = serializers.UUIDField(error_messages = {
         'required': 'The product is required.',
         'blank': 'The product cannot be blank.',
@@ -1207,6 +1214,13 @@ class AddEditSalePaymentSerializer(serializers.ModelSerializer):
         'invalid': 'The commission is invalid.',
     }, required = False)
 
+    surcharge = serializers.FloatField(error_messages = {
+        'required': 'The surcharge is required.',
+        'blank': 'The surcharge cannot be blank.',
+        'null': 'The surcharge cannot be blank.',
+        'invalid': 'The surcharge is invalid.',
+    }, required = False)
+
     discount_per = serializers.FloatField(error_messages = {
         'required': 'The discount per is required.',
         'blank': 'The discount per cannot be blank.',
@@ -1306,10 +1320,10 @@ class AddEditSalePaymentSerializer(serializers.ModelSerializer):
 
 class GetSalePaymentSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(error_messages = {
-        'required': 'The payment method is required.',
-        'blank': 'The payment method cannot be blank.',
-        'null': 'The payment method cannot be blank.',
-        'invalid': 'The payment method is invalid.',
+        'required': 'The sale payment is required.',
+        'blank': 'The sale payment cannot be blank.',
+        'null': 'The sale payment cannot be blank.',
+        'invalid': 'The sale payment is invalid.',
     })
     
     class Meta:
@@ -1405,12 +1419,49 @@ class AddEditSaleSerializer(serializers.ModelSerializer):
 
 class GetSaleSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(error_messages = {
-        'required': 'The payment method is required.',
-        'blank': 'The payment method cannot be blank.',
-        'null': 'The payment method cannot be blank.',
-        'invalid': 'The payment method is invalid.',
+        'required': 'The sale is required.',
+        'blank': 'The sale cannot be blank.',
+        'null': 'The sale cannot be blank.',
+        'invalid': 'The sale is invalid.',
     })
     
     class Meta:
         model = SalesModel
+        fields = ['id']
+
+#Sale receipt
+class SaleReceiptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleReceiptModel
+        fields = '__all__'
+
+class AddEditSaleReceiptSerializer(serializers.ModelSerializer):
+    prompter = serializers.CharField(error_messages = {
+        'required': 'The prompter is required.',
+        'blank': 'The prompter cannot be blank.',
+        'null': 'The prompter cannot be blank.',
+        'max_length': 'The street cannot exceed 50 characters.',
+    }, max_length = 50)
+
+    description = serializers.CharField(error_messages = {
+        'required': 'The prompter is required.',
+        'blank': 'The prompter cannot be blank.',
+        'null': 'The prompter cannot be blank.',
+        'max_length': 'The street cannot exceed 254 characters.',
+    }, max_length = 254)
+
+    class Meta:
+        model = SaleReceiptModel
+        exclude = ['id']
+
+class GetSaleReceiptSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The sale receipt is required.',
+        'blank': 'The sale receipt cannot be blank.',
+        'null': 'The sale receipt cannot be blank.',
+        'invalid': 'The sale receipt is invalid.',
+    })
+    
+    class Meta:
+        model = SaleReceiptModel
         fields = ['id']

@@ -154,5 +154,9 @@
     "manage_sale_payments_info": "Administra los pagos de la venta aquí. ¡Agrega y edita!",
     "add_payment": "Agregar pago",
     "edit_payment": "Editar pago",
-    "details_payment": "Detalles del pago"
+    "details_payment": "Detalles del pago",
+    "receipt": "Recibo",
+    "add_receipt": "Agregar al recibo",
+    "edit_receipt": "Editar al recibo",
+    "manage_receipt": "Administra los datos del recibo aquí. ¡Agrega y edita!"
 }
