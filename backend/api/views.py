@@ -1660,14 +1660,14 @@ class ManageSalePaymentsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     
     @classmethod
-    def get_object(cls, pk) :
+    def get_object(self, pk) :
         try:
             return SalePaymentsModel.objects.get(pk = pk)
         except SalePaymentsModel.DoesNotExist:
             raise Http404('Sale payment not found.')
     
     @classmethod
-    def get_object_pending(cls, sale_id):
+    def get_object_pending(self, sale_id):
         try:
             sale_payments = SalePaymentsModel.objects.filter(sale_id = sale_id)
             
@@ -1685,7 +1685,7 @@ class ManageSalePaymentsAPIView(APIView):
             raise Http404('Sale payment not found.')
 
     @classmethod
-    def get_max_no(cls) :
+    def get_max_no(self) :
         try:
             max_payment_no = SalePaymentsModel.objects.aggregate(Max('no'))['no__max']
             
@@ -1697,6 +1697,35 @@ class ManageSalePaymentsAPIView(APIView):
             return max_no
         except SalePaymentsModel.DoesNotExist:
             return 100000
+    
+    @classmethod
+    def get_paid(self, sale_id) :
+        try:
+            paid = SalePaymentsModel.objects.filter(
+                sale_id = sale_id
+            ).aggregate(
+                total = Sum(
+                    ExpressionWrapper (
+                        (F('total') - F('commission') - F('surcharge')) + F('discount'),
+                        output_field = FloatField()
+                    )
+                )
+            )['total']
+
+            return paid
+        except:
+            raise Http404('Sale remaining error.')
+
+    @classmethod
+    def get_remaining(self, sale_id) :
+        try:
+            sale_instance = ManageSalesAPIView.get_object(sale_id)
+            remaining = self.get_paid(sale_id)
+
+            total = sale_instance.total - remaining
+            return total
+        except:
+            raise Http404('Sale remaining error.')
         
     def get(self, request):
         data = request.query_params
@@ -1758,23 +1787,14 @@ class ManageSalePaymentsAPIView(APIView):
 
             sale = ManageSalesAPIView.get_object(data_id)
 
-            remaining = SalePaymentsModel.objects.filter(
-                sale_id = data_id
-            ).aggregate(
-                total = Sum(
-                    ExpressionWrapper(
-                        (F('total') - F('commission') - F('surcharge')) + F('discount'),
-                        output_field = FloatField()
-                    )
-                )
-            )['total']
+            remaining = self.get_remaining(data_id)
             
             return JsonResponse({
                 'success': True,
                 'resp': {
                     'total': total,
                     'total_payment': sale.total,
-                    'remaining': sale.total - remaining
+                    'remaining': remaining
                 }
             })     
 
@@ -1822,7 +1842,11 @@ class ManageSalePaymentsAPIView(APIView):
 
                 sale_payment_instance = sale_payment_serializer.save()
                 invoice_id = sale_payment_instance.id
-            elif subtotal_fin <= 0:
+
+                sale_payment_instance.total_paid = self.get_paid(sale_id)
+                sale_payment_instance.total_remaining = self.get_remaining(sale_id)
+                sale_payment_instance.save()
+            elif subtotal_fin <= 0: 
                 sale_payment_serializer = AddEditSalePaymentSerializer(payment_pending, data = data, payment_method_required = True)
                 if not sale_payment_serializer.is_valid():
                     transaction.set_rollback(True)
@@ -1830,6 +1854,10 @@ class ManageSalePaymentsAPIView(APIView):
 
                 sale_payment_instance = sale_payment_serializer.save()
                 invoice_id = sale_payment_instance.id
+
+                sale_payment_instance.total_paid = self.get_paid(sale_id)
+                sale_payment_instance.total_remaining = self.get_remaining(sale_id)
+                sale_payment_instance.save()
 
                 remaining_subtotal = abs(subtotal_fin)
                 while remaining_subtotal > 0:
@@ -1860,6 +1888,12 @@ class ManageSalePaymentsAPIView(APIView):
                         return JsonResponse({'success': False, 'resp': r_item_sale_payment_serializer.errors}, status = 400)
 
                     r_item_sale_payment_serializer.save()
+                
+            remaining = self.get_remaining(sale_id)
+            if remaining < 1:
+                sale = ManageSalesAPIView.get_object(sale_id)
+                sale.status_id = 1
+                sale.save()
 
             return JsonResponse({
                 'success': True, 
@@ -1910,6 +1944,7 @@ class ManageSalesAPIView(APIView):
     
     def get(self, request):
         data = request.query_params
+        data_id = data.get('id', None)
         query = data.get('query', None)
         search = data.get('search', '')
         page_number = request.query_params.get('page', 1)
@@ -1920,6 +1955,7 @@ class ManageSalesAPIView(APIView):
         if query == 'table':
             type = request.query_params.get('type', None)   
             location_id = request.query_params.get('location[id]', None)   
+            status_id = request.query_params.get('status[id]', None)
            
             model = SalesModel.objects.filter(
                 Q(id__icontains = search) |
@@ -1932,6 +1968,9 @@ class ManageSalesAPIView(APIView):
             
             if location_id not in [None,  0, '0']:
                 model = model.filter(location_id = location_id)
+            
+            if status_id not in [None,  0, '0']:
+                model = model.filter(status_id = status_id)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -1948,6 +1987,21 @@ class ManageSalesAPIView(APIView):
                 'total_pages': paginator.num_pages,
                 'current_page': model.number
             })
+        elif query == 'get':
+            serializer = GetSaleSerializer(data = data)  
+            if not serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': serializer.errors
+                }, status = 400)    
+                    
+            instance = self.get_object(pk = data_id)
+            serialized = SalesSerializer(instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })   
         elif query == 'count':
             total = SalesModel.objects.count()            
             
@@ -1982,6 +2036,11 @@ class ManageSalesAPIView(APIView):
             if not type in [1, 2, '1' '2']:
                 return JsonResponse({'success': False, 'resp': 'Type inventory not found.'}, status = 400)
             
+            if type in [1, '1']:
+                sale['status_id'] = 1
+            else:
+                sale['status_id'] = 2
+
             sale_serializer = AddEditSaleSerializer(data = sale)
             if not sale_serializer.is_valid():
                 transaction.set_rollback(True)
@@ -1994,6 +2053,7 @@ class ManageSalesAPIView(APIView):
                 item_inventory['location'] = location
                 item_inventory['user_id'] = user_id
                 item_inventory['type_id'] = 3
+                item_inventory['type_inventory'] = 2
 
                 inventory_serializer = AddEditInventorySerializer(data = item_inventory)
                 if not inventory_serializer.is_valid():
@@ -2016,6 +2076,9 @@ class ManageSalesAPIView(APIView):
 
             sale_payment_instance = sale_payment_serializer.save()
             invoice_id = sale_payment_instance.id
+            sale_payment_instance.total_paid = ManageSalePaymentsAPIView.get_paid(sale_instance.id)
+            sale_payment_instance.total_remaining = ManageSalePaymentsAPIView.get_remaining(sale_instance.id)
+            sale_payment_instance.save()
 
             if type in [2, '2']:
                 quantity_of_payments = int(quantity_of_payments) - 1
@@ -2046,6 +2109,28 @@ class ManageSalesAPIView(APIView):
                     'msg': 'Added successfully.'
                 }
             })
+        
+    def put(self, request):
+        data = request.data
+
+        data_id = data.get('id', None)
+
+        serializer = GetSaleSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)     
+
+        serializer = AddEditSaleSerializer(instance, data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
 
 #Sale receipt
 class ManageSaleReceiptAPIView(APIView):
@@ -2181,6 +2266,295 @@ class ManageSaleReceiptAPIView(APIView):
             'resp': 'Deleted successfully.'
         }, status = 200)
 
+#Sale status
+class ManageSaleStatusAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    @classmethod
+    def get_object(self, pk) :
+        try:
+            return SaleStatusModel.objects.get(pk = pk)
+        except SaleStatusModel.DoesNotExist:
+            raise Http404('Sale status not found.')
+
+    def get(self, request):
+        data = request.query_params
+        data_id = data.get('id', None)
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':
+            model = SaleStatusModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = SaleStatusSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            serializer = GetSaleStatusSerializer(data = data)  
+            if not serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': serializer.errors
+                }, status = 400)    
+                    
+            instance = self.get_object(pk = data_id)
+            serialized = SaleStatusSerializer(instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = SaleStatusModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = TaxesSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = SaleStatusModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+
+        serializer = AddEditSaleStatusSerializer(data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        data_id = data.get('id', None)
+
+        serializer = GetSaleStatusSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)     
+
+        serializer = AddEditSaleStatusSerializer(instance, data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        data_id = data.get('id', None)
+
+        serializer = GetSaleStatusSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)           
+        instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
+
+#Cash register
+class ManageCashRegisterAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    @classmethod
+    def get_object(self, pk) :
+        try:
+            return CashRegisterModel.objects.get(pk = pk)
+        except CashRegisterModel.DoesNotExist:
+            raise Http404('Cash register not found.')
+
+    def get(self, request):
+        data = request.query_params
+        location_id = data.get('location[id]', None)
+        data_id = data.get('id', None)
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':
+            model = CashRegisterModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if location_id not in [None,  0, '0']:
+                model = model.filter(location_id = location_id)
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = CashRegisterSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            serializer = GetCashRegisterSerializer(data = data)  
+            if not serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': serializer.errors
+                }, status = 400)    
+                    
+            instance = self.get_object(pk = data_id)
+            serialized = CashRegisterSerializer(instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = CashRegisterModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = TaxesSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            expense = 0
+            model = CashRegisterModel.objects.filter()
+            if location_id not in [None,  0, '0']:
+                model = model.filter(location_id = location_id)
+            
+            expense = model.aggregate(total = Sum('amount'))['total'] or 0      
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': model.count(),
+                    'expense': expense
+                }
+            })      
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+        data['user_id'] = request.user.id
+
+        serializer = AddEditCashRegisterSerializer(data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        data_id = data.get('id', None)
+
+        serializer = GetCashRegisterSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)     
+
+        serializer = AddEditCashRegisterSerializer(instance, data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        data_id = data.get('id', None)
+
+        serializer = GetCashRegisterSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)           
+        instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
+
 #PDF
 class PDFGeneratorAPIView(APIView):
     authentication_classes = []
@@ -2188,6 +2562,7 @@ class PDFGeneratorAPIView(APIView):
     
     def get(self, request):
         data = request.query_params
+        one = data.get('one', False)
         payment_id = data.get('id', None)
 
         instance_payment = ManageSalePaymentsAPIView.get_object(payment_id)
@@ -2236,7 +2611,8 @@ class PDFGeneratorAPIView(APIView):
             'qr': qr_base64,
             'address': ManageSaleReceiptAPIView.get_object_prompter('address'),
             'nit': ManageSaleReceiptAPIView.get_object_prompter('nit'),
-            'tel': ManageSaleReceiptAPIView.get_object_prompter('tel')
+            'tel': ManageSaleReceiptAPIView.get_object_prompter('tel'),
+            'one': one
         }
 
         html = render_to_string('pdf/payment.html', context = data)

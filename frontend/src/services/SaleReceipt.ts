@@ -20,7 +20,6 @@ export const getCountSaleReceipt = async () => {
   return response.data;
 };
 
-
 export const addSaleReceipt = async (saleReceipt: SaleReceipt) => {
   const response = await apiService.post('/manage/sale/receipt', saleReceipt);
   return response.data;
@@ -28,5 +27,15 @@ export const addSaleReceipt = async (saleReceipt: SaleReceipt) => {
 
 export const editSaleReceipt = async (saleReceipt: SaleReceipt) => {
   const response = await apiService.put('/manage/sale/receipt', saleReceipt);
+  return response.data;
+};
+
+
+export const deleteSaleReceipt = async (saleReceipt: SaleReceipt) => {
+  const response = await apiService.delete('/manage/sale/receipt', {
+    params: {
+      id: saleReceipt.id
+    }
+  });
   return response.data;
 };

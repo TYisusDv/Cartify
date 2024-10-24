@@ -88,8 +88,16 @@
       <div class="item">
         <p>Total:</p> <span>Q{{payment.total|floatformat:2}}</span>
       </div>
+      {% if sale.type == 2 and one %}
+      <div class="item" style="border-top: 1px solid black; padding-top: 5px; margin-top: 10px;">
+        <p>Total abonado:</p> <span>Q{{payment.total_paid|floatformat:2}}</span>
+      </div>
+      <div class="item" style="border-bottom: 1px solid black; padding-bottom: 5px;">
+        <p>Total restante:</p> <span>Q{{payment.total_remaining|floatformat:2}}</span>
+      </div>
+      {% endif %}
     </div>
-    {% if sale.type == 2 %}
+    {% if sale.type == 2 and not one %}
     <p class="p-credit">Todos tus pagos</p>
     <table style="font-size: 0.95rem;">
       <thead>

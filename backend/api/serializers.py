@@ -1329,7 +1329,44 @@ class GetSalePaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalePaymentsModel
         fields = ['id']
-              
+
+#Sale status
+class SaleStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleStatusModel
+        fields = '__all__'
+
+class AddEditSaleStatusSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(error_messages = {
+        'required': 'The name is required.',
+        'blank': 'The name cannot be blank.',
+        'null': 'The name cannot be blank.',
+        'max_length': 'The name cannot exceed 100 characters.',
+    }, max_length = 100)
+
+    calculate = serializers.BooleanField(error_messages = {
+        'required': 'The calculate is required.',
+        'blank': 'The calculate cannot be blank.',
+        'null': 'The calculate cannot be blank.',
+        'invalid': 'The calculate is invalid.',
+    })
+
+    class Meta:
+        model = SaleStatusModel
+        exclude = ['id']
+
+class GetSaleStatusSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The sale status is required.',
+        'blank': 'The sale status cannot be blank.',
+        'null': 'The sale status cannot be blank.',
+        'invalid': 'The sale status is invalid.',
+    })
+    
+    class Meta:
+        model = SaleStatusModel
+        fields = ['id']
+
 #Sale
 class SalesSerializer(serializers.ModelSerializer):
     client = ClientsSerializer(read_only = True)
@@ -1337,6 +1374,7 @@ class SalesSerializer(serializers.ModelSerializer):
     inventory = InventorySerializer(source = 'inventory_sale', many = True, read_only = True)
     location = LocationsSerializer(read_only = True)
     user = UserExcludeSerializer(read_only = True)
+    status = SaleStatusSerializer(read_only = True)
 
     class Meta:
         model = SalesModel
@@ -1392,6 +1430,13 @@ class AddEditSaleSerializer(serializers.ModelSerializer):
         'invalid': 'The user is invalid.',
     })
 
+    status_id = serializers.IntegerField(error_messages = {
+        'required': 'The status is required.',
+        'blank': 'The status cannot be blank.',
+        'null': 'The status cannot be blank.',
+        'invalid': 'The status is invalid.',
+    })
+
     def to_internal_value(self, data):
         if 'client' in data and isinstance(data['client'], dict) and 'id' in data['client']:
             data['client_id'] = data['client']['id']
@@ -1401,6 +1446,9 @@ class AddEditSaleSerializer(serializers.ModelSerializer):
         
         if 'user' in data and isinstance(data['user'], dict) and 'id' in data['user']:
             data['user_id'] = data['user']['id']
+        
+        if 'status' in data and isinstance(data['status'], dict) and 'id' in data['status']:
+            data['status_id'] = data['status']['id']
     
         if data.get('client_id') in [0, '0']:
             data['client_id'] = None
@@ -1410,12 +1458,15 @@ class AddEditSaleSerializer(serializers.ModelSerializer):
         
         if data.get('user_id') in [0, '0']:
             data['user_id'] = None
+        
+        if data.get('status_id') in [0, '0']:
+            data['status_id'] = None
 
         return super().to_internal_value(data)
     
     class Meta:
         model = SalesModel
-        exclude = ['id', 'client', 'location', 'user']
+        exclude = ['id', 'client', 'location', 'user', 'status']
 
 class GetSaleSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(error_messages = {
@@ -1440,14 +1491,14 @@ class AddEditSaleReceiptSerializer(serializers.ModelSerializer):
         'required': 'The prompter is required.',
         'blank': 'The prompter cannot be blank.',
         'null': 'The prompter cannot be blank.',
-        'max_length': 'The street cannot exceed 50 characters.',
+        'max_length': 'The prompter cannot exceed 50 characters.',
     }, max_length = 50)
 
     description = serializers.CharField(error_messages = {
-        'required': 'The prompter is required.',
-        'blank': 'The prompter cannot be blank.',
-        'null': 'The prompter cannot be blank.',
-        'max_length': 'The street cannot exceed 254 characters.',
+        'required': 'The description is required.',
+        'blank': 'The description cannot be blank.',
+        'null': 'The description cannot be blank.',
+        'max_length': 'The description cannot exceed 254 characters.',
     }, max_length = 254)
 
     class Meta:
@@ -1464,4 +1515,80 @@ class GetSaleReceiptSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = SaleReceiptModel
+        fields = ['id']
+
+#Cash Register
+class CashRegisterSerializer(serializers.ModelSerializer):
+    location = LocationsSerializer(read_only = True)
+    user = UserExcludeSerializer(read_only = True)
+    
+    class Meta:
+        model = CashRegisterModel
+        fields = '__all__'
+
+class AddEditCashRegisterSerializer(serializers.ModelSerializer):
+    no = serializers.CharField(error_messages = {
+        'required': 'The no document is required.',
+        'blank': 'The no document cannot be blank.',
+        'null': 'The no document cannot be blank.',
+        'max_length': 'The no document cannot exceed 100 characters.',
+    }, max_length = 100)
+
+    amount = serializers.FloatField(error_messages = {
+        'required': 'The amount is required.',
+        'blank': 'The amount cannot be blank.',
+        'null': 'The amount cannot be blank.',
+        'invalid': 'The amount is invalid.',
+    })
+
+    description = serializers.CharField(error_messages = {
+        'required': 'The description is required.',
+        'blank': 'The description cannot be blank.',
+        'null': 'The description cannot be blank.',
+        'max_length': 'The description cannot exceed 254 characters.',
+    }, max_length = 254)
+
+    location_id = serializers.IntegerField(error_messages = {
+        'required': 'The location is required.',
+        'blank': 'The location cannot be blank.',
+        'null': 'The location cannot be blank.',
+        'invalid': 'The location is invalid.',
+    })
+
+    user_id = serializers.IntegerField(error_messages = {
+        'required': 'The user is required.',
+        'blank': 'The user cannot be blank.',
+        'null': 'The user cannot be blank.',
+        'invalid': 'The user is invalid.',
+    })
+
+    def to_internal_value(self, data):
+        if 'location' in data and isinstance(data['location'], dict) and 'id' in data['location']:
+            data['location_id'] = data['location']['id']
+        
+        if 'user' in data and isinstance(data['user'], dict) and 'id' in data['user']:
+            data['user_id'] = data['user']['id']
+        
+        if data.get('location_id') in [0, '0']:
+            data['location_id'] = None
+        
+        if data.get('user_id') in [0, '0']:
+            data['user_id'] = None
+
+        return super().to_internal_value(data)
+    
+    class Meta:
+        model = CashRegisterModel
+        exclude = ['id', 'location', 'user']
+
+class GetCashRegisterSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The cash register is required.',
+        'blank': 'The cash register cannot be blank.',
+        'null': 'The cash register cannot be blank.',
+        'invalid': 'The cash register is invalid.',
+    })
+    
+    class Meta:
+        model = CashRegisterModel
         fields = ['id']

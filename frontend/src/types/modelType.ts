@@ -209,6 +209,13 @@ export interface PaymentMethod {
     allow_note?: boolean | '0' | '1' | 0 | 1;
 }
 
+//Sale status
+export interface SaleStatus {
+    id?: number;
+    name?: string;
+    calculate?: boolean | '0' | '1' | 0 | 1;
+}
+
 //Sale
 export interface Sale {
     id?: number;    
@@ -220,6 +227,7 @@ export interface Sale {
     client?: Client;
     location?: Location;
     user?: User;
+    status?: SaleStatus;
     sale_payments?: SalePayment[];
     inventory?: Inventory[];
 }
@@ -251,4 +259,15 @@ export interface SaleReceipt {
     id?: number;
     prompter?: string;
     description?: string;
+}
+
+//Cash register
+export interface CashRegister {
+    id?: number;
+    no?: string;
+    amount?: number;
+    description?: string;
+    date_reg?: Date;
+    location?: Location;
+    user?: User;
 }

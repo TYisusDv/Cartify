@@ -1,7 +1,7 @@
 import React from 'react';
 import useTranslations from '../../../hooks/useTranslations';
 import Select from '../../../components/Select';
-import { MoreIcon, StoreLocation01Icon } from 'hugeicons-react';
+import { DashboardBrowsingIcon, MoreIcon, StoreLocation01Icon } from 'hugeicons-react';
 
 interface FiltersPageProps {
     formValues?: any;
@@ -17,6 +17,30 @@ const FiltersPage: React.FC<FiltersPageProps> = ({ formValues, setFormValues }) 
 
     return (
         <>
+            <div className='col-span-1 w-full h-full rounded-2xl dark:bg-slate-700'>
+                <Select
+                    props={{
+                        id: 'status',
+                        name: 'status',
+                        onChange: (e) => {
+                            if (setFormValues) {
+                                setFormValues((prev: any) => ({
+                                    ...prev,
+                                    status: {
+                                        id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                    }
+                                }));
+                            };
+                        },
+                        value: formValues.status?.id,
+                    }}
+                    endpoint='manage/sale/status'
+                    endpoint_value='id'
+                    endpoint_text='{name}'
+                    icon={<DashboardBrowsingIcon size={20} />}
+                    label={translations.sale_status}
+                />
+            </div>
             <div className='col-span-1 w-full h-full rounded-2xl dark:bg-slate-700'>
                 <Select
                     props={{

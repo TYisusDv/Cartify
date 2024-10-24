@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getCountSuppliers } from '../../../services/suppliersService';
-import { Invoice02Icon, ShoppingBasketSecure03Icon } from 'hugeicons-react';
+import { Invoice02Icon, PencilEdit02Icon, ShoppingBasketSecure03Icon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import DelayedSuspense from '../../../components/DelayedSuspense';
 import SkeletonLoader from '../../../components/SkeletonLoader';
@@ -8,10 +8,12 @@ import Table from '../../../components/Table';
 import TablePage from './TablePage';
 import FiltersPage from './filtersPage';
 import { Link } from 'react-router-dom';
+import Modal from '../../../components/Modal';
+import CrudPage from './Crud';
 
 const ManageSalesPage: React.FC = () => {
     const { translations } = useTranslations();
-    const [selected, setSelected] = useState<number>(0);
+    const [selected, setSelected] = useState<number | undefined>();
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, details: false });
     const [reloadTable, setReloadTable] = useState(0);
     const [countData, setCountData] = useState(0);
@@ -41,6 +43,7 @@ const ManageSalesPage: React.FC = () => {
     const table_header = [
         { name: 'date_reg', headerName: 'Fecha de registro' },
         { name: 'id', headerName: 'No. Factura' },
+        { name: 'status.name', headerName: 'Estado' },
         { name: 'total', headerName: 'Total' },
         { name: 'location.name', headerName: 'Sucursal' },
         { name: 'client.person.firstname', headerName: 'Cliente' },
@@ -56,7 +59,8 @@ const ManageSalesPage: React.FC = () => {
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_sales_info}</span>
                 </div>
                 <div className='flex gap-2'>
-                    <Link to={`/manage/sale/payments?id=${selected}`}><button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === 0}><Invoice02Icon /></button></Link>
+                    <Link to={`/manage/sale/payments?id=${selected}`}><button className='bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === undefined}><Invoice02Icon /></button></Link>
+                    <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === undefined}><PencilEdit02Icon /></button>
                 </div>
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
@@ -79,7 +83,12 @@ const ManageSalesPage: React.FC = () => {
                         filters={<FiltersPage />}
                     />
                 </div>
-            </div>            
+            </div>    
+            {isModalOpen.edit && (
+                <Modal title={translations.edit_sale} onClose={() => setIsModalOpen({ ...isModalOpen, edit: false })}>
+                    <CrudPage type='edit' selected_id={selected} onClose={() => setIsModalOpen({ ...isModalOpen, edit: false })} handleTableReload={handleTableReload} setSelected={setSelected} />
+                </Modal>
+            )}        
         </DelayedSuspense>
     );
 };

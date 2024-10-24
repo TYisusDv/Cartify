@@ -1,12 +1,27 @@
 import apiService from './apiService';
 import { Sale, Inventory, SalePayment } from '../types/modelType';
 
+export const getSale = async (sale: Sale) => {
+  const response = await apiService.get('/manage/sales', {
+    params: {
+      query: 'get',
+      id: sale.id
+    }
+  });
+  return response.data;
+};
+
 export const addSale = async (sale: Sale, inventory: Inventory[], salePayment: SalePayment) => {
   const response = await apiService.post('/manage/sales', {
     sale: sale,
     inventory: inventory,
     sale_payment: salePayment
   });
+  return response.data;
+};
+
+export const editSale = async (sale: Sale) => {
+  const response = await apiService.put('/manage/sales', sale);
   return response.data;
 };
 

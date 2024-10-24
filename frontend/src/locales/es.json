@@ -158,5 +158,17 @@
     "receipt": "Recibo",
     "add_receipt": "Agregar al recibo",
     "edit_receipt": "Editar al recibo",
-    "manage_receipt": "Administra los datos del recibo aquí. ¡Agrega y edita!"
+    "delete_receipt_sure": "¿Está seguro/a de que desea eliminar el dato del recibo?",
+    "manage_receipt": "Administra los datos del recibo aquí. ¡Agrega, edita y elimina!",
+    "sale_status": "Estados de venta",
+    "manage_sale_status":  "Administra los estados de ventas aquí. ¡Agrega, edita y elimina!",
+    "add_sale_status": "Agregar estado de venta",
+    "edit_sale_status": "Editar estado de venta",
+    "delete_sale_status_sure": "¿Está seguro/a de que desea eliminar el estado de venta?",
+    "edit_sale": "Editar venta",
+    "cash_register": "Caja",
+    "add_register": "Agregar registro",
+    "edit_register": "Editar registro",
+    "delete_register_sure": "¿Está seguro/a de que desea eliminar el registro?",
+    "manage_cash_register": "Administra la caja aquí. ¡Agrega, edita y elimina!"
 }

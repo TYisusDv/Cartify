@@ -1,13 +1,13 @@
 import React from 'react';
-import { Calendar03Icon, CreditCardIcon, Invoice03Icon, Layers01Icon, LocationUser04Icon, Note01Icon, StoreLocation01Icon, UserIcon } from 'hugeicons-react';
+import { Calendar03Icon, Invoice03Icon, Layers01Icon, LocationUser04Icon, ShoppingBasketSecure03Icon, StoreLocation01Icon, UserIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import { Sale } from '../../../types/modelType';
 import { generateKey } from '../../../utils/uuidGen';
 
 interface TablePageProps {
     data?: Array<Sale>;
-    selected: number;
-    setSelected: (value: number) => void;
+    selected?: number;
+    setSelected: (value: number | undefined) => void;
 }
 
 const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) => {
@@ -17,7 +17,7 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
         <tbody>
             {data && data.length > 0 ? (
                 data.map((row, index) => (
-                    <tr key={generateKey(index)} className={`text-sm text-gray-800 bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/80 ${selected === row.id ? 'bg-gray-200/80 dark:bg-slate-700/60' : ''}`} onClick={() => setSelected(row.id || 0)}>
+                    <tr key={generateKey(index)} className={`text-sm text-gray-800 bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/80 ${selected === row.id ? 'bg-gray-200/80 dark:bg-slate-700/60' : ''}`} onClick={() => setSelected(row.id)}>
                         <td className='px-6 py-4'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
                                 <Calendar03Icon size={22} />
@@ -35,7 +35,18 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                         </td>
                         <td className='px-6 py-4'>
                             <span className='flex items-center gap-1'><Invoice03Icon size={22} /> {row.id || '-'}</span>
-                        </td>                        
+                        </td>  
+                        <td className='px-6 py-4'>
+                            {
+                            row.status?.id === 1 ? 
+                                <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-blue-600 text-white rounded-xl'><ShoppingBasketSecure03Icon size={22} /> {row.status.name}</span>
+                            :
+                            row.status?.id === 2 ? 
+                                <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-green-600 text-white rounded-xl'><ShoppingBasketSecure03Icon size={22} /> {row.status.name}</span>
+                            :
+                                <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-red-600 text-white rounded-xl'><ShoppingBasketSecure03Icon size={22} /> {row.status?.name || '-'}</span>
+                            }
+                        </td>              
                         <td className='px-6 py-4'>
                             <span className='flex items-center gap-1'>Q {row.total || '-'}</span>
                         </td>

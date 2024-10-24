@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { SaleReceipt } from '../../../../types/modelType';
-import useTranslations from '../../../../hooks/useTranslations';
-import Input from '../../../../components/Input';
-import { addAlert } from '../../../../utils/Alerts';
-import { generateUUID } from '../../../../utils/uuidGen';
-import { extractMessages } from '../../../../utils/formUtils';
-import { CursorPointer01Icon, Note01Icon } from 'hugeicons-react';
-import { addSaleReceipt, deleteSaleReceipt, editSaleReceipt, getSaleReceipt } from '../../../../services/SaleReceipt';
+import { Sale } from '../../../types/modelType';
+import useTranslations from '../../../hooks/useTranslations';
+import Input from '../../../components/Input';
+import { addAlert } from '../../../utils/Alerts';
+import { generateUUID } from '../../../utils/uuidGen';
+import { extractMessages } from '../../../utils/formUtils';
+import { CursorPointer01Icon, DashboardBrowsingIcon } from 'hugeicons-react';
+import { editSale, getSale } from '../../../services/SalesService';
+import Select from '../../../components/Select';
 
-interface CrudPageProps { 
+interface CrudPageProps {
     onClose: () => void;
     handleTableReload?: () => void;
     setSelected?: (value: number | undefined) => void;
@@ -18,7 +19,7 @@ interface CrudPageProps {
 
 const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSelected, type, selected_id }) => {
     const { translations } = useTranslations();
-    const [formValues, setFormValues] = useState<SaleReceipt>({ id: selected_id });
+    const [formValues, setFormValues] = useState<Sale>({ id: selected_id });
     const [colorPage, setColorPage] = useState<'blue' | 'orange' | 'red' | 'yellow'>('blue');
 
     useEffect(() => {
@@ -33,7 +34,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
         if ((type === 'details' || type === 'delete' || type === 'edit') && selected_id) {
             const fetchGet = async () => {
                 try {
-                    const response = await getSaleReceipt(formValues);
+                    const response = await getSale(formValues);
                     const response_resp = response.resp;
                     setFormValues(response_resp);
                 } catch (error) {
@@ -49,14 +50,8 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
 
         try {
             let response_resp;
-            if (type === 'add') {
-                const response = await addSaleReceipt(formValues);
-                response_resp = response?.resp;
-            } else if (type === 'edit') {
-                const response = await editSaleReceipt(formValues);
-                response_resp = response?.resp;
-            } else if (type === 'delete') {
-                const response = await deleteSaleReceipt(formValues);
+            if (type === 'edit') {
+                const response = await editSale(formValues);
                 response_resp = response?.resp;
             }
 
@@ -90,41 +85,24 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
     return (
         <form autoComplete='off' onSubmit={onSubmit}>
             <div className='flex flex-col gap-2'>
-                <Input
+                <Select
                     props={{
-                        id: 'prompter',
-                        name: 'prompter',
-                        value: formValues.prompter,
-                        onChange: (e) => {
-                            setFormValues(prev => ({
-                                ...prev,
-                                prompter: e.target.value
-                            }));
-                        },
+                        id: 'status',
+                        name: 'status',
+                        onChange: (e) => setFormValues(prev => ({
+                            ...prev,
+                            status: {
+                                id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                            }
+                        })),
+                        value: formValues.status?.id,
                         disabled: ['details', 'delete'].includes(type)
                     }}
-                    label='Apuntador'
-                    icon={<CursorPointer01Icon className='icon' size={24} />}
-                    required={false}
-                    color={colorPage}
-                />
-                <Input
-                    props={{
-                        id: 'description',
-                        name: 'description',
-                        value: formValues.description,
-                        onChange: (e) => {
-                            setFormValues(prev => ({
-                                ...prev,
-                                description: e.target.value
-                            }));
-                        },
-                        disabled: ['details', 'delete'].includes(type)
-                    }}
-                    label='Descripcion'
-                    icon={<Note01Icon className='icon' size={24} />}
-                    required={false}
-                    color={colorPage}
+                    endpoint='manage/sale/status'
+                    endpoint_value='id'
+                    endpoint_text='{name}'
+                    icon={<DashboardBrowsingIcon size={20} />}
+                    label={translations.sale_status}
                 />
             </div>
             <div className='grid grid-cols-1 md:grid-cols-2 mt-3'>

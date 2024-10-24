@@ -233,6 +233,14 @@ class PaymentMethodsModel(models.Model):
     class Meta: 
         db_table = 'payment_methods'
 
+class SaleStatusModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    name = models.CharField(max_length = 100, null = False, blank = False)
+    calculate = models.BooleanField(default = True, null = False, blank = False)  
+
+    class Meta: 
+        db_table = 'sale_status'
+
 class SalesModel(models.Model):
     id = models.AutoField(primary_key = True)
     total = models.FloatField(default = 0, null = False, blank = False)
@@ -243,6 +251,7 @@ class SalesModel(models.Model):
     client = models.ForeignKey(ClientsModel, null = False, blank = False, on_delete = models.RESTRICT)
     location = models.ForeignKey(LocationsModel, null = False, blank = False, on_delete = models.RESTRICT)
     user = models.ForeignKey(User, null = False, blank = False, on_delete = models.RESTRICT)
+    status = models.ForeignKey(SaleStatusModel, null = False, blank = False, on_delete = models.RESTRICT)
 
     class Meta: 
         db_table = 'sales'
@@ -256,6 +265,8 @@ class SalePaymentsModel(models.Model):
     discount_per = models.FloatField(default = 0, null = False, blank = False)
     discount = models.FloatField(default = 0, null = False, blank = False)
     total = models.FloatField(default = 0, null = False, blank = False)
+    total_paid = models.FloatField(default = 0, null = False, blank = False)
+    total_remaining = models.FloatField(default = 0, null = False, blank = False)
     pay = models.FloatField(default = 0, null = False, blank = False)
     change = models.FloatField(default = 0, null = False, blank = False)
     note = models.CharField(max_length = 100, null = True, blank = False)
@@ -304,3 +315,16 @@ class InventoryModel(models.Model):
     
     class Meta: 
         db_table = 'inventory'
+
+class CashRegisterModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    no = models.CharField(max_length = 100, null = False, blank = False)   
+    amount = models.FloatField(default = 0, null = False, blank = False)
+    description = models.CharField(null = False, blank = False)   
+    date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
+    location = models.ForeignKey(LocationsModel, on_delete = models.RESTRICT)
+    user = models.ForeignKey(User, on_delete = models.RESTRICT)
+    
+    class Meta: 
+        db_table = 'cash_register'
+        

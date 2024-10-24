@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { SaleReceipt } from '../../../../types/modelType';
+import { SaleStatus } from '../../../../types/modelType';
 import useTranslations from '../../../../hooks/useTranslations';
 import Input from '../../../../components/Input';
 import { addAlert } from '../../../../utils/Alerts';
 import { generateUUID } from '../../../../utils/uuidGen';
 import { extractMessages } from '../../../../utils/formUtils';
-import { CursorPointer01Icon, Note01Icon } from 'hugeicons-react';
-import { addSaleReceipt, deleteSaleReceipt, editSaleReceipt, getSaleReceipt } from '../../../../services/SaleReceipt';
+import { CursorPointer01Icon } from 'hugeicons-react';
+import Switch from '../../../../components/Switch';
+import { addSaleStatus, deleteSaleStatus, editSaleStatus, getSaleStatus } from '../../../../services/SaleStatus';
 
 interface CrudPageProps { 
     onClose: () => void;
@@ -18,7 +19,7 @@ interface CrudPageProps {
 
 const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSelected, type, selected_id }) => {
     const { translations } = useTranslations();
-    const [formValues, setFormValues] = useState<SaleReceipt>({ id: selected_id });
+    const [formValues, setFormValues] = useState<SaleStatus>({ id: selected_id, calculate: true });
     const [colorPage, setColorPage] = useState<'blue' | 'orange' | 'red' | 'yellow'>('blue');
 
     useEffect(() => {
@@ -33,7 +34,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
         if ((type === 'details' || type === 'delete' || type === 'edit') && selected_id) {
             const fetchGet = async () => {
                 try {
-                    const response = await getSaleReceipt(formValues);
+                    const response = await getSaleStatus(formValues);
                     const response_resp = response.resp;
                     setFormValues(response_resp);
                 } catch (error) {
@@ -50,13 +51,13 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
         try {
             let response_resp;
             if (type === 'add') {
-                const response = await addSaleReceipt(formValues);
+                const response = await addSaleStatus(formValues);
                 response_resp = response?.resp;
             } else if (type === 'edit') {
-                const response = await editSaleReceipt(formValues);
+                const response = await editSaleStatus(formValues);
                 response_resp = response?.resp;
             } else if (type === 'delete') {
-                const response = await deleteSaleReceipt(formValues);
+                const response = await deleteSaleStatus(formValues);
                 response_resp = response?.resp;
             }
 
@@ -92,38 +93,34 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
             <div className='flex flex-col gap-2'>
                 <Input
                     props={{
-                        id: 'prompter',
-                        name: 'prompter',
-                        value: formValues.prompter,
+                        id: 'name',
+                        name: 'name',
+                        value: formValues.name,
                         onChange: (e) => {
                             setFormValues(prev => ({
                                 ...prev,
-                                prompter: e.target.value
+                                name: e.target.value
                             }));
                         },
                         disabled: ['details', 'delete'].includes(type)
                     }}
-                    label='Apuntador'
+                    label={translations.name}
                     icon={<CursorPointer01Icon className='icon' size={24} />}
                     required={false}
                     color={colorPage}
                 />
-                <Input
+                <Switch
                     props={{
-                        id: 'description',
-                        name: 'description',
-                        value: formValues.description,
-                        onChange: (e) => {
-                            setFormValues(prev => ({
-                                ...prev,
-                                description: e.target.value
-                            }));
-                        },
+                        id: 'calculate',
+                        name: 'calculate',
+                        checked: !!(formValues.calculate === true || formValues.calculate === 1 || formValues.calculate === '1'),
+                        onChange: (e) => setFormValues(prev => ({
+                            ...prev,
+                            calculate: e.target.checked ? true : false
+                        })),
                         disabled: ['details', 'delete'].includes(type)
                     }}
-                    label='Descripcion'
-                    icon={<Note01Icon className='icon' size={24} />}
-                    required={false}
+                    label='Permite calcular?'
                     color={colorPage}
                 />
             </div>
