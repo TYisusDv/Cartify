@@ -14,7 +14,7 @@ from django.core.paginator import Paginator
 from .serializers import *
 from .models import *
 from .utils import *
-from datetime import timedelta
+from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
 import uuid, qrcode, io
 
@@ -1292,10 +1292,10 @@ class AppInventoryAPIView(APIView):
         
     
     @classmethod
-    def get_product_entries(cls, product_id):
+    def get_product_entries(cls, product_id, location_id):
         try:
-            total_entries = InventoryModel.objects.filter(product_id = product_id, type_inventory = 1).aggregate(total_quantity = Sum('quantity'))['total_quantity'] or 0            
-            total_exits = InventoryModel.objects.filter(product_id = product_id, type_inventory = 2).aggregate(total_quantity = Sum('quantity'))['total_quantity'] or 0
+            total_entries = InventoryModel.objects.filter(product_id = product_id, location_id = location_id, type_inventory = 1).aggregate(total_quantity = Sum('quantity'))['total_quantity'] or 0            
+            total_exits = InventoryModel.objects.filter(product_id = product_id, location_id = location_id, type_inventory = 2).aggregate(total_quantity = Sum('quantity'))['total_quantity'] or 0
             
             total_inventory = total_entries - total_exits
             return total_inventory
@@ -1449,13 +1449,15 @@ class AppInventoryAPIView(APIView):
                 product = movement.get('product', {})
                 product_id = product.get('id', None)
                 product_name = product.get('name', None)
+                location = movement.get('location', {})
+                location_id = location.get('id', None)
                 type_movement = movement.get('type', {})
                 type_id = type_movement.get('id', None)
 
                 type_movement_instance = ManageInventoryTypesAPIView.get_object(type_id)
                 type_inventory = type_movement_instance.type
                 if type_inventory == 2:
-                    if self.get_product_entries(product_id) < movement.get('quantity', 0):
+                    if self.get_product_entries(product_id, location_id) < movement.get('quantity', 0):
                         transaction.set_rollback(True)
                         return JsonResponse({'success': False, 'resp': f'There is not enough {product_name} product in the location.'}, status = 400)
 
@@ -1679,8 +1681,7 @@ class ManageSalePaymentsAPIView(APIView):
             if not pending_payment:
                 raise Http404('No expired or pending sale payments found.')        
             
-            return pending_payment
-        
+            return pending_payment        
         except SalePaymentsModel.DoesNotExist:
             raise Http404('Sale payment not found.')
 
@@ -2026,7 +2027,8 @@ class ManageSalesAPIView(APIView):
             type = sale.get('type', None)
             quantity_of_payments = sale.get('quantity_of_payments', 0)
             payment_days = sale.get('payment_days', 0)
-            location = sale.get('location', None)
+            location = sale.get('location', {})
+            location_id = location.get('id', None)
             inventory = data.get('inventory', [])
             sale_payment = data.get('sale_payment', None)
             invoice_id = None
@@ -2054,6 +2056,13 @@ class ManageSalesAPIView(APIView):
                 item_inventory['user_id'] = user_id
                 item_inventory['type_id'] = 3
                 item_inventory['type_inventory'] = 2
+                product = item_inventory.get('product', {})
+                product_id = product.get('id', None)
+                product_name = product.get('name', product_id)
+
+                if AppInventoryAPIView.get_product_entries(product_id, location_id) < item_inventory.get('quantity', 0):
+                    transaction.set_rollback(True)
+                    return JsonResponse({'success': False, 'resp': f'There is not enough {product_name} product in the location.'}, status = 400)
 
                 inventory_serializer = AddEditInventorySerializer(data = item_inventory)
                 if not inventory_serializer.is_valid():
@@ -2428,10 +2437,32 @@ class ManageCashRegisterAPIView(APIView):
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
 
+        date_1_str = data.get('date_1', None)
+        date_2_str = data.get('date_2', None)   
+
+        if not date_1_str:
+            date_1_str = data.get('filters[date_1]', None)
+        
+        if not date_2_str:
+            date_2_str = data.get('filters[date_2]', None)
+
+        date_1, date_2 = None, None
+        if date_1_str:
+            date_1 = datetime.strptime(date_1_str, '%Y-%m-%d').date()
+
+        if date_2_str:
+            date_2 = datetime.strptime(date_2_str, '%Y-%m-%d').date()
+
         if query == 'table':
             model = CashRegisterModel.objects.filter(
                 Q(id__icontains = search)
             )
+
+            if date_1_str:
+                model = model.filter(date_reg__gte = date_1)
+            
+            if date_2_str:
+                model = model.filter(date_reg__lte = date_2)
 
             if location_id not in [None,  0, '0']:
                 model = model.filter(location_id = location_id)
@@ -2473,6 +2504,7 @@ class ManageCashRegisterAPIView(APIView):
                 Q(id__icontains = search) |
                 Q(name__icontains = search)
             )[:10]
+            
             serialized = TaxesSerializer(model, many = True)
             
             return JsonResponse({
@@ -2483,8 +2515,15 @@ class ManageCashRegisterAPIView(APIView):
         elif query == 'count':
             expense = 0
             model = CashRegisterModel.objects.filter()
+
             if location_id not in [None,  0, '0']:
                 model = model.filter(location_id = location_id)
+            
+            if date_1_str:
+                model = model.filter(date_reg__gte = date_1)
+            
+            if date_2_str:
+                model = model.filter(date_reg__lte = date_2)
             
             expense = model.aggregate(total = Sum('amount'))['total'] or 0      
             
@@ -2555,6 +2594,178 @@ class ManageCashRegisterAPIView(APIView):
             'resp': 'Deleted successfully.'
         }, status = 200)
 
+#Cash register sales
+class ManageCashRegisterSalesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        data = request.query_params
+        data_id = data.get('id', None)        
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        sale_type = data.get('sale[type]', None)
+        payment_method_id = data.get('payment_method[id]', None)    
+        
+        type = data.get('type', None)   
+        location_id = data.get('filters[location][id]', None)
+        date_1_str = data.get('filters[date_1]', None)
+        date_2_str = data.get('filters[date_2]', None)        
+
+        date_1, date_2 = None, None
+        if date_1_str:
+            date_1 = datetime.strptime(date_1_str, '%Y-%m-%d').date()
+
+        if date_2_str:
+            date_2 = datetime.strptime(date_2_str, '%Y-%m-%d').date()
+
+        if query == 'table':           
+            model = SalesModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if date_1_str:
+                model = model.filter(date_reg__gte = date_1)
+            
+            if date_2_str:
+                model = model.filter(date_reg__lte = date_2)
+
+            if location_id not in [None,  0, '0']:
+                model = model.filter(location_id = location_id)
+
+            if type not in [None,  0, '0']:
+                model = model.filter(type = type)
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = SalesSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+        if query == 'table_payments':           
+            model = SalePaymentsModel.objects.filter(
+                Q(id__icontains = search),
+                total__gt = 0
+            )
+
+            if date_1_str:
+                model = model.filter(date_reg__gte = date_1)
+            
+            if date_2_str:
+                model = model.filter(date_reg__lte = date_2)
+
+            if location_id not in [None,  0, '0']:
+                model = model.filter(location_id = location_id)
+                
+            if sale_type not in [None,  0, '0']:
+                model = model.filter(sale__type = sale_type)
+            
+            if payment_method_id not in [None,  0, '0']:
+                model = model.filter(payment_method_id = payment_method_id)
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = SalePaymentsSaleSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })    
+        elif query == 'get':
+            serializer = GetSaleSerializer(data = data)  
+            if not serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': serializer.errors
+                }, status = 400)    
+                    
+            instance = ManageSalesAPIView.get_object(pk = data_id)
+            serialized = SalesSerializer(instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })   
+        elif query == 'count':
+            model = SalesModel.objects.filter(status__calculate = True)                
+            
+            if location_id not in [None,  0, '0']:
+                model = model.filter(
+                    location_id = location_id
+                )
+            
+            if date_1_str:
+                model = model.filter(date_reg__gte = date_1)
+            
+            if date_2_str:
+                model = model.filter(date_reg__lte = date_2)
+
+            if type not in [None,  0, '0']:
+                model = model.filter(type = type)
+
+            total = model.aggregate(total = Sum('total'))['total'] or 0
+
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+        elif query == 'count_payments':
+            model = SalePaymentsModel.objects.filter(
+                sale__status__calculate = True
+            )                
+            
+            if date_1_str:
+                model = model.filter(date_reg__gte = date_1)
+            
+            if date_2_str:
+                model = model.filter(date_reg__lte = date_2)
+
+            if location_id not in [None,  0, '0']:
+                model = model.filter(location_id = location_id)
+            
+            if sale_type not in [None,  0, '0']:
+                model = model.filter(sale__type = sale_type)\
+            
+            if payment_method_id not in [None,  0, '0']:
+                model = model.filter(payment_method_id = payment_method_id)
+
+            total = model.aggregate(total = Sum('total'))['total'] or 0
+
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404)\
+        
 #PDF
 class PDFGeneratorAPIView(APIView):
     authentication_classes = []

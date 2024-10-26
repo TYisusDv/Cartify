@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Add01Icon, Cash01Icon, Delete02Icon, PencilEdit02Icon } from 'hugeicons-react';
-import useTranslations from '../../../hooks/useTranslations';
-import DelayedSuspense from '../../../components/DelayedSuspense';
-import SkeletonLoader from '../../../components/SkeletonLoader';
-import Table from '../../../components/Table';
+import useTranslations from '../../../../hooks/useTranslations';
+import DelayedSuspense from '../../../../components/DelayedSuspense';
+import SkeletonLoader from '../../../../components/SkeletonLoader';
+import Table from '../../../../components/Table';
 import TablePage from './TBody';
-import Modal from '../../../components/Modal';
+import Modal from '../../../../components/Modal';
 import CrudPage from './Crud';
-import { getCountCashRegister } from '../../../services/CashRegister';
+import { getCountCashRegister } from '../../../../services/CashRegister';
 import Filters from './Filters';
-import { CashRegister as CashRegisterType } from '../../../types/modelType';
+import { CashRegister as CashRegisterType } from '../../../../types/modelType';
 
-const CashRegister: React.FC = () => {
+const Sales: React.FC = () => {
     const { translations } = useTranslations();
     const [selected, setSelected] = useState<number | undefined>();
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false });
@@ -20,7 +20,12 @@ const CashRegister: React.FC = () => {
         total: 0,
         expense: 0
     });
-    const [formValues, setFormValues] = useState<CashRegisterType>();
+    const today = new Date();
+    const formattedToday = today.toISOString().split('T')[0];
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const formattedTomorrow = tomorrow.toISOString().split('T')[0];
+    const [formValues, setFormValues] = useState<CashRegisterType>({date_1: formattedToday, date_2: formattedTomorrow});
 
     const handleTableReload = () => {
         setReloadTable(prev => prev + 1);
@@ -29,6 +34,7 @@ const CashRegister: React.FC = () => {
     const table_header = [
         { name: 'date_reg', headerName: 'Fecha de registro' },
         { name: 'no', headerName: 'No. Documento' },
+        { name: 'supplier', headerName: translations.supplier },
         { name: 'amount', headerName: 'Monto' },
         { name: 'description', headerName: 'Descripcion' },
         { name: 'location.name', headerName: 'Ubicacion' },
@@ -79,7 +85,7 @@ const CashRegister: React.FC = () => {
                         </div>
                         <div>
                             <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Gastos</h2>
-                            <h3 className='text-lg font-bold dark:text-white'>{countData.expense}</h3>
+                            <h3 className='text-lg font-bold dark:text-white'>Q{countData.expense}</h3>
                         </div>
                     </div>
                 </div>
@@ -94,7 +100,8 @@ const CashRegister: React.FC = () => {
                                 setSelected={setSelected} 
                             />
                         } 
-                        filters={<Filters setFormValuesPage={setFormValues} />}
+                        filters={<Filters formValuesPage={formValues} setFormValuesPage={setFormValues} />}
+                        filters_params={formValues}
                     />
                 </div>
             </div>
@@ -117,4 +124,4 @@ const CashRegister: React.FC = () => {
     );
 };
 
-export default CashRegister;
+export default Sales;

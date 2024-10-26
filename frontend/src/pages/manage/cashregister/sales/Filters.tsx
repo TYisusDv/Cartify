@@ -1,7 +1,7 @@
 import React from 'react';
-import useTranslations from '../../../hooks/useTranslations';
-import Select from '../../../components/Select';
-import { BrandfetchIcon, Layers01Icon, StoreLocation01Icon } from 'hugeicons-react';
+import useTranslations from '../../../../hooks/useTranslations';
+import Select from '../../../../components/Select';
+import { MoreIcon } from 'hugeicons-react';
 
 interface FiltersProps {
     formValues?: any;
@@ -12,35 +12,34 @@ interface FiltersProps {
 const Filters: React.FC<FiltersProps> = ({ formValues, setFormValues, setFormValuesPage }) => {
     const { translations } = useTranslations();
 
+    const type_of_sales_options = [
+        { value: 1, label: 'Contado' },
+        { value: 2, label: 'Credito' },
+    ];
+
     return (
         <>
             <div className='col-span-1 w-full h-full rounded-2xl dark:bg-slate-700'>
                 <Select
                     props={{
+                        name: 'type_of_sale',
                         onChange: (e) => {
                             setFormValuesPage((prev: any) => ({
                                 ...prev,
-                                location: {
-                                    id: e.target.value
-                                }
+                                type: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
                             }));
-
                             if (setFormValues) {
                                 setFormValues((prev: any) => ({
                                     ...prev,
-                                    location: {
-                                        id: e.target.value
-                                    }
+                                    type: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
                                 }));
                             }
                         },
-                        value: formValues.location?.id
+                        value: formValues.brand?.id
                     }}
-                    endpoint='manage/locations'
-                    endpoint_value='id'
-                    endpoint_text='{name}'
-                    icon={<StoreLocation01Icon size={20} />}
-                    label={translations.location}
+                    myOptions={type_of_sales_options}
+                    icon={<MoreIcon size={20} />}
+                    label={translations.type_of_sale}
                 />
             </div>
         </>

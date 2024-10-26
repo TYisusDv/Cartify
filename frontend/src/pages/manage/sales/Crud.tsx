@@ -5,7 +5,7 @@ import Input from '../../../components/Input';
 import { addAlert } from '../../../utils/Alerts';
 import { generateUUID } from '../../../utils/uuidGen';
 import { extractMessages } from '../../../utils/formUtils';
-import { CursorPointer01Icon, DashboardBrowsingIcon } from 'hugeicons-react';
+import { CursorPointer01Icon, DashboardBrowsingIcon, Note01Icon } from 'hugeicons-react';
 import { editSale, getSale } from '../../../services/SalesService';
 import Select from '../../../components/Select';
 
@@ -85,24 +85,44 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
     return (
         <form autoComplete='off' onSubmit={onSubmit}>
             <div className='flex flex-col gap-2'>
-                <Select
+                <div className='z-10'>
+                    <Select
+                        props={{
+                            id: 'status',
+                            name: 'status',
+                            onChange: (e) => setFormValues(prev => ({
+                                ...prev,
+                                status: {
+                                    id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                }
+                            })),
+                            value: formValues.status?.id,
+                            disabled: ['details', 'delete'].includes(type)
+                        }}
+                        endpoint='manage/sale/status'
+                        endpoint_value='id'
+                        endpoint_text='{name}'
+                        icon={<DashboardBrowsingIcon size={20} />}
+                        label={translations.sale_status}
+                    />
+                </div>
+                <Input
                     props={{
-                        id: 'status',
-                        name: 'status',
-                        onChange: (e) => setFormValues(prev => ({
-                            ...prev,
-                            status: {
-                                id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
-                            }
-                        })),
-                        value: formValues.status?.id,
+                        id: 'note',
+                        name: 'note',
+                        value: formValues.note,
+                        onChange: (e) => {
+                            setFormValues(prev => ({
+                                ...prev,
+                                note: e.target.value
+                            }));
+                        },
                         disabled: ['details', 'delete'].includes(type)
                     }}
-                    endpoint='manage/sale/status'
-                    endpoint_value='id'
-                    endpoint_text='{name}'
-                    icon={<DashboardBrowsingIcon size={20} />}
-                    label={translations.sale_status}
+                    label={translations.note}
+                    icon={<Note01Icon className='icon' size={24} />}
+                    required={false}
+                    color={colorPage}
                 />
             </div>
             <div className='grid grid-cols-1 md:grid-cols-2 mt-3'>

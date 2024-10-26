@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { CashRegister } from '../../../types/modelType';
-import useTranslations from '../../../hooks/useTranslations';
-import Input from '../../../components/Input';
-import { addAlert } from '../../../utils/Alerts';
-import { generateUUID } from '../../../utils/uuidGen';
-import { extractMessages } from '../../../utils/formUtils';
-import { CursorPointer01Icon, DocumentCodeIcon, Note01Icon, StoreLocation01Icon } from 'hugeicons-react';
-import { addCashRegister, deleteCashRegister, editCashRegister, getCashRegister } from '../../../services/CashRegister';
-import Select from '../../../components/Select';
+import { CashRegister } from '../../../../types/modelType';
+import useTranslations from '../../../../hooks/useTranslations';
+import Input from '../../../../components/Input';
+import { addAlert } from '../../../../utils/Alerts';
+import { generateUUID } from '../../../../utils/uuidGen';
+import { extractMessages } from '../../../../utils/formUtils';
+import { DistributionIcon, DocumentCodeIcon, Note01Icon, StoreLocation01Icon } from 'hugeicons-react';
+import { addCashRegister, deleteCashRegister, editCashRegister, getCashRegister } from '../../../../services/CashRegister';
+import Select from '../../../../components/Select';
 
 interface CrudPageProps {
     onClose: () => void;
@@ -135,6 +135,24 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                 />
                 <Input
                     props={{
+                        id: 'supplier',
+                        name: 'supplier',
+                        value: formValues.supplier,
+                        onChange: (e) => {
+                            setFormValues(prev => ({
+                                ...prev,
+                                supplier: e.target.value
+                            }));
+                        },
+                        disabled: ['details', 'delete'].includes(type)
+                    }}
+                    label={translations.supplier}
+                    icon={<DistributionIcon className='icon' size={24} />}
+                    required={true}
+                    color={colorPage}
+                />
+                <Input
+                    props={{
                         id: 'amount',
                         name: 'amount',
                         type: 'number',
@@ -151,7 +169,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                     icon='Q'
                     color={colorPage}
                     required={true}
-                />
+                />                
                 <Input
                     props={{
                         id: 'description',

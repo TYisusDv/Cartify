@@ -1,24 +1,22 @@
 import React from 'react';
 import { Calendar01Icon, Calendar03Icon, Invoice03Icon, Layers01Icon, LocationUser04Icon, ShoppingBasketSecure03Icon, StoreLocation01Icon, UserIcon } from 'hugeicons-react';
-import useTranslations from '../../../hooks/useTranslations';
-import { Sale } from '../../../types/modelType';
-import { generateKey } from '../../../utils/uuidGen';
-import { calculateDaysRemaining } from '../../../utils/DateFuncs';
+import useTranslations from '../../hooks/useTranslations';
+import { Sale } from '../../types/modelType';
+import { generateKey } from '../../utils/uuidGen';
+import { calculateDaysRemaining } from '../../utils/DateFuncs';
 
-interface TablePageProps {
+interface TBodyProps {
     data?: Array<Sale>;
-    selected?: number;
-    setSelected: (value: number | undefined) => void;
 }
 
-const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) => {
+const TBody: React.FC<TBodyProps> = ({ data }) => {
     const { translations } = useTranslations();
 
     return (
         <tbody>
             {data && data.length > 0 ? (
                 data.map((row, index) => (
-                    <tr key={generateKey(index)} className={`text-sm text-gray-800 bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/80 ${selected === row.id ? 'bg-gray-200/80 dark:bg-slate-700/60' : ''}`} onClick={() => setSelected(row.id)}>
+                    <tr key={generateKey(index)} className={`text-sm text-gray-800 bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/80`}>
                         <td className='px-6 py-4'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
                                 <Calendar03Icon size={22} />
@@ -105,4 +103,4 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
     );
 };
 
-export default TablePage;
+export default TBody;

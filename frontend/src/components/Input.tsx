@@ -14,7 +14,7 @@ const Input: React.FC<InputProps> = ({ props, icon, label, color = 'blue', requi
     useEffect(() => {
         if(props?.value !== null && props?.value !== '' && props?.value !== undefined && props?.value.toString().length !== 0){
             setHasText(true);
-        } else if(props?.type === 'date'){
+        } else if(props?.type === 'date' || props?.type === 'datetime-local'){
             setHasText(true);
         } else {
             setHasText(false);

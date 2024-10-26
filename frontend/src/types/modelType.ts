@@ -223,6 +223,7 @@ export interface Sale {
     type?: number;  
     quantity_of_payments?: number;
     payment_days?: number;
+    note?: string;  
     date_reg?: Date;  
     client?: Client;
     location?: Location;
@@ -230,6 +231,7 @@ export interface Sale {
     status?: SaleStatus;
     sale_payments?: SalePayment[];
     inventory?: Inventory[];
+    last_pending_payment?: SalePayment;
 }
 
 //Sale payment
@@ -266,8 +268,11 @@ export interface CashRegister {
     id?: number;
     no?: string;
     amount?: number;
+    supplier?: string;
     description?: string;
     date_reg?: Date;
     location?: Location;
     user?: User;
+    date_1?: Date | string;
+    date_2?: Date | string;
 }

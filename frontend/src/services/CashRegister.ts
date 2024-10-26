@@ -1,5 +1,5 @@
 import apiService from './apiService';
-import { CashRegister } from '../types/modelType';
+import { CashRegister, Sale, SalePayment } from '../types/modelType';
 
 export const getCashRegister = async (cashRegister: CashRegister) => {
   const response = await apiService.get('/manage/cashregister', {
@@ -36,6 +36,28 @@ export const deleteCashRegister = async (cashRegister: CashRegister) => {
   const response = await apiService.delete('/manage/cashregister', {
     params: {
       id: cashRegister.id
+    }
+  });
+  return response.data;
+};
+
+export const getCountCashRegisterSales = async (sales?: Sale, filters?: any) => {
+  const response = await apiService.get('/manage/cashregister/sales', {
+    params: {
+      query: 'count',
+      filters: filters,
+      ...sales
+    }
+  });
+  return response.data;
+};
+
+export const getCountCashRegisterSalesPayments = async (sale_payments?: SalePayment, filters?: any) => {
+  const response = await apiService.get('/manage/cashregister/sales', {
+    params: {
+      query: 'count_payments',
+      filters: filters,
+      ...sale_payments
     }
   });
   return response.data;

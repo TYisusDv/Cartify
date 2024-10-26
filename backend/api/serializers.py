@@ -3,6 +3,7 @@ from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 from django.utils.timezone import localtime
+from django.db.models import Q, F
 from .models import *
 import json, base64
 
@@ -1161,11 +1162,77 @@ class GetInventorySerializer(serializers.ModelSerializer):
         model = InventoryModel
         fields = ['id']
 
+#Sale status
+class SaleStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleStatusModel
+        fields = '__all__'
+
+class AddEditSaleStatusSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(error_messages = {
+        'required': 'The name is required.',
+        'blank': 'The name cannot be blank.',
+        'null': 'The name cannot be blank.',
+        'max_length': 'The name cannot exceed 100 characters.',
+    }, max_length = 100)
+
+    calculate = serializers.BooleanField(error_messages = {
+        'required': 'The calculate is required.',
+        'blank': 'The calculate cannot be blank.',
+        'null': 'The calculate cannot be blank.',
+        'invalid': 'The calculate is invalid.',
+    })
+
+    class Meta:
+        model = SaleStatusModel
+        exclude = ['id']
+
+class GetSaleStatusSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The sale status is required.',
+        'blank': 'The sale status cannot be blank.',
+        'null': 'The sale status cannot be blank.',
+        'invalid': 'The sale status is invalid.',
+    })
+    
+    class Meta:
+        model = SaleStatusModel
+        fields = ['id']
+
 #Sale payment
 class SalePaymentsSerializer(serializers.ModelSerializer):
     payment_method = PaymentMethodsSerializer(read_only = True)
     location = LocationsSerializer(read_only = True)
     user = UserExcludeSerializer(read_only = True)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        
+        if instance.date_limit:
+            representation['date_limit'] = instance.date_limit.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+        
+        return representation
+    
+    class Meta:
+        model = SalePaymentsModel
+        fields = '__all__'
+
+class SalesNoPaymentSerializer(serializers.ModelSerializer):
+    client = ClientsSerializer(read_only = True)
+    inventory = InventorySerializer(source = 'inventory_sale', many = True, read_only = True)
+    location = LocationsSerializer(read_only = True)
+    user = UserExcludeSerializer(read_only = True)
+    status = SaleStatusSerializer(read_only = True)
+
+    class Meta:
+        model = SalesModel
+        fields = '__all__'
+
+class SalePaymentsSaleSerializer(serializers.ModelSerializer):
+    payment_method = PaymentMethodsSerializer(read_only = True)
+    location = LocationsSerializer(read_only = True)
+    user = UserExcludeSerializer(read_only = True)
+    sale = SalesNoPaymentSerializer(read_only = True)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -1330,51 +1397,28 @@ class GetSalePaymentSerializer(serializers.ModelSerializer):
         model = SalePaymentsModel
         fields = ['id']
 
-#Sale status
-class SaleStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SaleStatusModel
-        fields = '__all__'
-
-class AddEditSaleStatusSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(error_messages = {
-        'required': 'The name is required.',
-        'blank': 'The name cannot be blank.',
-        'null': 'The name cannot be blank.',
-        'max_length': 'The name cannot exceed 100 characters.',
-    }, max_length = 100)
-
-    calculate = serializers.BooleanField(error_messages = {
-        'required': 'The calculate is required.',
-        'blank': 'The calculate cannot be blank.',
-        'null': 'The calculate cannot be blank.',
-        'invalid': 'The calculate is invalid.',
-    })
-
-    class Meta:
-        model = SaleStatusModel
-        exclude = ['id']
-
-class GetSaleStatusSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(error_messages = {
-        'required': 'The sale status is required.',
-        'blank': 'The sale status cannot be blank.',
-        'null': 'The sale status cannot be blank.',
-        'invalid': 'The sale status is invalid.',
-    })
-    
-    class Meta:
-        model = SaleStatusModel
-        fields = ['id']
-
 #Sale
 class SalesSerializer(serializers.ModelSerializer):
+    last_pending_payment = serializers.SerializerMethodField()
     client = ClientsSerializer(read_only = True)
     sale_payments = SalePaymentsSerializer(source = 'sale_payments_sale', many = True, read_only = True)
     inventory = InventorySerializer(source = 'inventory_sale', many = True, read_only = True)
     location = LocationsSerializer(read_only = True)
     user = UserExcludeSerializer(read_only = True)
     status = SaleStatusSerializer(read_only = True)
+
+    def get_last_pending_payment(self, obj):
+        sale_payments = SalePaymentsModel.objects.filter(sale_id = obj.id)            
+        pending_payment = sale_payments.filter(
+            Q(total__lt = F('subtotal'))
+            | Q(total__isnull=True)
+        ).order_by('date_limit').first()
+
+        return {
+            'id': pending_payment.id,
+            'subtotal': pending_payment.subtotal,
+            'date_limit': pending_payment.date_limit
+        } if pending_payment else None
 
     class Meta:
         model = SalesModel
@@ -1407,7 +1451,14 @@ class AddEditSaleSerializer(serializers.ModelSerializer):
         'blank': 'The payment days cannot be blank.',
         'null': 'The payment days cannot be blank.',
         'invalid': 'The payment days is invalid.',
-    }, required = False)
+    }, required = False, allow_null = True)
+
+    note = serializers.CharField(error_messages = {
+        'required': 'The note is required.',
+        'blank': 'The note cannot be blank.',
+        'null': 'The note cannot be blank.',
+        'max_length': 'The note cannot exceed 100 characters.',
+    }, max_length = 100, required = False)
 
     client_id = serializers.IntegerField(error_messages = {
         'required': 'The client is required.',
@@ -1540,6 +1591,13 @@ class AddEditCashRegisterSerializer(serializers.ModelSerializer):
         'null': 'The amount cannot be blank.',
         'invalid': 'The amount is invalid.',
     })
+
+    supplier = serializers.CharField(error_messages = {
+        'required': 'The supplier is required.',
+        'blank': 'The supplier cannot be blank.',
+        'null': 'The supplier cannot be blank.',
+        'max_length': 'The supplier cannot exceed 100 characters.',
+    }, max_length = 100)
 
     description = serializers.CharField(error_messages = {
         'required': 'The description is required.',

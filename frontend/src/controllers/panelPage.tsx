@@ -11,6 +11,7 @@ const AuthLogoutPage = React.lazy(() => import('../pages/auth/authLogoutPage'));
 const AppPOSPage = React.lazy(() => import('../pages/app/pos/AppPOSPage'));
 const AppInventoryPage = React.lazy(() => import('../pages/app/inventory/AppInventoryPage'));
 const AppInventoryTransferPage = React.lazy(() => import('../pages/app/inventory/transfer/AppInventoryTransferPage'));
+const StatisticsSales = React.lazy(() => import('../pages/statistics/Sales'));
 const ManageUsersPage = React.lazy(() => import('../pages/manage/manageUsersPage'));
 const ManageClientsPage = React.lazy(() => import('../pages/manage/clients/ManageClientsPage'));
 const ManageTaxesPage = React.lazy(() => import('../pages/manage/taxes/ManageTaxesPage'));
@@ -24,7 +25,8 @@ const ManageSalesPage = React.lazy(() => import('../pages/manage/sales/ManageSal
 const ManageSalePayments = React.lazy(() => import('../pages/manage/sales/payments/Payments'));
 const ManageSaleReceipt = React.lazy(() => import('../pages/manage/sales/receipt/Receipt'));
 const ManageSaleStatus = React.lazy(() => import('../pages/manage/sales/status/Status'));
-const ManageCashRegister = React.lazy(() => import('../pages/manage/cashregister/CashRegister'));
+const ManageCashRegister = React.lazy(() => import('../pages/manage/cashregister/index/CashRegister'));
+const ManageCashRegisterSales = React.lazy(() => import('../pages/manage/cashregister/sales/Sales'));
 const SettingGeneralPage = React.lazy(() => import('../pages/settings/settingGeneralPage'));
 
 const PanelPage: React.FC = () => {
@@ -74,9 +76,27 @@ const PanelPage: React.FC = () => {
                 <li><Link to='/manage/inventory/types' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/inventory/types')}`}><SearchAreaIcon size={20} /> {translations.types}</Link></li>
             </DropdownMenu>
           </li>
-          <li><Link to='/statistics' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/statistics')}`}><Analytics02Icon />  {translations.statistics}</Link></li>
+          <li>
+            <DropdownMenu
+              label={translations.statistics}
+              icon={<Analytics02Icon className='w-7' />}
+              links={['/statistics/sales']}
+            >
+              <li><Link to='/statistics/sales' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/statistics/sales')}`}><Analytics02Icon size={20} /> Ventas</Link></li>
+            </DropdownMenu>
+          </li>
           <hr className='border dark:border-slate-600' />
-          <li><Link to='/manage/cashregister' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/cashregister')}`}><Cash01Icon />  {translations.cash_register}</Link></li>
+          <li>
+            <DropdownMenu 
+              label={translations.cash_register} 
+              icon={<Cash01Icon className='w-7' />}
+              links={['/manage/cashregister', '/manage/cashregister/sales']}
+
+            >
+                <li><Link to='/manage/cashregister' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/cashregister')}`}><Cash01Icon size={20} /> Gastos</Link></li>
+                <li><Link to='/manage/cashregister/sales' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/cashregister/sales')}`}><Cash01Icon size={20} /> Ingresos</Link></li>
+            </DropdownMenu>
+          </li>
           <li><Link to='/manage/users' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/users')}`}><UserGroupIcon />  {translations.users}</Link></li>
           <li><Link to='/manage/clients' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/clients')}`}><LocationUser04Icon />  {translations.clients}</Link></li>
           <li><Link to='/manage/locations' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/locations')}`}><StoreLocation02Icon />  {translations.locations}</Link></li>
@@ -125,7 +145,9 @@ const PanelPage: React.FC = () => {
             <Route path='/app/pos' element={<AppPOSPage />} />
             <Route path='/app/inventory' element={<AppInventoryPage />} />
             <Route path='/app/inventory/transfer' element={<AppInventoryTransferPage  />} />
+            <Route path='/statistics/sales' element={<StatisticsSales  />} />
             <Route path='/manage/cashregister' element={<ManageCashRegister/>} />
+            <Route path='/manage/cashregister/sales' element={<ManageCashRegisterSales/>} />            
             <Route path='/manage/users' element={<ManageUsersPage />} />
             <Route path='/manage/clients' element={<ManageClientsPage  />} />
             <Route path='/manage/taxes' element={<ManageTaxesPage />} />

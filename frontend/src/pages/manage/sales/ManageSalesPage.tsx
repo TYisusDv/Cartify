@@ -45,6 +45,7 @@ const ManageSalesPage: React.FC = () => {
         { name: 'id', headerName: 'No. Factura' },
         { name: 'status.name', headerName: 'Estado' },
         { name: 'total', headerName: 'Total' },
+        { name: '', headerName: 'Pagos pendientes' },
         { name: 'location.name', headerName: 'Sucursal' },
         { name: 'client.person.firstname', headerName: 'Cliente' },
         { name: 'user.first_name', headerName: 'Empleado' },

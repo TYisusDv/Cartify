@@ -26,14 +26,16 @@ interface TableProps {
     order?: string;
     query?: string;
     id?: string | number;
+    classNameFilters?: string;
+    filters_params?: any;
 }
 
-const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, filters, order_by = 'id', order = 'desc', query = 'table', id }) => {
+const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, filters, order_by = 'id', order = 'desc', query = 'table', id, classNameFilters, filters_params }) => {
     const { translations } = useTranslations();
     const [data, setData] = useState<DataRow[]>([]);
     const itemsPerPage = 10;
     const [totalPages, setTotalPages] = useState(1);
-    const [formValues, setFormValues] = useState({ query: query, id: id, page: 1, show: itemsPerPage, search: '', order_by: order_by, order: order });
+    const [formValues, setFormValues] = useState({ query: query, id: id, page: 1, show: itemsPerPage, search: '', order_by: order_by, order: order, filters: filters_params });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -60,6 +62,10 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
 
         fetchData();
     }, [endpoint, reloadTable, formValues]);
+
+    useEffect(() => {
+        setFormValues((prev) => ({...prev, filters: filters_params}));
+    }, [filters_params]);
 
     const handlePageChange = (page: number) => {
         setFormValues(prev => ({
@@ -89,7 +95,7 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
 
     return (
         <div className='flex flex-col gap-2'>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 items-start gap-2'>
+            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 items-start gap-2 ${classNameFilters}`}>
                 <div className='col-span-1 w-full bg-gray-100 dark:bg-slate-700 rounded-2xl'>
                     <Input
                         props={{

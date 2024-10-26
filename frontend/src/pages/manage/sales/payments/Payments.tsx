@@ -118,7 +118,7 @@ const Payments: React.FC = () => {
                         </div>
                         <div>
                             <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total a pagar</h2>
-                            <h3 className='text-lg font-bold dark:text-white'>{countData.total_payment}</h3>
+                            <h3 className='text-lg font-bold dark:text-white'>Q{countData.total_payment}</h3>
                         </div>
                     </div>
                     <div className='col-span-1 flex items-center gap-3 border-r-0 pt-3 border-gray-100 md:border-r-0 lg:border-r-0 lg:p-0 dark:border-slate-600'>
@@ -127,7 +127,7 @@ const Payments: React.FC = () => {
                         </div>
                         <div>
                             <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total restante</h2>
-                            <h3 className='text-lg font-bold dark:text-white'>{countData.remaining}</h3>
+                            <h3 className='text-lg font-bold dark:text-white'>Q{countData.remaining}</h3>
                         </div>
                     </div>
                 </div>

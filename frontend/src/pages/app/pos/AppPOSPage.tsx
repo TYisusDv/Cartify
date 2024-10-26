@@ -114,7 +114,7 @@ const AppPOSPage: React.FC = () => {
     const handleQuantityChange = (index: number, newQuantity: number) => {
         setFormValuesDetails((prevDetails) => {
             if (!prevDetails.length) return prevDetails;
-
+    
             const updatedDetails = prevDetails.map((detail, idx) => {
                 if (idx === index && newQuantity > 0) {
                     return {
@@ -123,8 +123,8 @@ const AppPOSPage: React.FC = () => {
                     };
                 }
                 return detail;
-            });
-
+            }).filter((detail, idx) => !(idx === index && newQuantity === 0));
+    
             return updatedDetails;
         });
     };

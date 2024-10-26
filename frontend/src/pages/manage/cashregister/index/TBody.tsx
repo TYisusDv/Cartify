@@ -1,7 +1,7 @@
 import React from 'react';
-import { Calendar03Icon, Cancel01Icon, DashboardBrowsingIcon, DocumentCodeIcon, Note01Icon, StoreLocation01Icon, Tick01Icon, UserIcon } from 'hugeicons-react';
-import useTranslations from '../../../hooks/useTranslations';
-import { CashRegister } from '../../../types/modelType';
+import { Calendar03Icon, DistributionIcon, DocumentCodeIcon, Note01Icon, StoreLocation01Icon, UserIcon } from 'hugeicons-react';
+import useTranslations from '../../../../hooks/useTranslations';
+import { CashRegister } from '../../../../types/modelType';
 
 interface TablePageProps {
     data?: Array<CashRegister>;
@@ -34,6 +34,9 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                         </td>
                         <td className='px-6 py-4'>
                             <span className='flex items-center gap-1'><DocumentCodeIcon size={22} /> {row.no || '-'}</span>
+                        </td>
+                        <td className='px-6 py-4'>
+                            <span className='flex items-center gap-1'><DistributionIcon size={22} /> {row.supplier || '-'}</span>
                         </td>
                         <td className='px-6 py-4'>
                             <span className='flex items-center gap-1'>Q {row.amount || '-'}</span>

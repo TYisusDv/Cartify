@@ -95,7 +95,7 @@ const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_va
 
     return (
         <div ref={containerRef} className='flex border-2 h-full border-gray-200 rounded-2xl p-2 select-none dark:border-slate-600 items-center justify-between w-full gap-2 dark:text-white'>
-            <h3 className='w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'>{label} {required ? <span className='text-red-500'>*</span> : ''}</h3>
+            <h3 className='flex gap-1 w-auto text-sm font-semibold text-nowrap dark:text-gray-100 pl-1'><span className='text-wrap'>{label}</span> {required ? <span className='text-red-500'>*</span> : ''}</h3>
             <div className='relative w-full'>
                 <select
                     {...props}

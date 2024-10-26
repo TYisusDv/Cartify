@@ -45,6 +45,16 @@ export const getPayment = async (salePayment: SalePayment) => {
   return response.data;
 };
 
+export const getPaymentPending = async (id: number) => {
+  const response = await apiService.get('/manage/sale/payments', {
+    params: {
+      query: 'pending',
+      id: id
+    }
+  });
+  return response.data;
+};
+
 export const getCountPayments = async (id: number) => {
   const response = await apiService.get('/manage/sale/payments', {
     params: {
