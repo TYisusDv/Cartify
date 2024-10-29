@@ -57,7 +57,7 @@ const Sales: React.FC = () => {
     const table_header_payments = [
         { name: 'no', headerName: 'No. Recibo' },
         { name: 'date_reg', headerName: 'Fecha de registro' },
-        { name: 'sale.status.name', headerName: 'Estado Factura' },
+        { name: 'payment_method.name', headerName: 'Metodo de pago' },
         { name: 'total', headerName: 'Total' },
         { name: 'location.name', headerName: 'Ubicacion' },
         { name: 'sale.client.person.firstname', headerName: 'Cliente' },

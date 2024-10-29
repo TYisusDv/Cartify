@@ -1259,13 +1259,13 @@ class AddEditSalePaymentSerializer(serializers.ModelSerializer):
         'blank': 'The no cannot be blank.',
         'null': 'The no cannot be blank.',
         'invalid': 'The no is invalid.',
-    }, required = False)
+    }, required = False, allow_null = True)
 
     note = serializers.CharField(error_messages = {
         'required': 'The note is required.',
         'blank': 'The note cannot be blank.',
         'null': 'The note cannot be blank.',
-    }, required = False)
+    }, required = False, allow_null = True)
 
     subtotal = serializers.FloatField(error_messages = {
         'required': 'The subtotal is required.',
@@ -1425,6 +1425,13 @@ class SalesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AddEditSaleSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The id is required.',
+        'blank': 'The id cannot be blank.',
+        'null': 'The id cannot be blank.',
+        'invalid': 'The id is invalid.',
+    })
+
     total = serializers.FloatField(error_messages = {
         'required': 'The total is required.',
         'blank': 'The total cannot be blank.',
@@ -1458,7 +1465,7 @@ class AddEditSaleSerializer(serializers.ModelSerializer):
         'blank': 'The note cannot be blank.',
         'null': 'The note cannot be blank.',
         'max_length': 'The note cannot exceed 100 characters.',
-    }, max_length = 100, required = False)
+    }, max_length = 100, required = False, allow_blank = True)
 
     client_id = serializers.IntegerField(error_messages = {
         'required': 'The client is required.',
@@ -1517,7 +1524,7 @@ class AddEditSaleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = SalesModel
-        exclude = ['id', 'client', 'location', 'user', 'status']
+        exclude = ['client', 'location', 'user', 'status']
 
 class GetSaleSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(error_messages = {

@@ -66,12 +66,12 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
             if (type === 'add') {
                 const response = await addPayment(formValues);
                 response_resp = response?.resp;
+                handleInvoice(response_resp.id);
             } else if (type === 'edit') {
                 const response = await editPayment(formValues);
                 response_resp = response?.resp;
             }
 
-            handleInvoice(response_resp.id);
             addAlert({
                 id: generateUUID(),
                 title: 'Success',

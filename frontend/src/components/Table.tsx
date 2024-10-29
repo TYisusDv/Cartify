@@ -28,9 +28,11 @@ interface TableProps {
     id?: string | number;
     classNameFilters?: string;
     filters_params?: any;
+    show_search?: boolean;
+    show_pagination?: boolean;
 }
 
-const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, filters, order_by = 'id', order = 'desc', query = 'table', id, classNameFilters, filters_params }) => {
+const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, filters, order_by = 'id', order = 'desc', query = 'table', id, classNameFilters, filters_params, show_search = true, show_pagination = true }) => {
     const { translations } = useTranslations();
     const [data, setData] = useState<DataRow[]>([]);
     const itemsPerPage = 10;
@@ -44,7 +46,7 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
                 const response_resp = response.resp;
 
                 setData(response_resp);
-                setTotalPages(response.total_pages);                
+                setTotalPages(response.total_pages);
             } catch (error) {
                 const messages = extractMessages(error);
                 messages.forEach(msg => {
@@ -64,7 +66,7 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
     }, [endpoint, reloadTable, formValues]);
 
     useEffect(() => {
-        setFormValues((prev) => ({...prev, filters: filters_params}));
+        setFormValues((prev) => ({ ...prev, filters: filters_params }));
     }, [filters_params]);
 
     const handlePageChange = (page: number) => {
@@ -96,22 +98,24 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
     return (
         <div className='flex flex-col gap-2'>
             <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 items-start gap-2 ${classNameFilters}`}>
-                <div className='col-span-1 w-full bg-gray-100 dark:bg-slate-700 rounded-2xl'>
-                    <Input
-                        props={{
-                            id: 'search',
-                            name: 'search',
-                            onChange: (e) => setFormValues(prev => ({
-                                ...prev,
-                                search: e.target.value
-                            })),
-                            value: formValues.search || ''
-                        }}
-                        label={translations.search}
-                        icon={<Search01Icon className='icon' size={20} />}
-                        required={false}
-                    />
-                </div>
+                {show_search && (
+                    <div className='col-span-1 w-full bg-gray-100 dark:bg-slate-700 rounded-2xl'>
+                        <Input
+                            props={{
+                                id: 'search',
+                                name: 'search',
+                                onChange: (e) => setFormValues(prev => ({
+                                    ...prev,
+                                    search: e.target.value
+                                })),
+                                value: formValues.search || ''
+                            }}
+                            label={translations.search}
+                            icon={<Search01Icon className='icon' size={20} />}
+                            required={false}
+                        />
+                    </div>
+                )}
                 {filters && cloneElement(filters, { formValues, setFormValues })}
             </div>
             <div className='flex flex-col w-full'>
@@ -134,31 +138,33 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
                         {cloneElement(tbody, { data })}
                     </table>
                 </div>
-                <div className="flex justify-end items-center mt-4">
-                    <button
-                        onClick={() => handlePageChange(formValues.page - 1)}
-                        disabled={formValues.page === 1}
-                        className="px-3 py-2 mx-1 bg-gray-200 dark:bg-slate-600 dark:text-white rounded-lg"
-                    >
-                        Previous
-                    </button>
-                    {Array.from({ length: totalPages }, (_, i) => (
+                {show_pagination && (
+                    <div className="flex justify-end items-center mt-4">
                         <button
-                            key={i}
-                            onClick={() => handlePageChange(i + 1)}
-                            className={`px-4 py-2 mx-1 ${formValues.page === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-slate-600 dark:text-white'} rounded-lg`}
+                            onClick={() => handlePageChange(formValues.page - 1)}
+                            disabled={formValues.page === 1}
+                            className="px-3 py-2 mx-1 bg-gray-200 dark:bg-slate-600 dark:text-white rounded-lg"
                         >
-                            {i + 1}
+                            Previous
                         </button>
-                    ))}
-                    <button
-                        onClick={() => handlePageChange(formValues.page + 1)}
-                        disabled={formValues.page === totalPages}
-                        className="px-3 py-2 mx-1 bg-gray-200 dark:bg-slate-600 dark:text-white rounded-lg"
-                    >
-                        Next
-                    </button>
-                </div>
+                        {Array.from({ length: totalPages }, (_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => handlePageChange(i + 1)}
+                                className={`px-4 py-2 mx-1 ${formValues.page === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-slate-600 dark:text-white'} rounded-lg`}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+                        <button
+                            onClick={() => handlePageChange(formValues.page + 1)}
+                            disabled={formValues.page === totalPages}
+                            className="px-3 py-2 mx-1 bg-gray-200 dark:bg-slate-600 dark:text-white rounded-lg"
+                        >
+                            Next
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

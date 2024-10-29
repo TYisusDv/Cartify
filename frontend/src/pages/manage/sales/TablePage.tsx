@@ -56,7 +56,7 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                         </td>
                         <td className='px-6 py-4'>
                             {row.last_pending_payment ? 
-                                <span className={`inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold rounded-xl ${(calculateDaysRemaining(row.last_pending_payment.date_limit ? new Date(row.last_pending_payment.date_limit) : undefined) || 0) < 0 ? 'bg-red-500' : (calculateDaysRemaining(row.last_pending_payment.date_limit ? new Date(row.last_pending_payment.date_limit) : undefined) || 0) <= 3 ? 'bg-yellow-500' : 'bg-green-500'}`}>
+                                <span className={`inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold rounded-xl ${(calculateDaysRemaining(row.last_pending_payment.date_limit ? new Date(row.last_pending_payment.date_limit) : undefined) || 0) < -3 ? 'bg-red-500' : (calculateDaysRemaining(row.last_pending_payment.date_limit ? new Date(row.last_pending_payment.date_limit) : undefined) || 0) <= 0 ? 'bg-yellow-500' : 'bg-green-500'}`}>
                                     <Calendar01Icon size={22} />
                                     {calculateDaysRemaining(row.last_pending_payment.date_limit ? new Date(row.last_pending_payment.date_limit) : undefined)} dias.                        
                                 </span>

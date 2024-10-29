@@ -55,6 +55,8 @@ const AppPOSPage: React.FC = () => {
     });
 
     const [updateFlag, setUpdateFlag] = useState(false);
+    const [selectedProductIndex, setSelectedProductIndex] = useState<number | null>(null);
+    const [newPrice, setNewPrice] = useState<number>(0);
 
     useEffect(() => {
         sessionStorage.setItem('posValues', JSON.stringify(formValues));
@@ -114,7 +116,7 @@ const AppPOSPage: React.FC = () => {
     const handleQuantityChange = (index: number, newQuantity: number) => {
         setFormValuesDetails((prevDetails) => {
             if (!prevDetails.length) return prevDetails;
-    
+
             const updatedDetails = prevDetails.map((detail, idx) => {
                 if (idx === index && newQuantity > 0) {
                     return {
@@ -124,7 +126,7 @@ const AppPOSPage: React.FC = () => {
                 }
                 return detail;
             }).filter((detail, idx) => !(idx === index && newQuantity === 0));
-    
+
             return updatedDetails;
         });
     };
@@ -172,6 +174,9 @@ const AppPOSPage: React.FC = () => {
             const { subtotal = 0, discount = 0, payment_method, pay = 0 } = prevFormValuesPayment;
 
             let updatedDetails = formValuesDetails?.map((row) => {
+                if (row.isPriceEdited) {
+                    return row;
+                }
                 if (formValues.type === 1) {
                     return row.product?.cash_price !== row.price
                         ? { ...row, price: row.product?.cash_price }
@@ -323,6 +328,28 @@ const AppPOSPage: React.FC = () => {
         }
     };
 
+    const handleProductClick = (index: number) => {
+        const selectedProduct = formValuesDetails[index];
+        if (formValues.type === 2 && selectedProduct.price && selectedProduct.price >= (selectedProduct.product?.credit_price || 0)) {
+            setSelectedProductIndex(index);
+            setNewPrice(selectedProduct.price || selectedProduct.product?.credit_price || 0);
+            setIsModalOpen((prev) => ({ ...prev, edit_price: true }));
+        }
+    };
+
+    const handleSavePrice = () => {
+        if (selectedProductIndex !== null) {
+            setFormValuesDetails((prevDetails) =>
+                prevDetails.map((item, idx) =>
+                    idx === selectedProductIndex
+                        ? { ...item, price: newPrice, isPriceEdited: true }
+                        : item
+                )
+            );
+            setIsModalOpen((prev) => ({ ...prev, edit_price: false }));
+        }
+    }
+
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
             <div className='flex items-center justify-between w-full p-8 animate__animated animate__fadeIn animate__faster'>
@@ -407,7 +434,9 @@ const AppPOSPage: React.FC = () => {
                             <div className='flex flex-col gap-2 h-80'>
                                 {formValuesDetails && formValuesDetails.length > 0 ? (
                                     formValuesDetails.map((row, index) => (
-                                        <div className='flex gap-3 w-full p-4 rounded-lg cursor-pointer hover:scale-[1.02] dark:bg-slate-600 dark:text-white transition-all ease-in-out duration-200'>
+                                        <div 
+                                            className='flex gap-3 w-full p-4 rounded-lg cursor-pointer hover:scale-[1.02] dark:bg-slate-600 dark:text-white transition-all ease-in-out duration-200'      
+                                        >
                                             <div
                                                 className='w-[4.4rem] h-16 bg-cover rounded-full border-[3px] dark:border-slate-500'
                                                 style={{
@@ -431,7 +460,10 @@ const AppPOSPage: React.FC = () => {
                                                             onChange={(e) => handleQuantityChange(index, Number(e.target.value))}
                                                         />
                                                     </span>
-                                                    <span className='font-bold uppercase ml-2'>Q{((row.price || 0) * (row.quantity || 0)).toFixed(2)}</span>
+                                                    <span 
+                                                        className='font-bold uppercase ml-2'
+                                                        onClick={() => handleProductClick(index)}
+                                                    >Q{((row.price || 0) * (row.quantity || 0)).toFixed(2)}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -671,23 +703,22 @@ const AppPOSPage: React.FC = () => {
                                 </div>
                             )}
                             {formValuesPayment.payment_method?.allow_note && (
-                                    <Input
-                                        props={{
-                                            name: 'note',
-                                            value: formValuesPayment.note || '',
-                                            onChange: (e) => {
-                                                setFormValuesPayment(prev => ({
-                                                    ...prev,
-                                                    note: e.target.value
-                                                }));
-                                            },
-                                        }}
-                                        label='Nota'
-                                        icon={<Note01Icon />}
-                                        required={false}
-                                    />
-                                )
-                            }
+                                <Input
+                                    props={{
+                                        name: 'note',
+                                        value: formValuesPayment.note || '',
+                                        onChange: (e) => {
+                                            setFormValuesPayment(prev => ({
+                                                ...prev,
+                                                note: e.target.value
+                                            }));
+                                        },
+                                    }}
+                                    label='Nota'
+                                    icon={<Note01Icon />}
+                                    required={false}
+                                />
+                            )}
                             <div className='w-full'>
                                 <Input
                                     props={{
@@ -772,10 +803,30 @@ const AppPOSPage: React.FC = () => {
             )}
 
             {isModalOpen.edit_price && (
-                <Modal title={translations.add_client} onClose={() => setIsModalOpen({ ...isModalOpen, add_client: false })} className='max-w-screen-xl'>
-                    <form autoComplete='off'>
+                <Modal title='Editar precio' onClose={() => setIsModalOpen({ ...isModalOpen, edit_price: false })}>
+                    <form autoComplete='off' onSubmit={(e) => { e.preventDefault(); handleSavePrice(); }}>
                         <div className='flex flex-col gap-2 w-full tab-item'>
-
+                            <Input
+                                props={{
+                                    id: 'newPrice',
+                                    name: 'newPrice',
+                                    type: 'number',
+                                    value: newPrice,
+                                    min: selectedProductIndex !== null ? (formValuesDetails[selectedProductIndex]?.product?.credit_price || 0) : 0,
+                                    onChange: (e: React.ChangeEvent<HTMLInputElement>) => setNewPrice(Number(e.target.value)),
+                                }}
+                                label='Precio'
+                                icon={'Q'}
+                                required={true}
+                                color='yellow'
+                            />
+                        </div>
+                        <div className='grid grid-cols-1 md:grid-cols-2 mt-3'>
+                            <div className='col-span-1 md:col-end-3 w-full mt-2'>
+                                <button type='submit' className={`btn btn-yellow max-w-full h-12`}>
+                                    Editar
+                                </button>                          
+                            </div>
                         </div>
                     </form>
                 </Modal>

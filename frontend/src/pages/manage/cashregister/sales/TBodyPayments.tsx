@@ -44,7 +44,7 @@ const TBodyPayments: React.FC<TBodyPaymentsProps> = ({ data, selected, setSelect
                         <td className='px-6 py-4'>                            
                             {
                             row.sale?.status?.calculate ? 
-                                <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-blue-600 text-white rounded-xl'><ShoppingBasketSecure03Icon size={22} /> {row.sale.type === 1 ? 'Contado' : row.sale.type === 2 ? 'Credito' : '-'}</span>
+                                <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-blue-600 text-white rounded-xl'><ShoppingBasketSecure03Icon size={22} />{row.payment_method?.name || '-'}</span>
                             :
                                 <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-red-600 text-white rounded-xl'><ShoppingBasketSecure03Icon size={22} /> {row.sale?.status?.name || '-'}</span>
                             }

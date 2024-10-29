@@ -1,5 +1,6 @@
 export interface TableType {
     query: string;
+    filters: any,
 }
 
 export interface SelectGroupType {

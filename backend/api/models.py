@@ -242,7 +242,7 @@ class SaleStatusModel(models.Model):
         db_table = 'sale_status'
 
 class SalesModel(models.Model):
-    id = models.AutoField(primary_key = True)
+    id = models.IntegerField(primary_key = True)
     total = models.FloatField(default = 0, null = False, blank = False)
     type = models.IntegerField(default = 1, null = False, blank = False)
     quantity_of_payments = models.IntegerField(default = 1, null = False, blank = False)

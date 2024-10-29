@@ -197,6 +197,7 @@ export interface Inventory {
     user_transfer?: User;
     user_transfer_receives?: User;
     sale?: Sale
+    isPriceEdited?: boolean;
 }
 
 //PaymentMethod

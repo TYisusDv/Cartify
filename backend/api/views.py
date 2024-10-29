@@ -16,6 +16,7 @@ from .models import *
 from .utils import *
 from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
+from collections import defaultdict
 import uuid, qrcode, io
 
 #Login
@@ -1917,7 +1918,7 @@ class ManageSalePaymentsAPIView(APIView):
                 
         instance = self.get_object(pk = data_id)
         
-        sale_payment_serializer = AddEditSalePaymentSerializer(instance, data = data, payment_method_required = True)
+        sale_payment_serializer = AddEditSalePaymentSerializer(instance, data = data, payment_method_required = False)
         if not sale_payment_serializer.is_valid():
             return JsonResponse({'success': False, 'resp': sale_payment_serializer.errors}, status = 400)
         
@@ -1943,26 +1944,48 @@ class ManageSalesAPIView(APIView):
         except SalesModel.DoesNotExist:
             raise Http404('Sale not found.')
     
+    @classmethod
+    def get_max_id(self) :
+        try:
+            max_id = SalesModel.objects.aggregate(Max('id'))['id__max']
+            
+            if max_id and max_id >= 1:
+                max_id = max_id + 1
+            else:
+                max_id = 1
+
+            return max_id
+        except SalePaymentsModel.DoesNotExist:
+            return 1
+    
     def get(self, request):
         data = request.query_params
         data_id = data.get('id', None)
         query = data.get('query', None)
         search = data.get('search', '')
-        page_number = request.query_params.get('page', 1)
-        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
-        order = request.query_params.get('order', 'desc')
-        show = request.query_params.get('show', 10)
+        page_number = data.get('page', 1)
+        order_by = data.get('order_by', 'id').replace('.', '__')
+        order = data.get('order', 'desc')
+        show = data.get('show', 10)
 
-        if query == 'table':
-            type = request.query_params.get('type', None)   
-            location_id = request.query_params.get('location[id]', None)   
-            status_id = request.query_params.get('status[id]', None)
-           
-            model = SalesModel.objects.filter(
-                Q(id__icontains = search) |
-                Q(client__person__firstname__icontains = search) |
-                Q(client__person__lastname__icontains = search)
-            )
+        type = data.get('type', None)   
+        location_id = data.get('location[id]', None)   
+        status_id = data.get('status[id]', None)
+        other = data.get('other', None)
+        
+        if query == 'table': 
+            if other in [1, '1']:
+                overdue_sales = SalePaymentsModel.objects.filter(
+                    Q(total__lt=F('subtotal')) | Q(total__isnull = True),
+                    date_limit__lt = timezone.now()
+                ).values_list('sale_id', flat = True)
+                model = SalesModel.objects.filter(id__in = overdue_sales)
+            else:          
+                model = SalesModel.objects.filter(
+                    Q(id__icontains = search) |
+                    Q(client__person__firstname__icontains = search) |
+                    Q(client__person__lastname__icontains = search)
+                )
 
             if type not in [None,  0, '0']:
                 model = model.filter(type = type)
@@ -2033,6 +2056,7 @@ class ManageSalesAPIView(APIView):
             sale_payment = data.get('sale_payment', None)
             invoice_id = None
 
+            sale['id'] = self.get_max_id()
             sale['user_id'] = user_id
             
             if not type in [1, 2, '1' '2']:
@@ -2747,7 +2771,7 @@ class ManageCashRegisterSalesAPIView(APIView):
                 model = model.filter(location_id = location_id)
             
             if sale_type not in [None,  0, '0']:
-                model = model.filter(sale__type = sale_type)\
+                model = model.filter(sale__type = sale_type)
             
             if payment_method_id not in [None,  0, '0']:
                 model = model.filter(payment_method_id = payment_method_id)
@@ -2764,8 +2788,131 @@ class ManageCashRegisterSalesAPIView(APIView):
         return JsonResponse({
             'success': True, 
             'resp': 'Page not found.'
-        }, status = 404)\
+        }, status = 404)
+
+#Statistics sales
+class StatisticsSalesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+        date_1_str = data.get('filters[date_1]', None)
+        date_2_str = data.get('filters[date_2]', None)        
+
+        date_1, date_2 = None, None
+        if date_1_str:
+            date_1 = datetime.strptime(date_1_str, '%Y-%m-%d').date()
+
+        if date_2_str:
+            date_2 = datetime.strptime(date_2_str, '%Y-%m-%d').date()
+
+        if query == 'table_payment_methods':        
+            payment_summaries = (
+                SalePaymentsModel.objects.filter(
+                    sale__status__calculate = True, 
+                    payment_method__isnull = False
+                ).values('payment_method__name').annotate(total_payments = Sum('total')) 
+            )
+
+            return JsonResponse({
+                'success': True,
+                'resp': list(payment_summaries),
+                'total_pages':1,
+                'current_page':1
+            })
+
+        elif query == 'table_location_payment_methods':
+            model = SalePaymentsModel.objects.filter(
+                sale__status__calculate = True,
+                payment_method__isnull = False
+            )            
+
+            if date_1_str:
+                model = model.filter(date_reg__gte = date_1)
+            
+            if date_2_str:
+                model = model.filter(date_reg__lte = date_2)
+            
+            payment_summaries = (                
+                model.values('location__name', 'payment_method__name').annotate(total = Sum('total'))
+            )
+
+            location_data = defaultdict(list)
+            for item in payment_summaries:
+                location_name = item['location__name']
+                payment_method_data = {
+                    'name': item['payment_method__name'],
+                    'total': item['total']
+                }
+                location_data[location_name].append(payment_method_data)
+
+            response_data = [
+                {'location_name': location, 'payment_methods': methods}
+                for location, methods in location_data.items()
+            ]
+
+            return JsonResponse({
+                'success': True,
+                'resp': response_data,
+                'total_pages': 1,
+                'current_page': 1
+            })
+
+        elif query == 'table_sales':     
+            model = SalesModel.objects.filter(
+                status__calculate=True 
+            )
+
+            if date_1_str:
+                model = model.filter(date_reg__gte = date_1)
+            
+            if date_2_str:
+                model = model.filter(date_reg__lte = date_2)
+
+            model = model.values('location__name').annotate(total_sales=Sum('total'))
+
+            return JsonResponse({
+                'success': True,
+                'resp': list(model),
+                'total_pages':1,
+                'current_page':1
+            })
         
+        elif query == 'count':        
+            total_sales = SalesModel.objects.filter(status__calculate = True)
+            total_payments = SalePaymentsModel.objects.filter(sale__status__calculate = True)
+
+            if date_1_str:
+                total_sales = total_sales.filter(date_reg__gte = date_1)
+                total_payments = total_payments.filter(date_reg__gte = date_1)
+            
+            if date_2_str:
+                total_sales = total_sales.filter(date_reg__lte = date_2)
+                total_payments = total_payments.filter(date_reg__lte = date_2)            
+
+            total_sales = total_sales.aggregate(total_sales = Sum('total'))['total_sales']
+            total_payments = total_payments.aggregate(total_payments = Sum('total'))['total_payments']
+
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total_sales': total_sales,
+                    'total_payments': total_payments
+                }
+            })
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404)
+
 #PDF
 class PDFGeneratorAPIView(APIView):
     authentication_classes = []

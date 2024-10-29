@@ -1,11 +1,11 @@
 import React from 'react';
-import useTranslations from '../../../../hooks/useTranslations';
-import Input from '../../../../components/Input';
-import { addAlert } from '../../../../utils/Alerts';
-import { generateUUID } from '../../../../utils/uuidGen';
-import { extractMessages } from '../../../../utils/formUtils';
+import useTranslations from '../../hooks/useTranslations';
+import Input from '../../components/Input';
+import { addAlert } from '../../utils/Alerts';
+import { generateUUID } from '../../utils/uuidGen';
+import { extractMessages } from '../../utils/formUtils';
 import { Calendar02Icon, StoreLocation01Icon } from 'hugeicons-react';
-import Select from '../../../../components/Select';
+import Select from '../../components/Select';
 
 interface CrudProps {
     onClose: () => void;
@@ -44,29 +44,7 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
 
     return (
         <form autoComplete='off' onSubmit={onSubmit}>
-            <div className='flex flex-col gap-2'>
-                <div className='z-10'>
-                    <Select
-                        props={{
-                            id: 'location',
-                            name: 'location',
-                            value: formValues?.location?.id,
-                            onChange: (e) => {
-                                setFormValues((prev: any) => ({
-                                    ...prev,
-                                    location: {
-                                        id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
-                                    }
-                                }));
-                            }
-                        }}
-                        endpoint='manage/locations'
-                        endpoint_value='id'
-                        endpoint_text='{name}'
-                        icon={<StoreLocation01Icon size={20} />}
-                        label={translations.location}
-                    />
-                </div>
+            <div className='flex flex-col gap-2'>                
                 <Input
                     props={{
                         id: 'date_1',

@@ -15,6 +15,10 @@ const FiltersPage: React.FC<FiltersPageProps> = ({ formValues, setFormValues }) 
         { value: 2, label: 'Credito' },
     ];
 
+    const other_options = [
+        { value: 1, label: 'Clientes atrasados' }
+    ];
+
     return (
         <>
             <div className='col-span-1 w-full h-full rounded-2xl dark:bg-slate-700'>
@@ -53,7 +57,7 @@ const FiltersPage: React.FC<FiltersPageProps> = ({ formValues, setFormValues }) 
                                 }));
                             }
                         },
-                        value: formValues.brand?.id
+                        value: formValues.type_of_sale?.id
                     }}
                     myOptions={type_of_sales_options}
                     icon={<MoreIcon size={20} />}
@@ -82,6 +86,25 @@ const FiltersPage: React.FC<FiltersPageProps> = ({ formValues, setFormValues }) 
                     endpoint_text='{name}'
                     icon={<StoreLocation01Icon size={20} />}
                     label={translations.location}
+                />
+            </div>
+            <div className='col-span-1 w-full h-full rounded-2xl dark:bg-slate-700'>
+                <Select
+                    props={{
+                        name: 'other',
+                        onChange: (e) => {
+                            if (setFormValues) {
+                                setFormValues((prev: any) => ({
+                                    ...prev,
+                                    other: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                                }));
+                            }
+                        },
+                        value: formValues.other?.id
+                    }}
+                    myOptions={other_options}
+                    icon={<MoreIcon size={20} />}
+                    label='Otros'
                 />
             </div>
         </>

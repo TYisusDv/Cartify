@@ -3,11 +3,11 @@ import { CreditCardIcon } from 'hugeicons-react';
 import useTranslations from '../../hooks/useTranslations';
 import { generateKey } from '../../utils/uuidGen';
 
-interface TBodyProps {
+interface TBodySalesProps {
     data?: Array<{ [key: string]: any }>;
 }
 
-const TBody: React.FC<TBodyProps> = ({ data }) => {
+const TBodySales: React.FC<TBodySalesProps> = ({ data }) => {
     const { translations } = useTranslations();
 
     return (
@@ -18,11 +18,11 @@ const TBody: React.FC<TBodyProps> = ({ data }) => {
                         <td className='px-6 py-4'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
                                 <CreditCardIcon size={22} />
-                                {row.payment_method__name}
+                                {row.location__name}
                             </span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'>Q{row.total_payments || '-'}</span>
+                            <span className='flex items-center gap-1'>Q{row.total_sales || 0}</span>
                         </td>                        
                     </tr>
                 ))
@@ -35,4 +35,4 @@ const TBody: React.FC<TBodyProps> = ({ data }) => {
     );
 };
 
-export default TBody;
+export default TBodySales;
