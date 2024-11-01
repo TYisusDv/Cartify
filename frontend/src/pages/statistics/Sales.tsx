@@ -53,9 +53,28 @@ const Sales: React.FC = () => {
         location: undefined
     });
 
+    const [locationNames, setLocationNames] = useState<string[]>([]);
+    const [totalSales, setTotalSales] = useState<number[]>([]);
+
     const handleTableReload = () => {
         setReloadTable(prev => prev + 1);
     };
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const response = await getTable('/statistics/sales', { query: 'table_sales', filters: formValuesSearch });
+                const responseData = response.resp;
+                const names = responseData.map((item: any) => item.location__name);
+                const sales = responseData.map((item: any) => item.total_sales);
+                setLocationNames(names);
+                setTotalSales(sales);
+            } catch (error) {
+                console.error("Error al obtener datos:", error);
+            }
+        }
+        fetchData();
+    }, [formValuesSearch]);
 
     useEffect(() => {
         async function fetchData() {
@@ -125,7 +144,7 @@ const Sales: React.FC = () => {
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.statistics}</span>
                 </div>
                 <div className='flex gap-2'>
-                    <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => setIsModalOpen((prev) => ({...prev, search: true}))}><Search01Icon /></button>
+                    <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => setIsModalOpen((prev) => ({ ...prev, search: true }))}><Search01Icon /></button>
                 </div>
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
@@ -214,8 +233,30 @@ const Sales: React.FC = () => {
                         </table>
                     </div>
                 </div>
-                <h1 className='font-bold text-xl mt-8 text-black dark:text-white'>Graficos por Sucursal</h1>
+                <h1 className='font-bold text-xl mt-8 text-black dark:text-white'>Graficos</h1>
                 <div className='w-full mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                    <div className='col-span-1 flex flex-col items-center gap-2 w-full text-black dark:text-white'>
+                        <Chart
+                            options={{
+                                chart: {
+                                    type: 'donut',
+                                },
+                                labels: locationNames,
+                                legend: {
+                                    position: 'bottom',
+                                },
+                                theme: {
+                                    mode: 'dark',
+                                },
+                                title: {
+                                    text: 'Total de ventas',
+                                    align: 'center',
+                                },
+                            }}
+                            series={totalSales}
+                            type="donut"
+                        />
+                    </div>
                     <div className='col-span-1 flex flex-col items-center gap-2 w-full text-black dark:text-white'>
                         <div className='w-full mt-4 flex justify-center'>
                             <Chart

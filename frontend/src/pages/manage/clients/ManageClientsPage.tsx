@@ -8,6 +8,8 @@ import Modal from '../../../components/Modal';
 import TablePage from './TablePage';
 import CrudPage from './CrudPage';
 import { getCountClients } from '../../../services/clientsService';
+import { IconFileExcel } from '@tabler/icons-react';
+import { URL_BACKEND } from '../../../services/apiService';
 
 const ManageClientsPage: React.FC = () => {
     const { translations } = useTranslations();
@@ -50,6 +52,10 @@ const ManageClientsPage: React.FC = () => {
         fetchCount();
     }, [reloadTable]);
 
+    const handleExcel = () => {
+        window.open(`${URL_BACKEND}/excel/clients`, '_blank');
+    }
+
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
             <div className='flex items-center justify-between w-full p-8 animate__animated animate__fadeIn animate__faster'>
@@ -58,6 +64,7 @@ const ManageClientsPage: React.FC = () => {
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_clients_info}</span>
                 </div>
                 <div className='flex gap-2'>
+                    <button className='bg-green-600 text-white border-2 border-green-600 hover:bg-green-600/20 hover:text-green-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={handleExcel}><IconFileExcel /></button>
                     <button className='bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('delete', true)} disabled={selected === 0}><Delete02Icon /></button>
                     <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === 0}><PencilEdit02Icon /></button>
                     <button className='bg-orange-500 text-white border-2 border-orange-500 hover:bg-orange-500/20 hover:text-orange-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-orange-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('details', true)} disabled={selected === 0}><EyeIcon /></button>

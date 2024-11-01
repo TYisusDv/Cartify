@@ -12,6 +12,8 @@ import Select from '../../../components/Select';
 import Switch from '../../../components/Switch';
 import { addAlert } from '../../../utils/Alerts';
 import { generateUUID } from '../../../utils/uuidGen';
+import Table from '../../../components/Table';
+import TBodyInventory from './TBodyInventory';
 
 interface CrudPageProps {
     onClose: () => void;
@@ -26,8 +28,9 @@ interface CrudPageProps {
 const CrudPage: React.FC<CrudPageProps> = ({ onClose, toggleModal, handleTableReload, setSelected, setImageUrl, type, selected_id }) => {
     const { translations } = useTranslations();
     const [formValues, setFormValues] = useState<Product>({ id: selected_id, status: true, cost_price: 0, cash_profit: 0, cash_price: 0, credit_profit: 0, credit_price: 0, min_stock: 0 });
-    const [activeTab, setActiveTab] = useState<'home' | 'product_images'>('home');
+    const [activeTab, setActiveTab] = useState<'home' | 'product_images' | 'kardex'>('home');
     const [colorPage, setColorPage] = useState<'blue' | 'orange' | 'red' | 'yellow'>('blue');
+    const [reloadTable, setReloadTable] = useState(0);
     const [productImages, setProductImages] = useState<{ image: string }[]>([]);
     const [updateFlag, setUpdateFlag] = useState(false);
     const {
@@ -262,6 +265,16 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, toggleModal, handleTableRe
         setUpdateFlag(false);
     }, [formValues.cost_price, formValues.credit_price]);
 
+    const table_header = [
+        { name: 'date_reg', headerName: 'Fecha de registro' },
+        { name: 'quantity', headerName: 'Cantidad' },
+        { name: 'product.name', headerName: 'Producto' },
+        { name: 'location.name', headerName: 'Ubicación' },
+        { name: 'type', headerName: 'Tipo' },
+        { name: 'note', headerName: 'Nota' },
+        { name: 'user.first_name', headerName: 'Empleado' },
+    ];
+
     return (
         <div>
             <div className='flex space-x-2 overflow-x-auto'>
@@ -282,6 +295,17 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, toggleModal, handleTableRe
                             onClick={() => setActiveTab(tab as 'home' | 'product_images')}
                         >
                             {translations[tab]}
+                        </button>
+                    ))
+                )}
+                {(type === 'details') && (
+                    ['kardex'].map(tab => (
+                        <button
+                            key={tab}
+                            className={`tab ${tab === activeTab ? `tab-active tab-${colorPage}` : `hover:tab-${colorPage}`}`}
+                            onClick={() => setActiveTab(tab as 'home' | 'kardex')}
+                        >
+                            Kardex
                         </button>
                     ))
                 )}
@@ -664,6 +688,18 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, toggleModal, handleTableRe
                             color={colorPage}
                             required={false}
                         />
+                        <Input
+                            props={{
+                                id: 'date_reg',
+                                name: 'date_reg',
+                                value: formValues.date_reg?.toString(),
+                                disabled: true
+                            }}
+                            label='Fecha de registro'
+                            icon={<Note04Icon className='icon' size={24} />}
+                            color={colorPage}
+                            required={false}
+                        />
                     </div>
                     <div className={`flex flex-col gap-2 w-full tab-item ${'product_images' === activeTab ? 'block' : 'hidden'}`}>
                         <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
@@ -679,6 +715,20 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, toggleModal, handleTableRe
                             ))}
                         </div>
                     </div>
+                    <div className={`flex flex-col gap-2 w-full tab-item ${'kardex' === activeTab ? 'block' : 'hidden'}`}>
+                        <h3 className='font-bold text-black dark:text-white'>Movimientos</h3>
+                        <Table
+                            endpoint='app/inventory'
+                            reloadTable={reloadTable}
+                            header={table_header}
+                            order_by='date_reg'
+                            tbody={
+                                <TBodyInventory />
+                            }
+                            filters_params={{product: {id: formValues.id}}}
+                            show_search={false}
+                        />
+                    </div>
                     <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>
                         <div className='col-span-1 md:col-end-3 w-full'>
                             {(type === 'delete' || type === 'edit' || type === 'add') && (
@@ -689,8 +739,8 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, toggleModal, handleTableRe
                         </div>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

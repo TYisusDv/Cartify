@@ -17,7 +17,8 @@ from .utils import *
 from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
-import uuid, qrcode, io
+from django.conf import settings
+import uuid, qrcode, io, openpyxl
 
 #Login
 class LoginAPIView(APIView):
@@ -1312,15 +1313,33 @@ class AppInventoryAPIView(APIView):
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
 
-        if query == 'table':   
-            type_id = request.query_params.get('type[id]', None)
-            product_id = request.query_params.get('product[id]', None)
-            location_id = request.query_params.get('location[id]', None)
+        type_id = request.query_params.get('type[id]', None)
+        product_id = request.query_params.get('product[id]', None)
+        location_id = request.query_params.get('location[id]', None)
+        date_1_str = data.get('filters[date_1]', None)
+        date_2_str = data.get('filters[date_2]', None)        
 
+        if not product_id:
+            product_id = request.query_params.get('filters[product][id]', None)
+            
+        date_1, date_2 = None, None
+        if date_1_str:
+            date_1 = datetime.strptime(date_1_str, '%Y-%m-%d').date()
+
+        if date_2_str:
+            date_2 = datetime.strptime(date_2_str, '%Y-%m-%d').date()
+
+        if query == 'table':  
             model = InventoryModel.objects.filter(
                 Q(id__icontains = search),
                 type__type__in = [1, 2]
             )
+
+            if date_1:
+                model = model.filter(date_reg__gte = date_1)
+            
+            if date_2:
+                model = model.filter(date_reg__lte = date_2)
             
             if product_id not in [None,  0, '0']:
                 model = model.filter(product_id = product_id)
@@ -1356,6 +1375,12 @@ class AppInventoryAPIView(APIView):
                 Q(id__icontains = search),
                 type__type = 3
             )
+
+            if date_1:
+                model = model.filter(date_reg__gte = date_1)
+            
+            if date_2:
+                model = model.filter(date_reg__lte = date_2)
             
             if product_id not in [None,  0, '0']:
                 model = model.filter(product_id = product_id)
@@ -1413,8 +1438,16 @@ class AppInventoryAPIView(APIView):
             })
         
         elif query == 'count':
-            total = InventoryModel.objects.filter(type__type__in = [1, 2]).count()
+            model = InventoryModel.objects.filter(type__type__in = [1, 2])
             
+            if date_1:
+                model = model.filter(date_reg__gte = date_1)
+            
+            if date_2:
+                model = model.filter(date_reg__lte = date_2)
+
+            total = model.count()
+
             return JsonResponse({
                 'success': True,
                 'resp': {
@@ -1423,8 +1456,16 @@ class AppInventoryAPIView(APIView):
             })    
 
         elif query == 'count_transfer':
-            total = InventoryModel.objects.filter(type__type = 3).count()
+            model = InventoryModel.objects.filter(type__type = 3)
             
+            if date_1:
+                model = model.filter(date_reg__gte = date_1)
+            
+            if date_2:
+                model = model.filter(date_reg__lte = date_2)
+
+            total = model.count()
+
             return JsonResponse({
                 'success': True,
                 'resp': {
@@ -2482,10 +2523,10 @@ class ManageCashRegisterAPIView(APIView):
                 Q(id__icontains = search)
             )
 
-            if date_1_str:
+            if date_1:
                 model = model.filter(date_reg__gte = date_1)
             
-            if date_2_str:
+            if date_2:
                 model = model.filter(date_reg__lte = date_2)
 
             if location_id not in [None,  0, '0']:
@@ -2543,10 +2584,10 @@ class ManageCashRegisterAPIView(APIView):
             if location_id not in [None,  0, '0']:
                 model = model.filter(location_id = location_id)
             
-            if date_1_str:
+            if date_1:
                 model = model.filter(date_reg__gte = date_1)
             
-            if date_2_str:
+            if date_2:
                 model = model.filter(date_reg__lte = date_2)
             
             expense = model.aggregate(total = Sum('amount'))['total'] or 0      
@@ -2653,10 +2694,10 @@ class ManageCashRegisterSalesAPIView(APIView):
                 Q(id__icontains = search)
             )
 
-            if date_1_str:
+            if date_1:
                 model = model.filter(date_reg__gte = date_1)
             
-            if date_2_str:
+            if date_2:
                 model = model.filter(date_reg__lte = date_2)
 
             if location_id not in [None,  0, '0']:
@@ -2686,10 +2727,10 @@ class ManageCashRegisterSalesAPIView(APIView):
                 total__gt = 0
             )
 
-            if date_1_str:
+            if date_1:
                 model = model.filter(date_reg__gte = date_1)
             
-            if date_2_str:
+            if date_2:
                 model = model.filter(date_reg__lte = date_2)
 
             if location_id not in [None,  0, '0']:
@@ -2739,10 +2780,10 @@ class ManageCashRegisterSalesAPIView(APIView):
                     location_id = location_id
                 )
             
-            if date_1_str:
+            if date_1:
                 model = model.filter(date_reg__gte = date_1)
             
-            if date_2_str:
+            if date_2:
                 model = model.filter(date_reg__lte = date_2)
 
             if type not in [None,  0, '0']:
@@ -2761,10 +2802,10 @@ class ManageCashRegisterSalesAPIView(APIView):
                 sale__status__calculate = True
             )                
             
-            if date_1_str:
+            if date_1:
                 model = model.filter(date_reg__gte = date_1)
             
-            if date_2_str:
+            if date_2:
                 model = model.filter(date_reg__lte = date_2)
 
             if location_id not in [None,  0, '0']:
@@ -2834,10 +2875,10 @@ class StatisticsSalesAPIView(APIView):
                 payment_method__isnull = False
             )            
 
-            if date_1_str:
+            if date_1:
                 model = model.filter(date_reg__gte = date_1)
             
-            if date_2_str:
+            if date_2:
                 model = model.filter(date_reg__lte = date_2)
             
             payment_summaries = (                
@@ -2870,10 +2911,10 @@ class StatisticsSalesAPIView(APIView):
                 status__calculate=True 
             )
 
-            if date_1_str:
+            if date_1:
                 model = model.filter(date_reg__gte = date_1)
             
-            if date_2_str:
+            if date_2:
                 model = model.filter(date_reg__lte = date_2)
 
             model = model.values('location__name').annotate(total_sales=Sum('total'))
@@ -2986,3 +3027,54 @@ class PDFGeneratorAPIView(APIView):
             'success': False, 
             'resp': 'Error generating PDF.'
         }, status = 500)
+    
+#Excel clients
+class ExcelClientsAPIView(APIView):
+    #authentication_classes = [JWTAuthentication]
+    #permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        try:
+            template_path = settings.BASE_DIR / 'api/templates/excel/template_clients.xlsx'
+            wb = openpyxl.load_workbook(template_path)
+            ws = wb.active
+
+            start_row = 5
+            total_row = 34
+            sales_data = SalesModel.objects.filter(
+                status_id = 2
+            ).select_related('client')
+
+            for idx, sale in enumerate(sales_data):
+                row = start_row + idx
+                if row >= total_row:
+                    ws.insert_rows(row)
+                    total_row += 1
+
+                ws[f'A{row}'] = sale.id
+                ws[f'B{row}'] = sale.date_reg.strftime('%Y-%m-%d')
+                ws[f'C{row}'] = sale.client.person.firstname + ' ' + sale.client.person.lastname
+                ws[f'D{row}'] = sale.total
+                
+                remaining = ManageSalePaymentsAPIView.get_remaining(sale.id)
+                ws[f'E{row}'] = remaining if remaining is not None else 0
+
+            ws[f'D{total_row}'] = f'=SUM(D{start_row}:D{total_row - 1})'
+            ws[f'E{total_row}'] = f'=SUM(E{start_row}:E{total_row - 1})'
+
+            output = io.BytesIO()
+            wb.save(output)
+            output.seek(0)
+
+            response = HttpResponse(
+                output,
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            response['Content-Disposition'] = 'attachment; filename="client_invoice.xlsx"'
+            return response
+
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'resp': f'Error generating Excel: {e}'
+            }, status=500)

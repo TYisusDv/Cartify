@@ -197,6 +197,7 @@ class ProductsModel(models.Model):
     credit_profit = models.FloatField(default = 0, null = False, blank = False)
     credit_price = models.FloatField(default = 0, null = False, blank = False)
     min_stock = models.IntegerField(default = 0, null = False, blank = False)
+    date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
     category = models.ForeignKey(ProductCategoriesModel, null = True, blank = False, on_delete = models.RESTRICT)
     brand = models.ForeignKey(ProductBrandsModel, null = True, blank = False, on_delete = models.RESTRICT)
     supplier = models.ForeignKey(SuppliersModel, null = True, blank = False, on_delete = models.RESTRICT) 

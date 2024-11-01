@@ -16,6 +16,12 @@ const AppInventoryPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, details: false });
     const [reloadTable, setReloadTable] = useState(0);
     const [countData, setCountData] = useState({total: 0});
+    const today = new Date();
+    const formattedToday = today.toISOString().split('T')[0];
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const formattedTomorrow = tomorrow.toISOString().split('T')[0];
+    const [formValues, setFormValues] = useState({date_1: formattedToday, date_2: formattedTomorrow});
 
     const handleTableReload = () => {
         setReloadTable(prev => prev + 1);
@@ -38,7 +44,7 @@ const AppInventoryPage: React.FC = () => {
     useEffect(() => {
         const fetchCount = async () => {
             try {
-                const response = await getCountInventory();
+                const response = await getCountInventory(formValues);
                 const response_resp = response.resp;
 
                 setCountData({total: response_resp.total});
@@ -48,7 +54,7 @@ const AppInventoryPage: React.FC = () => {
         };
 
         fetchCount();
-    }, [reloadTable]);
+    }, [reloadTable, formValues]);
     
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
@@ -88,7 +94,8 @@ const AppInventoryPage: React.FC = () => {
                                 setSelected={setSelected}
                             />
                         }
-                        filters={<FiltersPage />}
+                        filters={<FiltersPage formValuesPage={formValues} setFormValuesPage={setFormValues} />}
+                        filters_params={formValues}
                     />
                 </div>
             </div>

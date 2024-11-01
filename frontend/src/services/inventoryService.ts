@@ -20,19 +20,21 @@ export const getCountAllInventory = async () => {
   return response.data;
 };
 
-export const getCountInventory = async () => {
+export const getCountInventory = async (filters: any) => {
   const response = await apiService.get('/app/inventory', {
     params: {
       query: 'count',
+      filters: filters
     }
   });
   return response.data;
 };
 
-export const getCountInventoryTransfer = async () => {
+export const getCountInventoryTransfer = async (filters: any) => {
   const response = await apiService.get('/app/inventory', {
     params: {
       query: 'count_transfer',
+      filters: filters
     }
   });
   return response.data;

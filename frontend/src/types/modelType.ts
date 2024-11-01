@@ -167,6 +167,7 @@ export interface Product {
     credit_profit?: number;
     credit_price?: number;
     min_stock?: number;
+    date_reg?: Date;
     status?: boolean | '0' | '1' | 0 | 1;
     category?: ProductCategory;
     brand?: ProductBrand;
