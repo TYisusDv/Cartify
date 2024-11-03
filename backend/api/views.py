@@ -3035,12 +3035,13 @@ class ExcelClientsAPIView(APIView):
     
     def get(self, request):
         try:
-            template_path = settings.BASE_DIR / 'api/templates/excel/template_clients.xlsx'
+            template_path = settings.BASE_DIR / 'api/templates/excel/pending_clients.xlsx'
             wb = openpyxl.load_workbook(template_path)
             ws = wb.active
 
             start_row = 5
             total_row = 34
+
             sales_data = SalesModel.objects.filter(
                 status_id = 2
             ).select_related('client')
@@ -3070,7 +3071,80 @@ class ExcelClientsAPIView(APIView):
                 output,
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
-            response['Content-Disposition'] = 'attachment; filename="client_invoice.xlsx"'
+            response['Content-Disposition'] = 'attachment; filename="pending_clients.xlsx"'
+            return response
+
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'resp': f'Error generating Excel: {e}'
+            }, status=500)
+        
+#Excel cash register
+class ExcelCashRegisterAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        try:
+            data = request.query_params
+            date_1_str = data.get('filters[date_1]', None)
+            date_2_str = data.get('filters[date_2]', None)    
+            location_id = data.get('filters[location][id]', None)   
+
+            date_1, date_2 = None, None
+            if date_1_str:
+                date_1 = datetime.strptime(date_1_str, '%Y-%m-%d').date()
+
+            if date_2_str:
+                date_2 = datetime.strptime(date_2_str, '%Y-%m-%d').date()
+
+            user = request.user
+            template_path = settings.BASE_DIR / 'api/templates/excel/cash_register.xlsx'
+            wb = openpyxl.load_workbook(template_path)
+            ws = wb.active
+
+            ws['B4'] = user.first_name + ' ' + user.last_name
+            
+            start_row = 7
+            total_row = 25
+
+            cash_register_model = CashRegisterModel.objects.filter()
+            b3_date = ''
+            if date_1:
+                cash_register_model = cash_register_model.filter(date_reg__gte = date_1)
+                b3_date = date_1
+            
+            if date_2:
+                cash_register_model = cash_register_model.filter(date_reg__lte = date_2)
+                b3_date = f'{b3_date} - {date_2}'
+
+            ws['B3'] = b3_date
+
+            if location_id not in [None,  0, '0']:
+                cash_register_model = cash_register_model.filter(location_id = location_id)
+            
+            for idx, cash_register in enumerate(cash_register_model):
+                row = start_row + idx
+                if row >= total_row:
+                    ws.insert_rows(row)
+                    total_row += 1 
+
+                ws[f'A{row}'] = cash_register.no
+                ws[f'B{row}'] = cash_register.date_reg.strftime('%Y-%m-%d')
+                ws[f'C{row}'] = cash_register.supplier
+                ws[f'E{row}'] = cash_register.description     
+                ws[f'F{row}'] = cash_register.amount     
+
+            output = io.BytesIO()
+            wb.save(output)
+            output.seek(0)
+
+            response = HttpResponse(
+                output,
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            response['Content-Disposition'] = 'attachment; filename="cash_register.xlsx"'
             return response
 
         except Exception as e:

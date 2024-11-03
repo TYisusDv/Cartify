@@ -10,6 +10,11 @@ import CrudPage from './Crud';
 import { getCountCashRegister } from '../../../../services/CashRegister';
 import Filters from './Filters';
 import { CashRegister as CashRegisterType } from '../../../../types/modelType';
+import { addAlert } from '../../../../utils/Alerts';
+import { generateUUID } from '../../../../utils/uuidGen';
+import { extractMessages } from '../../../../utils/formUtils';
+import apiService from '../../../../services/apiService';
+import { IconFileExcel } from '@tabler/icons-react';
 
 const Sales: React.FC = () => {
     const { translations } = useTranslations();
@@ -55,6 +60,41 @@ const Sales: React.FC = () => {
         fetchCount();
     }, [reloadTable, formValues]);
 
+    const downloadExcel = async () => {
+        try {
+            const response = await apiService.get('excel/cashregister', {
+                responseType: 'blob',
+                params: {
+                    filters: formValues
+                }
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+
+            link.setAttribute('download', 'cash_register.xlsx');
+
+            document.body.appendChild(link);
+            link.click();
+
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            const messages = extractMessages(error);
+            messages.forEach(msg => {
+                addAlert({
+                    id: generateUUID(),
+                    title: 'An error has occurred.',
+                    msg: msg,
+                    icon: 'Alert01Icon',
+                    color: 'red',
+                    timeout: 2000
+                });
+            });
+        }
+    };
+
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
             <div className='flex items-center justify-between w-full p-8 animate__animated animate__fadeIn animate__faster'>
@@ -63,6 +103,7 @@ const Sales: React.FC = () => {
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_cash_register}</span>
                 </div>
                 <div className='flex gap-2'>
+                    <button className='bg-green-600 text-white border-2 border-green-600 hover:bg-green-600/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={downloadExcel}><IconFileExcel /></button>
                     <button className='bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => setIsModalOpen({...isModalOpen, delete: true})} disabled={selected === undefined}><Delete02Icon /></button>
                     <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => setIsModalOpen({...isModalOpen, edit: true})} disabled={selected === undefined}><PencilEdit02Icon /></button>
                     <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => setIsModalOpen({...isModalOpen, add: true})}><Add01Icon /></button>

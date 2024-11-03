@@ -35,7 +35,7 @@ const Sales: React.FC = () => {
     const formattedTomorrow = tomorrow.toISOString().split('T')[0];
 
     const [formValuesSearch, setFormValuesSearch] = useState({
-        date_1: formattedToday, 
+        date_1: formattedToday,
         date_2: formattedTomorrow,
         location: undefined
     });
@@ -101,7 +101,7 @@ const Sales: React.FC = () => {
                 </div>
                 <div className='flex gap-2'>
                     <Link to={`/manage/sale/payments?id=${selected}`}><button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' disabled={selected === undefined}><Invoice02Icon /></button></Link>
-                    <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => setIsModalOpen((prev) => ({...prev, search: true}))}><Search01Icon /></button>
+                    <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => setIsModalOpen((prev) => ({ ...prev, search: true }))}><Search01Icon /></button>
                 </div>
             </div>
             <div className='grid grid-cols-1 xl:grid-cols-2 gap-3 w-full p-8 animate__animated animate__fadeIn animate__faster'>
@@ -170,8 +170,8 @@ const Sales: React.FC = () => {
                 </div>
             </div>
             {isModalOpen.search && (
-                <Modal title={translations.search} onClose={() => setIsModalOpen((prev) => ({...prev, search: false}))}>
-                    <Crud type='search' formValues={formValuesSearch} setFormValues={setFormValuesSearch} onClose={() => setIsModalOpen((prev) => ({...prev, search: false}))} handleTableReload={handleTableReload} setSelected={setSelected} />
+                <Modal title={translations.search} onClose={() => setIsModalOpen((prev) => ({ ...prev, search: false }))}>
+                    <Crud type='search' formValues={formValuesSearch} setFormValues={setFormValuesSearch} onClose={() => setIsModalOpen((prev) => ({ ...prev, search: false }))} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}
         </DelayedSuspense>
