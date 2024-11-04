@@ -304,7 +304,7 @@ class InventoryModel(models.Model):
     cost = models.FloatField(default = 0, null = False, blank = False)
     quantity = models.FloatField(default = 0, null = False, blank = False)
     note = models.CharField(max_length = 100, null = True, blank = False)
-    type_inventory = models.IntegerField(null = False, blank = False, default = 1)
+    type_inventory = models.IntegerField(null = False, blank = False)
     date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
     type = models.ForeignKey(InventoryTypesModel, on_delete = models.RESTRICT)
     product = models.ForeignKey(ProductsModel, on_delete = models.RESTRICT)
