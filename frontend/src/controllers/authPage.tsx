@@ -28,6 +28,10 @@ const AuthPage: React.FC = () => {
 
       saveToken(response_resp.accessToken);
       saveRefreshToken(response_resp.refreshToken);
+
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2000);
     } catch (error) {
       const messages = extractMessages(error);
       messages.forEach(msg => {
