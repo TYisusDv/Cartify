@@ -532,6 +532,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                                     endpoint='manage/states'
                                     endpoint_value='id'
                                     endpoint_text='{name}'
+                                    filters={{country_id: country}}
                                     icon={<UserAccountIcon size={20} />}
                                     label={translations.address_state}
                                 />
@@ -609,6 +610,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                                     endpoint='manage/cities'
                                     endpoint_value='id'
                                     endpoint_text='{name}'
+                                    filters={{state_id: state}}
                                     icon={<Location01Icon size={20} />}
                                     label={translations.address_city}
                                 />

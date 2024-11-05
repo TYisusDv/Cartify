@@ -17,9 +17,10 @@ interface SelectProps {
     label: string;
     required?: boolean;
     query?: string;
+    filters?: any;
 }
 
-const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_value, endpoint_text, icon, label, required = true, query = 'list' }) => {
+const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_value, endpoint_text, icon, label, required = true, query = 'list', filters }) => {
     const { translations } = useTranslations();
     const selectRef = useRef<HTMLSelectElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -63,7 +64,8 @@ const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_va
                 try {
                     const params = {
                         query: query,
-                        search: searchQuery || ''
+                        search: searchQuery || '',
+                        ...filters
                     };
                     const response = await getList(endpoint, params);
                     if (response.success) {
@@ -87,7 +89,7 @@ const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_va
             }));
             setOptions([{ value: '0', text: translations.select_an_option }, ...newOptions]);
         }
-    }, [endpoint, translations.select_an_option, endpoint_value, endpoint_text, searchQuery, myOptions]);
+    }, [query, endpoint, translations.select_an_option, endpoint_value, endpoint_text, searchQuery, myOptions, filters]);
 
     useEffect(() => {
         setValue(props?.value || '0');

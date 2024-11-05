@@ -170,5 +170,19 @@
     "add_register": "Agregar registro",
     "edit_register": "Editar registro",
     "delete_register_sure": "¿Está seguro/a de que desea eliminar el registro?",
-    "manage_cash_register": "Administra la caja aquí. ¡Agrega, edita y elimina!"
+    "manage_cash_register": "Administra la caja aquí. ¡Agrega, edita y elimina!",
+    "manage_locations_info": "Administra las ubicaciones aquí. ¡Agrega, edita y elimina!",
+    "add_location": "Agregar ubicación",
+    "edit_location": "Editar ubicación",
+    "delete_location_sure": "¿Está seguro/a de que desea eliminar la ubicación?",
+    "identifications": "Identificaciones",
+    "manage_identifications_info": "Administra las identificaciones aquí. ¡Agrega, edita y elimina!",
+    "add_identification": "Agregar identificacion",
+    "edit_identification": "Editar identificacion",
+    "delete_identification_sure": "¿Está seguro/a de que desea eliminar la identificacion?",
+    "client_types": "Tipos de clientes",
+    "manage_client_types_info": "Administra los tipos de clientes aquí. ¡Agrega, edita y elimina!",
+    "add_client_type": "Agregar tipo de cliente",
+    "edit_client_type": "Editar tipo de cliente",
+    "delete_client_type_sure": "¿Está seguro/a de que desea eliminar la tipo de cliente?"
 }

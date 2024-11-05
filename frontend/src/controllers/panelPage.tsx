@@ -1,6 +1,6 @@
 import React, { Suspense, useState } from 'react';
 import { Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
-import { Analytics02Icon, BarCode02Icon, BrandfetchIcon, Cash01Icon, CreditCardIcon, DashboardBrowsingIcon, DashboardSquare01Icon, DistributionIcon, Invoice02Icon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserGroupIcon } from 'hugeicons-react';
+import { Analytics02Icon, BarCode02Icon, BrandfetchIcon, Cash01Icon, CreditCardIcon, DashboardBrowsingIcon, DashboardSquare01Icon, DistributionIcon, Invoice02Icon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserAccountIcon, UserGroupIcon } from 'hugeicons-react';
 import useTranslations from '../hooks/useTranslations';
 import SkeletonLoader from '../components/SkeletonLoader';
 import ErrorPage from '../pages/errorPage';
@@ -14,6 +14,9 @@ const AppInventoryTransferPage = React.lazy(() => import('../pages/app/inventory
 const StatisticsSales = React.lazy(() => import('../pages/statistics/Sales'));
 const ManageUsersPage = React.lazy(() => import('../pages/manage/manageUsersPage'));
 const ManageClientsPage = React.lazy(() => import('../pages/manage/clients/ManageClientsPage'));
+const ManageIdentifications = React.lazy(() => import('../pages/manage/clients/identifications/Identifications'));
+const ManageClientTypes = React.lazy(() => import('../pages/manage/clients/types/Types'));
+const ManageLocations = React.lazy(() => import('../pages/manage/locations/Locations'));
 const ManageTaxesPage = React.lazy(() => import('../pages/manage/taxes/ManageTaxesPage'));
 const ManageSuppliersPage = React.lazy(() => import('../pages/manage/suppliers/ManageSuppliersPage'));
 const ManageProductsPage = React.lazy(() => import('../pages/manage/product/ManageProductsPage'));
@@ -98,7 +101,16 @@ const PanelPage: React.FC = () => {
             </DropdownMenu>
           </li>
           <li><Link to='/manage/users' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/users')}`}><UserGroupIcon />  {translations.users}</Link></li>
-          <li><Link to='/manage/clients' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/clients')}`}><LocationUser04Icon />  {translations.clients}</Link></li>
+          <DropdownMenu 
+              label={translations.clients} 
+              icon={<LocationUser04Icon className='w-7' />}
+              links={['/manage/clients','/manage/identifications','/manage/clienttypes']}
+
+            >
+                <li><Link to='/manage/clients' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/clients')}`}><LocationUser04Icon size={20} /> {translations.clients}</Link></li>
+                <li><Link to='/manage/identifications' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/identifications')}`}><UserAccountIcon size={20} /> {translations.identifications}</Link></li>
+                <li><Link to='/manage/clienttypes' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/clienttypes')}`}><UserAccountIcon size={20} /> {translations.client_types}</Link></li>
+            </DropdownMenu>
           <li><Link to='/manage/locations' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/locations')}`}><StoreLocation02Icon />  {translations.locations}</Link></li>
           <li><Link to='/manage/taxes' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/taxes')}`}><TaxesIcon />  {translations.taxes}</Link></li>
           <li>
@@ -150,6 +162,9 @@ const PanelPage: React.FC = () => {
             <Route path='/manage/cashregister/sales' element={<ManageCashRegisterSales/>} />            
             <Route path='/manage/users' element={<ManageUsersPage />} />
             <Route path='/manage/clients' element={<ManageClientsPage  />} />
+            <Route path='/manage/identifications' element={<ManageIdentifications  />} />
+            <Route path='/manage/clienttypes' element={<ManageClientTypes  />} />
+            <Route path='/manage/locations' element={<ManageLocations  />} />
             <Route path='/manage/taxes' element={<ManageTaxesPage />} />
             <Route path='/manage/suppliers' element={<ManageSuppliersPage />} />
             <Route path='/manage/products' element={<ManageProductsPage />} />

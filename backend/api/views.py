@@ -129,14 +129,21 @@ class ManageStatesAPIView(APIView):
     permission_classes = [IsAuthenticated]
   
     def get(self, request):
-        query = request.query_params.get('query', None)
-        search = request.query_params.get('search', '')
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        country_id = data.get('country_id', 0)
         
         if query == 'list':
             model = StatesModel.objects.filter(
                 Q(id__icontains = search) |
                 Q(name__icontains = search)
-            )[:10]
+            )
+
+            model = model.filter(country_id = country_id)
+            
+            model = model[:10]
+
             serialized = StatesSerializer(model, many = True)
             
             return JsonResponse({
@@ -150,14 +157,21 @@ class ManageCitiesAPIView(APIView):
     permission_classes = [IsAuthenticated]
   
     def get(self, request):
-        query = request.query_params.get('query', None)
-        search = request.query_params.get('search', '')
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        state_id = data.get('state_id', 0)
         
         if query == 'list':
             model = CitiesModel.objects.filter(
                 Q(id__icontains = search) |
                 Q(name__icontains = search)
-            )[:10]
+            )
+
+            model = model.filter(state_id = state_id)
+            
+            model = model[:10]
+
             serialized = CitiesSerializer(model, many = True)
             
             return JsonResponse({
@@ -169,12 +183,62 @@ class ManageCitiesAPIView(APIView):
 class ManageLocationsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-  
-    def get(self, request):
-        query = request.query_params.get('query', None)
-        search = request.query_params.get('search', '')
+    
+    def get_object(self, pk) :
+        try:
+            return LocationsModel.objects.get(pk = pk)
+        except LocationsModel.DoesNotExist:
+            raise Http404('Location not found.')
+
+    def get(self, request):       
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':
+            model = LocationsModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = LocationsSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            data_id = data.get('id', None)
+
+            serializer = GetLocationSerializer(data = data)  
+            if not serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': serializer.errors
+                }, status = 400)    
+                    
+            instance = self.get_object(pk = data_id)
+            serialized = LocationsSerializer(instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            }) 
         
-        if query == 'list':
+        elif query == 'list':
             model = LocationsModel.objects.filter(
                 Q(id__icontains = search) |
                 Q(name__icontains = search)
@@ -186,16 +250,137 @@ class ManageLocationsAPIView(APIView):
                 'resp': serialized.data
             })
 
+        elif query == 'count':
+            total = LocationsModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            }) 
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+    
+        serializer = AddEditLocationSerializer(data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        data_id = data.get('id', None)
+
+        serializer = GetLocationSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)     
+
+        serializer = AddEditLocationSerializer(instance, data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        data_id = data.get('id', None)
+
+        serializer = GetLocationSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)           
+        instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
+
 #Types ids
 class ManageTypesIdsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-  
+    
+    def get_object(self, pk) :
+        try:
+            return TypesIdsModel.objects.get(pk = pk)
+        except TypesIdsModel.DoesNotExist:
+            raise Http404('Type id not found.')
+
     def get(self, request):
         query = request.query_params.get('query', None)
         search = request.query_params.get('search', '')
         
-        if query == 'list':
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':
+            model = TypesIdsModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = TypesIdsSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            data_id = data.get('id', None)
+
+            serializer = GetTypeIdSerializer(data = data)  
+            if not serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': serializer.errors
+                }, status = 400)    
+                    
+            instance = self.get_object(pk = data_id)
+            serialized = TypesIdsSerializer(instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            }) 
+        
+        elif query == 'list':
             model = TypesIdsModel.objects.filter(
                 Q(id__icontains = search) |
                 Q(name__icontains = search)
@@ -206,17 +391,135 @@ class ManageTypesIdsAPIView(APIView):
                 'success': True,
                 'resp': serialized.data
             })
+        
+        elif query == 'count':
+            total = TypesIdsModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            }) 
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+    
+    def post(self, request):
+        data = request.data
+    
+        serializer = AddEditTypeIdSerializer(data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        data_id = data.get('id', None)
+
+        serializer = GetTypeIdSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)     
+
+        serializer = AddEditTypeIdSerializer(instance, data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        data_id = data.get('id', None)
+
+        serializer = GetTypeIdSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)           
+        instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
 
 #Client types    
 class ManageClientTypesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-  
+    
+    def get_object(self, pk) :
+        try:
+            return ClientTypesModel.objects.get(pk = pk)
+        except ClientTypesModel.DoesNotExist:
+            raise Http404('Client type not found.')
+
     def get(self, request):
-        query = request.query_params.get('query', None)
-        search = request.query_params.get('search', '')
+        data = request.query_params
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = request.query_params.get('page', 1)
+        order_by = request.query_params.get('order_by', 'id').replace('.', '__')
+        order = request.query_params.get('order', 'desc')
+        show = request.query_params.get('show', 10)
+
+        if query == 'table':
+            model = ClientTypesModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = ClientTypesSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            data_id = data.get('id', None)
+
+            serializer = GetClientTypeSerializer(data = data)  
+            if not serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': serializer.errors
+                }, status = 400)    
+                    
+            instance = self.get_object(pk = data_id)
+            serialized = ClientTypesSerializer(instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            }) 
         
-        if query == 'list':
+        elif query == 'list':
             model = ClientTypesModel.objects.filter(
                 Q(id__icontains = search) |
                 Q(name__icontains = search)
@@ -227,6 +530,73 @@ class ManageClientTypesAPIView(APIView):
                 'success': True,
                 'resp': serialized.data
             })
+        elif query == 'count':
+            total = ClientTypesModel.objects.count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            }) 
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+    
+        serializer = AddEditClientTypeSerializer(data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        data_id = data.get('id', None)
+
+        serializer = GetClientTypeSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)     
+
+        serializer = AddEditClientTypeSerializer(instance, data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        data_id = data.get('id', None)
+
+        serializer = GetClientTypeSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)           
+        instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
 
 #Clients
 class ManageClientsAPIView(APIView):

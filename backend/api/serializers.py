@@ -78,11 +78,73 @@ class TypesIdsSerializer(serializers.ModelSerializer):
         model = TypesIdsModel
         fields = '__all__'
 
+class AddEditTypeIdSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(error_messages = {
+        'required': 'The name is required.',
+        'blank': 'The name cannot be blank.',
+        'null': 'The name cannot be blank.',
+        'max_length': 'The name cannot exceed 254 characters.',
+    }, allow_blank = False, allow_null = False)
+
+    status = serializers.BooleanField(error_messages = {
+        'required': 'The status is required.',
+        'blank': 'The status cannot be blank.',
+        'null': 'The status cannot be blank.',
+        'invalid': 'The status is invalid.',
+    }, required = False)
+    
+    class Meta:
+        model = TypesIdsModel
+        exclude = ['id']
+
+class GetTypeIdSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The tax is required.',
+        'blank': 'The tax cannot be blank.',
+        'null': 'The tax cannot be blank.',
+        'invalid': 'The tax is invalid.',
+    })
+    
+    class Meta:
+        model = TypesIdsModel
+        fields = ['id']
+
 #Locations
 class LocationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = LocationsModel
         fields = '__all__'
+
+class AddEditLocationSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(error_messages = {
+        'required': 'The name is required.',
+        'blank': 'The name cannot be blank.',
+        'null': 'The name cannot be blank.',
+        'max_length': 'The name cannot exceed 254 characters.',
+    }, allow_blank = False, allow_null = False)
+
+    status = serializers.BooleanField(error_messages = {
+        'required': 'The status is required.',
+        'blank': 'The status cannot be blank.',
+        'null': 'The status cannot be blank.',
+        'invalid': 'The status is invalid.',
+    }, required = False)
+    
+    class Meta:
+        model = LocationsModel
+        exclude = ['id']
+
+class GetLocationSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The tax is required.',
+        'blank': 'The tax cannot be blank.',
+        'null': 'The tax cannot be blank.',
+        'invalid': 'The tax is invalid.',
+    })
+    
+    class Meta:
+        model = LocationsModel
+        fields = ['id']
 
 #Addresses
 class AddressesSerializer(serializers.ModelSerializer):
@@ -386,6 +448,30 @@ class ClientTypesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientTypesModel
         fields = '__all__'
+
+class AddEditClientTypeSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(error_messages = {
+        'required': 'The name is required.',
+        'blank': 'The name cannot be blank.',
+        'null': 'The name cannot be blank.',
+        'max_length': 'The name cannot exceed 254 characters.',
+    }, allow_blank = False, allow_null = False)
+    
+    class Meta:
+        model = ClientTypesModel
+        exclude = ['id']
+
+class GetClientTypeSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The tax is required.',
+        'blank': 'The tax cannot be blank.',
+        'null': 'The tax cannot be blank.',
+        'invalid': 'The tax is invalid.',
+    })
+    
+    class Meta:
+        model = ClientTypesModel
+        fields = ['id']
 
 #Clients
 class ClientsSerializer(serializers.ModelSerializer):
