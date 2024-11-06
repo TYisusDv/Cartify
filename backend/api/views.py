@@ -3373,6 +3373,7 @@ class PDFGeneratorAPIView(APIView):
         qr_base64 = base64.b64encode(qr_img.getvalue()).decode('utf-8')       
 
         data = {
+            'base_url': request.build_absolute_uri('/'),
             'uuid': uuid.uuid4(),
             'payment': instance_payment,
             'payment_date_utc': format_datetime_local(instance_payment.date_reg),

@@ -75,7 +75,7 @@ def convert_html_to_pdf(html_content, width_mm = 88):
         
         return pdf_bytes
     except Exception as e:
-        logger.info(f'An error has ocurred:{e}')
+        logger.info(f'An error has ocurred: {e}')
         return None    
     finally:
         if os.path.exists(output_image_path):
