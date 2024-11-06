@@ -2,7 +2,9 @@ from PIL import Image
 from reportlab.pdfgen import canvas
 from io import BytesIO
 from datetime import datetime
-import json, imgkit, os, uuid, pytz
+import json, imgkit, os, uuid, pytz, logging
+
+logger = logging.getLogger(__name__)
 
 def parse_json(request, key, default):
     try:
@@ -73,7 +75,7 @@ def convert_html_to_pdf(html_content, width_mm = 88):
         
         return pdf_bytes
     except Exception as e:
-        print(f'Error: {e}')
+        logger.info(f'An error has ocurred:{e}')
         return None    
     finally:
         if os.path.exists(output_image_path):
