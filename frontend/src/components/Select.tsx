@@ -89,7 +89,7 @@ const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_va
             }));
             setOptions([{ value: '0', text: translations.select_an_option }, ...newOptions]);
         }
-    }, [query, endpoint, translations.select_an_option, endpoint_value, endpoint_text, searchQuery, myOptions, filters]);
+    }, [isOpen, query, endpoint, translations.select_an_option, endpoint_value, endpoint_text, searchQuery, myOptions, filters]);
 
     useEffect(() => {
         setValue(props?.value || '0');
@@ -109,14 +109,14 @@ const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_va
                     ))}
                 </select>
                 <div
-                    className={`relative flex flex-wrap items-center justify-between text-sm rounded-md p-2 ${props?.disabled ? 'cursor-default dark:hover:bg-slate-700' : 'cursor-pointer dark:hover:bg-slate-600'}`}
+                    className={`relative flex flex-wrap items-center justify-between text-sm rounded-md p-2 ${props?.disabled ? 'cursor-default dark:hover:bg-slate-700' : 'cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600'}`}
                     onClick={handleOpen}
                 >
                     <span className='line-clamp-1'>{options.find((option) => option.value.toString() === value.toString())?.text}</span>
                     <div className='w-[20px] flex-shrink-0'>{icon ? icon : <ArrowDown01Icon size={20} />}</div>
                 </div>
                 {isOpen && !props?.disabled && (
-                    <div className='absolute w-full text-sm border-2 rounded-md mt-1 dark:bg-slate-700 dark:border-slate-600'>
+                    <div className='absolute w-full text-sm border-2 rounded-md mt-1 bg-white dark:bg-slate-700 dark:border-slate-600'>
                         {endpoint && (
                             <input
                                 type='text'
@@ -130,7 +130,7 @@ const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_va
                             {options.map((option) => (
                                 <li
                                     key={generateUUID()}
-                                    className='w-full cursor-pointer dark:hover:bg-slate-600 p-2'
+                                    className='w-full cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 p-2'
                                     onClick={() => { handleOptionClick(option.value) }}
                                 >
                                     {option.text}

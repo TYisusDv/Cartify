@@ -715,20 +715,22 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, toggleModal, handleTableRe
                             ))}
                         </div>
                     </div>
-                    <div className={`flex flex-col gap-2 w-full tab-item ${'kardex' === activeTab ? 'block' : 'hidden'}`}>
-                        <h3 className='font-bold text-black dark:text-white'>Movimientos</h3>
-                        <Table
-                            endpoint='app/inventory'
-                            reloadTable={reloadTable}
-                            header={table_header}
-                            order_by='date_reg'
-                            tbody={
-                                <TBodyInventory />
-                            }
-                            filters_params={{product: {id: formValues.id}}}
-                            show_search={false}
-                        />
-                    </div>
+                    { ['details'].includes(type) && (
+                        <div className={`flex flex-col gap-2 w-full tab-item ${'kardex' === activeTab ? 'block' : 'hidden'}`}>
+                            <h3 className='font-bold text-black dark:text-white'>Movimientos</h3>
+                            <Table
+                                endpoint='app/inventory'
+                                reloadTable={reloadTable}
+                                header={table_header}
+                                order_by='date_reg'
+                                tbody={
+                                    <TBodyInventory />
+                                }
+                                filters_params={{ product: { id: formValues.id } }}
+                                show_search={false}
+                            />
+                        </div>
+                    )}
                     <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>
                         <div className='col-span-1 md:col-end-3 w-full'>
                             {(type === 'delete' || type === 'edit' || type === 'add') && (
