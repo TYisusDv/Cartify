@@ -7,8 +7,8 @@ interface DelayedSuspenseProps {
 }
 
 const DelayedSuspense: React.FC<DelayedSuspenseProps> = ({ children, fallback, delay = 1000 }) => {
-  const [show, setShow] = useState(false);
-
+  const [show, setShow] = useState(true);
+  /*
   useEffect(() => {
     const timer = setTimeout(() => {
       setShow(true);
@@ -16,7 +16,7 @@ const DelayedSuspense: React.FC<DelayedSuspenseProps> = ({ children, fallback, d
 
     return () => clearTimeout(timer);
   }, [delay]);
-
+  */
   return (
     <React.Suspense fallback={fallback}>
       {show ? children : fallback}

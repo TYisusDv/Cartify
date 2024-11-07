@@ -3448,7 +3448,7 @@ class ExcelClientsAPIView(APIView):
         except Exception as e:
             return JsonResponse({
                 'success': False,
-                'resp': f'Error generating Excel: {e}'
+                'resp': f'Error generating Excel'
             }, status=500)
         
 #Excel cash register
@@ -3521,5 +3521,115 @@ class ExcelCashRegisterAPIView(APIView):
         except Exception as e:
             return JsonResponse({
                 'success': False,
-                'resp': f'Error generating Excel: {e}'
+                'resp': f'Error generating Excel'
+            }, status=500)
+        
+#Excel statistics sales
+class ExcelStatisticsSalesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        try:
+            data = request.query_params
+            date_1_str = data.get('filters[date_1]', None)
+            date_2_str = data.get('filters[date_2]', None)    
+
+            date_1, date_2 = None, None
+            if date_1_str:
+                date_1 = datetime.strptime(date_1_str, '%Y-%m-%d').date()
+
+            if date_2_str:
+                date_2 = datetime.strptime(date_2_str, '%Y-%m-%d').date()
+            
+            template_path = settings.BASE_DIR / 'api/templates/excel/statistics_sales.xlsx'
+            wb = openpyxl.load_workbook(template_path)
+            ws = wb.active
+            
+            start_row = 93
+            total_row = 387
+
+            sale_payments_model = SalePaymentsModel.objects.filter(no__isnull = False)
+            if date_1:
+                sale_payments_model = sale_payments_model.filter(date_reg__gte = date_1)
+            
+            if date_2:
+                sale_payments_model = sale_payments_model.filter(date_reg__lte = date_2)
+            
+
+            sale_payments_model = sale_payments_model.select_related(
+                'sale__client__person', 'sale__location', 'sale__status'
+            ).prefetch_related('sale__inventory_sale')
+
+            for idx, item in enumerate(sale_payments_model):
+                row = start_row + idx
+                if row >= total_row:
+                    ws.insert_rows(row)
+                    total_row += 1 
+                
+                ws[f'B{row}'] = item.date_reg.strftime('%Y-%m-%d')
+                ws[f'C{row}'] = item.no
+
+                if item.sale.status.calculate:
+                    ws[f'E{row}'] = item.sale.client.id
+                    ws[f'F{row}'] = f'{item.sale.client.person.firstname} {item.sale.client.person.lastname}'
+                    ws[f'G{row}'] = item.location.name
+                    ws[f'H{row}'] = ' + '.join([inventory.product.name for inventory in item.sale.inventory_sale.all()])
+                    
+                    if item.sale.type == 2:
+                        ws[f'K{row}'] = item.total_remaining + item.subtotal
+                    else:
+                        ws[f'K{row}'] = item.total
+
+                    ws[f'L{row}'] = item.total                
+                    ws[f'N{row}'] = item.payment_method.name
+                    ws[f'R{row}'] = item.user.first_name + ' ' + item.user.last_name
+                else:
+                    ws[f'F{row}'] = item.sale.status.name
+
+            start_row = 6
+            total_row = 89
+
+            sales_model = SalesModel.objects.filter().prefetch_related('inventory_sale')
+            if date_1:
+                sales_model = sales_model.filter(date_reg__gte = date_1)
+            
+            if date_2:
+                sales_model = sales_model.filter(date_reg__lte = date_2)
+            
+            for idx, sale in enumerate(sales_model):
+                row = start_row + idx
+                if row >= total_row:
+                    ws.insert_rows(row)
+                    total_row += 1                     
+                
+                ws[f'B{row}'] = sale.date_reg.strftime('%Y-%m-%d')
+                ws[f'C{row}'] = sale.id
+
+                if sale.status.calculate:
+                    ws[f'E{row}'] = sale.client.id
+                    ws[f'F{row}'] = f'{sale.client.person.firstname} {sale.client.person.lastname}'
+                    ws[f'G{row}'] = sale.location.name
+                    ws[f'H{row}'] = 'CRÉDITO' if sale.type == 2 else 'CONTADO'
+                    ws[f'I{row}'] = ' + '.join([inventory.product.name for inventory in sale.inventory_sale.all()])
+                    ws[f'K{row}'] = sale.total
+                    ws[f'R{row}'] = sale.user.first_name + ' ' + sale.user.last_name
+                else:
+                    ws[f'F{row}'] = sale.status.name
+
+            output = io.BytesIO()
+            wb.save(output)
+            output.seek(0)
+
+            response = HttpResponse(
+                output,
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            response['Content-Disposition'] = 'attachment; filename="statistics_sales.xlsx"'
+            return response
+
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'resp': f'Error generating Excel'
             }, status=500)

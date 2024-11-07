@@ -33,4 +33,5 @@ urlpatterns = [
     path('pdf/payment', PDFGeneratorAPIView.as_view(), name='pdf-payment'),
     path('excel/clients', ExcelClientsAPIView.as_view(), name='excel-client'),
     path('excel/cashregister', ExcelCashRegisterAPIView.as_view(), name='excel-cashregister'),
+    path('excel/statistics/sales', ExcelStatisticsSalesAPIView.as_view(), name='excel-statistics-sales'),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

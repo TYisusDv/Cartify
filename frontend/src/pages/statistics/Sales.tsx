@@ -5,12 +5,16 @@ import SkeletonLoader from '../../components/SkeletonLoader';
 import { CreditCardIcon, Invoice01Icon, Search01Icon } from 'hugeicons-react';
 import Table from '../../components/Table';
 import { getTable } from '../../services/componentsService';
-import { generateKey } from '../../utils/uuidGen';
+import { generateKey, generateUUID } from '../../utils/uuidGen';
 import TBodySales from './TBodySales';
 import { getCount } from '../../services/StatisticsSales';
 import Chart from 'react-apexcharts';
 import Modal from '../../components/Modal';
 import Crud from './Crud';
+import { IconFileExcel } from '@tabler/icons-react';
+import { addAlert } from '../../utils/Alerts';
+import { extractMessages } from '../../utils/formUtils';
+import apiService from '../../services/apiService';
 
 interface PaymentMethod {
     name: string;
@@ -34,7 +38,6 @@ const Sales: React.FC = () => {
     const [countData, setCountData] = useState({ total_sales: 0, total_payments: 0 });
 
     const [data, setData] = useState<OrganizedData>({});
-    const [loading, setLoading] = useState<boolean>(true);
     const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
     const [locations, setLocations] = useState<string[]>([]);
     const [locationTotals, setLocationTotals] = useState<{ [location: string]: number }>({});
@@ -100,7 +103,6 @@ const Sales: React.FC = () => {
                 setLocations(response_resp.map((loc) => loc.location_name));
                 setData(organizedData);
                 setLocationTotals(totals);
-                setLoading(false);
             } catch (error) {
                 console.error("Error al obtener datos:", error);
             }
@@ -134,7 +136,40 @@ const Sales: React.FC = () => {
 
     const series = paymentMethods.map(method => getTotalByMethod(method));
 
-    if (loading) return <p>Loading...</p>;
+    const downloadExcel = async () => {
+        try {
+            const response = await apiService.get('excel/statistics/sales', {
+                responseType: 'blob',
+                params: {
+                    filters: formValuesSearch
+                }
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+
+            link.setAttribute('download', 'statistics_sales.xlsx');
+
+            document.body.appendChild(link);
+            link.click();
+
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            const messages = extractMessages(error);
+            messages.forEach(msg => {
+                addAlert({
+                    id: generateUUID(),
+                    title: 'An error has occurred.',
+                    msg: msg,
+                    icon: 'Alert01Icon',
+                    color: 'red',
+                    timeout: 2000
+                });
+            });
+        }
+    };
 
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
@@ -144,6 +179,7 @@ const Sales: React.FC = () => {
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.statistics}</span>
                 </div>
                 <div className='flex gap-2'>
+                    <button className='bg-green-600 text-white border-2 border-green-600 hover:bg-green-600/20 hover:text-green-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={downloadExcel}><IconFileExcel /></button>
                     <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => setIsModalOpen((prev) => ({ ...prev, search: true }))}><Search01Icon /></button>
                 </div>
             </div>
