@@ -1,6 +1,6 @@
 import React, { Suspense, useState } from 'react';
 import { Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
-import { Analytics02Icon, BarCode02Icon, BrandfetchIcon, Cash01Icon, CreditCardIcon, DashboardBrowsingIcon, DashboardSquare01Icon, DistributionIcon, Invoice02Icon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserAccountIcon, UserGroupIcon } from 'hugeicons-react';
+import { Analytics02Icon, BarCode02Icon, BrandfetchIcon, Cash01Icon, CreditCardIcon, DashboardBrowsingIcon, DashboardSquare01Icon, DistributionIcon, Invoice02Icon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserAccountIcon, UserGroupIcon, WaterfallDown01Icon, WaterfallUp01Icon } from 'hugeicons-react';
 import useTranslations from '../hooks/useTranslations';
 import SkeletonLoader from '../components/SkeletonLoader';
 import ErrorPage from '../pages/errorPage';
@@ -30,6 +30,7 @@ const ManageSaleReceipt = React.lazy(() => import('../pages/manage/sales/receipt
 const ManageSaleStatus = React.lazy(() => import('../pages/manage/sales/status/Status'));
 const ManageCashRegister = React.lazy(() => import('../pages/manage/cashregister/index/CashRegister'));
 const ManageCashRegisterSales = React.lazy(() => import('../pages/manage/cashregister/sales/Sales'));
+const ManageExpenses = React.lazy(() => import('../pages/manage/expenses/Expenses'));
 const SettingGeneralPage = React.lazy(() => import('../pages/settings/settingGeneralPage'));
 
 const PanelPage: React.FC = () => {
@@ -97,7 +98,17 @@ const PanelPage: React.FC = () => {
 
             >
                 <li><Link to='/manage/cashregister' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/cashregister')}`}><Cash01Icon size={20} /> Gastos</Link></li>
-                <li><Link to='/manage/cashregister/sales' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/cashregister/sales')}`}><Cash01Icon size={20} /> Ingresos</Link></li>
+                <li><Link to='/manage/cashregister/sales' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/cashregister/sales')}`}><WaterfallUp01Icon size={20} /> Ingresos</Link></li>
+            </DropdownMenu>
+          </li>
+          <li>
+            <DropdownMenu 
+              label='Gastos'
+              icon={<WaterfallDown01Icon className='w-7' />}
+              links={['/manage/expenses']}
+
+            >
+                <li><Link to='/manage/expenses' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/expenses')}`}><WaterfallDown01Icon size={20} /> Gastos</Link></li>
             </DropdownMenu>
           </li>
           <li><Link to='/manage/users' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/users')}`}><UserGroupIcon />  {translations.users}</Link></li>
@@ -176,6 +187,7 @@ const PanelPage: React.FC = () => {
             <Route path='/manage/sale/payments' element={<ManageSalePayments />} />
             <Route path='/manage/sale/receipt' element={<ManageSaleReceipt />} />
             <Route path='/manage/sale/status' element={<ManageSaleStatus/>} />
+            <Route path='/manage/expenses' element={<ManageExpenses />} />
             <Route path='/auth/logout' element={<AuthLogoutPage />} />
             <Route path='*' element={<ErrorPage code={404} detail={translations.error_404} />} />
           </Routes>

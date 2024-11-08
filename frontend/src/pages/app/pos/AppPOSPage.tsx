@@ -274,7 +274,7 @@ const AppPOSPage: React.FC = () => {
     }, [formValuesPayment.discount]);
 
     const handleInvoice = (id: string) => {
-        window.open(`${URL_BACKEND}/pdf/payment?id=${id}`, '_blank');
+        window.open(`${URL_BACKEND}/pdf/payment?id=${id}&one=true`, '_blank');
     }
 
     const onSubmit = async (e: React.FormEvent) => {

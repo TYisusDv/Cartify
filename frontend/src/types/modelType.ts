@@ -278,3 +278,13 @@ export interface CashRegister {
     date_1?: Date | string;
     date_2?: Date | string;
 }
+
+//Expense
+export interface Expense {
+    id?: string;
+    no?: string;
+    date_limit?: string;
+    date_reg?: Date;
+    supplier_id?: string;
+    supplier?: Supplier;
+}

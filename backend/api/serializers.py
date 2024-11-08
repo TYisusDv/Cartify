@@ -1743,3 +1743,49 @@ class GetCashRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = CashRegisterModel
         fields = ['id']
+
+#Expenses
+class ExpensesSerializer(serializers.ModelSerializer):
+    supplier = SuppliersSerializer(read_only = True)
+
+    class Meta:
+        model = ExpensesModel
+        fields = '__all__'
+
+class AddEditExpenseSerializer(serializers.ModelSerializer):
+    no = serializers.CharField(error_messages = {
+        'required': 'The no is required.',
+        'blank': 'The no cannot be blank.',
+        'null': 'The no cannot be blank.',
+        'max_length': 'The no cannot exceed 254 characters.',
+    })
+
+    date_limit = serializers.DateField(error_messages = {
+        'required': 'The date limit is required.',
+        'blank': 'The date limit cannot be blank.',
+        'null': 'The date limit cannot be blank.',
+        'invalid': 'The date limit is invalid.',
+    })
+
+    supplier_id = serializers.UUIDField(error_messages = {
+        'required': 'The supplier is required.',
+        'blank': 'The supplier cannot be blank.',
+        'null': 'The supplier cannot be blank.',
+        'invalid': 'The supplier is invalid.',
+    })
+    
+    class Meta:
+        model = ExpensesModel
+        exclude = ['id', 'supplier']
+
+class GetExpenseSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(error_messages = {
+        'required': 'The expense is required.',
+        'blank': 'The expense cannot be blank.',
+        'null': 'The expense cannot be blank.',
+        'invalid': 'The expense is invalid.',
+    })
+    
+    class Meta:
+        model = ExpensesModel
+        fields = ['id']

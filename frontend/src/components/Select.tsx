@@ -116,7 +116,7 @@ const Select: React.FC<SelectProps> = ({ props, myOptions, endpoint, endpoint_va
                     <div className='w-[20px] flex-shrink-0'>{icon ? icon : <ArrowDown01Icon size={20} />}</div>
                 </div>
                 {isOpen && !props?.disabled && (
-                    <div className='absolute w-full text-sm border-2 rounded-md mt-1 bg-white dark:bg-slate-700 dark:border-slate-600'>
+                    <div className='absolute w-full text-sm border-2 rounded-md mt-1 overflow-y-auto max-h-52 mb-2 bg-white dark:bg-slate-700 dark:border-slate-600'>
                         {endpoint && (
                             <input
                                 type='text'

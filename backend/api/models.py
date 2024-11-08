@@ -330,4 +330,23 @@ class CashRegisterModel(models.Model):
     
     class Meta: 
         db_table = 'cash_register'
-        
+
+class ExpensesModel(models.Model):
+    id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+    no = models.CharField(unique = True, null = False, blank = False)
+    date_limit = models.DateField(null = True, blank = False)
+    date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
+    supplier = models.ForeignKey(SuppliersModel, null = False, blank = False, on_delete = models.RESTRICT) 
+    
+    class Meta: 
+        db_table = 'expenses'
+
+class ExpenseDetailsModel(models.Model):
+    id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+    cost = models.FloatField(default = 0, null = False, blank = False)
+    quantity = models.FloatField(default = 0, null = False, blank = False)
+    product = models.ForeignKey(ProductsModel, on_delete = models.RESTRICT)
+    expense = models.ForeignKey(ExpensesModel, on_delete = models.RESTRICT)
+    
+    class Meta: 
+        db_table = 'expense_details'
