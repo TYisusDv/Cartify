@@ -31,6 +31,8 @@ const ManageSaleStatus = React.lazy(() => import('../pages/manage/sales/status/S
 const ManageCashRegister = React.lazy(() => import('../pages/manage/cashregister/index/CashRegister'));
 const ManageCashRegisterSales = React.lazy(() => import('../pages/manage/cashregister/sales/Sales'));
 const ManageExpenses = React.lazy(() => import('../pages/manage/expenses/Expenses'));
+const ManageExpenseDetails = React.lazy(() => import('../pages/manage/expenses/details/Details'));
+const ManageExpensePayments = React.lazy(() => import('../pages/manage/expenses/payments/Payments'));
 const SettingGeneralPage = React.lazy(() => import('../pages/settings/settingGeneralPage'));
 
 const PanelPage: React.FC = () => {
@@ -188,6 +190,8 @@ const PanelPage: React.FC = () => {
             <Route path='/manage/sale/receipt' element={<ManageSaleReceipt />} />
             <Route path='/manage/sale/status' element={<ManageSaleStatus/>} />
             <Route path='/manage/expenses' element={<ManageExpenses />} />
+            <Route path='/manage/expenses/details' element={<ManageExpenseDetails />} />
+            <Route path='/manage/expenses/payments' element={<ManageExpensePayments />} />
             <Route path='/auth/logout' element={<AuthLogoutPage />} />
             <Route path='*' element={<ErrorPage code={404} detail={translations.error_404} />} />
           </Routes>

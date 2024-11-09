@@ -3,7 +3,7 @@ from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 from django.utils.timezone import localtime
-from django.db.models import Q, F
+from django.db.models import Q, F, Sum
 from .models import *
 import json, base64
 
@@ -1746,8 +1746,15 @@ class GetCashRegisterSerializer(serializers.ModelSerializer):
 
 #Expenses
 class ExpensesSerializer(serializers.ModelSerializer):
+    total_paid = serializers.SerializerMethodField()
     supplier = SuppliersSerializer(read_only = True)
 
+    def get_total_paid(self, obj):
+        model = ExpensePaymentsModel.objects.filter(expense_id = obj.id)
+        total_paid = model.aggregate(total = Sum('amount'))['total'] or 0 
+
+        return total_paid
+    
     class Meta:
         model = ExpensesModel
         fields = '__all__'
@@ -1758,6 +1765,13 @@ class AddEditExpenseSerializer(serializers.ModelSerializer):
         'blank': 'The no cannot be blank.',
         'null': 'The no cannot be blank.',
         'max_length': 'The no cannot exceed 254 characters.',
+    })
+
+    total = serializers.FloatField(error_messages = {
+        'required': 'The total is required.',
+        'blank': 'The total cannot be blank.',
+        'null': 'The total cannot be blank.',
+        'invalid': 'The total is invalid.',
     })
 
     date_limit = serializers.DateField(error_messages = {
@@ -1788,4 +1802,94 @@ class GetExpenseSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ExpensesModel
+        fields = ['id']
+
+#Expense details
+class ExpenseDetailsSerializer(serializers.ModelSerializer):
+    product = ProductsSerializer(read_only = True)
+
+    class Meta:
+        model = ExpenseDetailsModel
+        fields = '__all__'
+
+class AddEditExpenseDetailsSerializer(serializers.ModelSerializer):
+    cost = serializers.FloatField(error_messages = {
+        'required': 'The quantity is required.',
+        'blank': 'The quantity cannot be blank.',
+        'null': 'The quantity cannot be blank.',
+        'invalid': 'The quantity is invalid.',
+    })
+
+    quantity = serializers.FloatField(error_messages = {
+        'required': 'The quantity is required.',
+        'blank': 'The quantity cannot be blank.',
+        'null': 'The quantity cannot be blank.',
+        'invalid': 'The quantity is invalid.',
+    })
+
+    product_id = serializers.UUIDField(error_messages = {
+        'required': 'The product is required.',
+        'blank': 'The product cannot be blank.',
+        'null': 'The product cannot be blank.',
+        'invalid': 'The product is invalid.',
+    })
+
+    expense_id = serializers.UUIDField(error_messages = {
+        'required': 'The expense is required.',
+        'blank': 'The expense cannot be blank.',
+        'null': 'The expense cannot be blank.',
+        'invalid': 'The expense is invalid.',
+    })
+    
+    class Meta:
+        model = ExpenseDetailsModel
+        exclude = ['id', 'product', 'expense']
+
+class GetExpenseDetailsSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The expense detail is required.',
+        'blank': 'The expense detail cannot be blank.',
+        'null': 'The expense detail cannot be blank.',
+        'invalid': 'The expense detail is invalid.',
+    })
+    
+    class Meta:
+        model = ExpenseDetailsModel
+        fields = ['id']
+
+#Expense payments
+class ExpensePaymentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExpensePaymentsModel
+        fields = '__all__'
+
+class AddEditExpensePaymentSerializer(serializers.ModelSerializer):
+    amount = serializers.FloatField(error_messages = {
+        'required': 'The amount is required.',
+        'blank': 'The amount cannot be blank.',
+        'null': 'The amount cannot be blank.',
+        'invalid': 'The amount is invalid.',
+    })
+
+    expense_id = serializers.UUIDField(error_messages = {
+        'required': 'The expense is required.',
+        'blank': 'The expense cannot be blank.',
+        'null': 'The expense cannot be blank.',
+        'invalid': 'The expense is invalid.',
+    })
+    
+    class Meta:
+        model = ExpensePaymentsModel
+        exclude = ['id', 'expense']
+
+class GetExpensePaymentSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The expense payment is required.',
+        'blank': 'The expense payment cannot be blank.',
+        'null': 'The expense payment cannot be blank.',
+        'invalid': 'The expense payment is invalid.',
+    })
+    
+    class Meta:
+        model = ExpensePaymentsModel
         fields = ['id']

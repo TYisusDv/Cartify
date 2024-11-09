@@ -283,8 +283,32 @@ export interface CashRegister {
 export interface Expense {
     id?: string;
     no?: string;
+    total?: number;
     date_limit?: string;
     date_reg?: Date;
     supplier_id?: string;
     supplier?: Supplier;
+
+    //More
+    total_paid?: number;
+}
+
+//Expense details
+export interface ExpenseDetails {
+    id?: number;
+    cost?: number;
+    quantity?: number;
+    expense_id?: string;
+    product_id?: string;
+    product?: Product;
+    expense?: Expense;
+}
+
+//Expense payments
+export interface ExpensePayments {
+    id?: number;    
+    amount?: number;
+    date_reg?: Date;
+    expense_id?: string;
+    expense?: Expense;
 }

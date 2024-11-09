@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar03Icon, DistributionIcon, ProfileIcon, WaterfallDown01Icon } from 'hugeicons-react';
+import { Calendar03Icon, DistributionIcon, WaterfallDown01Icon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import { Expense } from '../../../types/modelType';
 
@@ -35,6 +35,15 @@ const TBody: React.FC<TBodyProps> = ({ data, selected, setSelected }) => {
                         <td className='px-6 py-4'>
                             <span className='flex items-center gap-[1px]'><WaterfallDown01Icon size={22} /> {row.no || '-'}</span>
                         </td>
+                        <td className='px-6 py-4'>
+                            <span className='flex items-center gap-[1px]'>Q{row.total || 0}</span>
+                        </td>
+                        <td className='px-6 py-4'>
+                            <span className='flex items-center gap-[1px]'>Q{row.total_paid || 0}</span>
+                        </td>
+                        <td className='px-6 py-4'>
+                            <span className='flex items-center gap-[1px]'>Q{(row.total || 0) - (row.total_paid || 0)}</span>
+                        </td>
                         <td className='px-6 py-6'>
                             <span className='flex items-center gap-[1px]'><DistributionIcon size={18} /> {row.supplier?.company_name || '-'}</span>
                         </td>         
@@ -54,7 +63,7 @@ const TBody: React.FC<TBodyProps> = ({ data, selected, setSelected }) => {
                 ))
             ) : (
                 <tr>
-                    <td colSpan={2} className='px-6 py-4 text-center dark:text-white'>{translations.no_data}</td>
+                    <td colSpan={4} className='px-6 py-4 text-center dark:text-white'>{translations.no_data}</td>
                 </tr>
             )}
         </tbody>

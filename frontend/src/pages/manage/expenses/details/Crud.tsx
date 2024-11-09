@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { Expense } from '../../../types/modelType';
-import { DistributionIcon, Invoice01Icon } from 'hugeicons-react';
-import useTranslations from '../../../hooks/useTranslations';
-import Input from '../../../components/Input';
-import { addAlert } from '../../../utils/Alerts';
-import { generateUUID } from '../../../utils/uuidGen';
-import { extractMessages } from '../../../utils/formUtils';
-import { addExpense, deleteExpense, editExpense, getExpense } from '../../../services/Exprenses';
-import Select from '../../../components/Select';
+import { ExpenseDetails } from '../../../../types/modelType';
+import { BarCode02Icon, Invoice01Icon } from 'hugeicons-react';
+import useTranslations from '../../../../hooks/useTranslations';
+import Input from '../../../../components/Input';
+import { addAlert } from '../../../../utils/Alerts';
+import { generateUUID } from '../../../../utils/uuidGen';
+import { extractMessages } from '../../../../utils/formUtils';
+import Select from '../../../../components/Select';
+import { addExpenseDetails, deleteExpenseDetails, editExpenseDetails, getExpenseDetails } from '../../../../services/ExprenseDetails';
 
 interface CrudProps {
     onClose: () => void;
     handleTableReload?: () => void;
-    setSelected?: (value: string | undefined) => void;
+    setSelected?: (value: number | undefined) => void;
     type: string;
-    selected_id?: string | undefined;
+    selected_id?: number | undefined;
+    expenseId?: string | undefined;
 }
 
-const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, type, selected_id }) => {
+const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, type, selected_id, expenseId }) => {
     const { translations } = useTranslations();
-    const [formValues, setFormValues] = useState<Expense>({ id: selected_id });
+    const [formValues, setFormValues] = useState<ExpenseDetails>({ id: selected_id, expense_id: expenseId });
     const [colorPage, setColorPage] = useState<'blue' | 'orange' | 'red' | 'yellow'>('blue');
 
     useEffect(() => {
@@ -34,10 +35,10 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
         if ((type === 'details' || type === 'delete' || type === 'edit') && selected_id) {
             const fetchGet = async () => {
                 try {
-                    const response = await getExpense(formValues);
+                    const response = await getExpenseDetails(formValues);
                     const response_resp = response.resp;
-                    
-                    setFormValues({...response_resp, supplier_id: response_resp.supplier?.id});
+
+                    setFormValues({ ...response_resp, expense_id: expenseId, product_id: response_resp.product.id });
                 } catch (error) {
                 }
             };
@@ -52,13 +53,13 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
         try {
             let response_resp;
             if (type === 'add') {
-                const response = await addExpense(formValues);
+                const response = await addExpenseDetails(formValues);
                 response_resp = response?.resp;
             } else if (type === 'edit') {
-                const response = await editExpense(formValues);
+                const response = await editExpenseDetails(formValues);
                 response_resp = response?.resp;
             } else if (type === 'delete' && selected_id) {
-                const response = await deleteExpense(formValues);
+                const response = await deleteExpenseDetails(formValues);
                 response_resp = response?.resp;
             }
 
@@ -92,77 +93,61 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
     return (
         <form autoComplete='off' onSubmit={onSubmit}>
             <div className='flex flex-col gap-2 w-full'>
+                <div className='z-10'>
+                    <Select
+                        props={{
+                            id: 'product_id',
+                            name: 'product_id',
+                            onChange: (e) => {
+                                if (setFormValues) {
+                                    setFormValues((prev) => ({
+                                        ...prev,
+                                        product_id: e.target.value
+                                    }));
+                                }
+                            },
+                            disabled: ['details', 'delete'].includes(type),
+                            value: formValues.product_id
+                        }}
+                        endpoint='manage/products'
+                        endpoint_value='id'
+                        endpoint_text='{name}'
+                        icon={<BarCode02Icon size={20} />}
+                        label={translations.product}
+                    />
+                </div>
                 <Input
                     props={{
-                        id: 'no',
-                        name: 'no',
-                        value: formValues.no,
-                        onChange: (e) => setFormValues(prev => ({
-                            ...prev,
-                            no: e.target.value
-                        })),
-                        disabled: ['details', 'delete'].includes(type)
-                    }}
-                    label='Numero'
-                    icon={<Invoice01Icon className='icon' size={24} />}
-                    color={colorPage}
-                />
-                <Input
-                    props={{
-                        id: 'total',
-                        name: 'total',
-                        value: formValues.total,
-                        type: 'number',
+                        id: 'cost',
+                        name: 'cost',
+                        value: formValues.cost,
                         min: 0,
                         onChange: (e) => setFormValues(prev => ({
                             ...prev,
-                            total: !isNaN(parseFloat(e.target.value)) ? parseFloat(e.target.value) : 0
+                            cost: !isNaN(parseFloat(e.target.value)) ? parseFloat(e.target.value) : 0
                         })),
                         disabled: ['details', 'delete'].includes(type)
                     }}
-                    label='Total'
+                    label='Costo'
                     icon={'Q'}
                     color={colorPage}
                 />
                 <Input
                     props={{
-                        id: 'date_limit',
-                        name: 'date_limit',
-                        value: formValues.date_limit,
-                        type: 'date',
+                        id: 'quantity',
+                        name: 'quantity',
+                        value: formValues.quantity,
+                        min: 0,
                         onChange: (e) => setFormValues(prev => ({
                             ...prev,
-                            date_limit: e.target.value
+                            quantity: !isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : 0
                         })),
                         disabled: ['details', 'delete'].includes(type)
                     }}
-                    label='Fecha limite'
-                    icon={<Invoice01Icon className='icon' size={24} />}
+                    label='Cantidad'
+                    icon={'Q'}
                     color={colorPage}
                 />
-                <div className='z-10'>
-                    <Select
-                        props={{
-                            id: 'supplier',
-                            name: 'supplier',
-                            onChange: (e) => {
-                                if (setFormValues) {
-                                    setFormValues((prev) => ({
-                                        ...prev,
-                                        supplier_id: e.target.value
-                                    }));
-                                }
-                            },
-                            disabled: ['details', 'delete'].includes(type),
-                            value: formValues.supplier_id
-                        }}
-                        endpoint='manage/suppliers'
-                        endpoint_value='id'
-                        endpoint_text='{company_name}'
-                        icon={<DistributionIcon size={20} />}
-                        label={translations.supplier}
-                    />
-                </div>
             </div>
             <div className='grid grid-cols-1 md:grid-cols-2 mt-2'>
                 <div className='col-span-1 md:col-end-3 w-full'>

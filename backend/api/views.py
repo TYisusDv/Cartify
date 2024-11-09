@@ -3325,12 +3325,32 @@ class ManageExpensesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
+    @classmethod
     def get_object(self, pk) :
         try:
             return ExpensesModel.objects.get(pk = pk)
         except ExpensesModel.DoesNotExist:
             raise Http404('Expenses not found.')
 
+    @classmethod
+    def get_total(self):
+        total = ExpensesModel.objects.filter().aggregate(total_sum = Sum('total'))['total_sum'] or 0 
+
+        return total
+
+    @classmethod
+    def get_total_paid(self):
+        total_paid = ExpensePaymentsModel.objects.filter().aggregate(total = Sum('amount'))['total'] or 0 
+
+        return total_paid
+
+    @classmethod
+    def get_remaining(self):
+        total = self.get_total()
+        total_remaining = self.get_total_paid()
+
+        return total - total_remaining
+        
     def get(self, request):
         data = request.query_params
         query = data.get('query', None)
@@ -3398,7 +3418,10 @@ class ManageExpensesAPIView(APIView):
             return JsonResponse({
                 'success': True,
                 'resp': {
-                    'total': total
+                    'total': total,
+                    'total_sum': self.get_total(),
+                    'total_paid': self.get_total_paid(),
+                    'total_remaining': self.get_remaining()
                 }
             })      
         
@@ -3459,7 +3482,322 @@ class ManageExpensesAPIView(APIView):
             'success': True,
             'resp': 'Deleted successfully.'
         }, status = 200)
-  
+
+#Expense details
+class ManageExpenseDetailsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self, pk) :
+        try:
+            return ExpenseDetailsModel.objects.get(pk = pk)
+        except ExpenseDetailsModel.DoesNotExist:
+            raise Http404('Expense detail not found.')
+
+    def get(self, request):
+        data = request.query_params
+        data_id = data.get('id', None)
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = data.get('page', 1)
+        order_by = data.get('order_by', 'id').replace('.', '__')
+        order = data.get('order', 'desc')
+        show = data.get('show', 10)
+
+        if query == 'table':
+            model = ExpenseDetailsModel.objects.filter(
+                Q(id__icontains = search),
+                expense_id = data_id
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = ExpenseDetailsSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            data_id = data.get('id', None)
+
+            serializer = GetExpenseDetailsSerializer(data = data)  
+            if not serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': serializer.errors
+                }, status = 400)    
+                    
+            instance = self.get_object(pk = data_id)
+
+            serialized = ExpenseDetailsSerializer(instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = ExpenseDetailsModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = ExpenseDetailsSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = ExpenseDetailsModel.objects.filter(expense_id = data_id).count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+
+        serializer = AddEditExpenseDetailsSerializer(data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        data_id = data.get('id', None)
+
+        serializer = GetExpenseDetailsSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)     
+
+        serializer = AddEditExpenseDetailsSerializer(instance, data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        data_id = data.get('id', None)
+
+        serializer = GetExpenseDetailsSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)           
+        instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
+
+#Expense payments
+class ManageExpensePaymentsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    @classmethod
+    def get_object(self, pk) :
+        try:
+            return ExpensePaymentsModel.objects.get(pk = pk)
+        except ExpensePaymentsModel.DoesNotExist:
+            raise Http404('Expense detail not found.')
+    
+    @classmethod
+    def get_total_paid(self, expense_id):
+        model = ExpensePaymentsModel.objects.filter(expense_id = expense_id)
+        total_paid = model.aggregate(total = Sum('amount'))['total'] or 0 
+
+        return total_paid
+    
+    @classmethod
+    def get_remaining(self, expense_id):
+        model = ManageExpensesAPIView.get_object(expense_id)
+        total_remaining = self.get_total_paid(expense_id)
+
+        return model.total - total_remaining
+
+    def get(self, request):
+        data = request.query_params
+        data_id = data.get('id', None)
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = data.get('page', 1)
+        order_by = data.get('order_by', 'id').replace('.', '__')
+        order = data.get('order', 'desc')
+        show = data.get('show', 10)
+
+        if query == 'table':
+            model = ExpensePaymentsModel.objects.filter(
+                Q(id__icontains = search),
+                expense_id = data_id
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = ExpensePaymentsSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            data_id = data.get('id', None)
+
+            serializer = GetExpensePaymentSerializer(data = data)  
+            if not serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': serializer.errors
+                }, status = 400)    
+                    
+            instance = self.get_object(pk = data_id)
+
+            serialized = ExpensePaymentsSerializer(instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = ExpensePaymentsModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = ExpensePaymentsSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = ExpensePaymentsModel.objects.filter(expense_id = data_id).count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total,
+                    'total_paid': self.get_total_paid(data_id),
+                    'total_remaining': self.get_remaining(data_id)
+                }
+            })      
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+        expense_id = data.get('expense_id', None)
+        amount = data.get('amount', 0)
+        amount = int(amount) if str(amount).isnumeric() else 0
+        
+        if amount <= 0:
+            return JsonResponse({
+                'success': False, 
+                'resp': 'The amount to be paid is equal to or less than 0.'
+            }, status = 400)
+        elif self.get_remaining(expense_id) < amount:
+            return JsonResponse({
+                'success': False, 
+                'resp': 'The amount to be paid exceeds the total payment.'
+            }, status = 400)
+        
+        serializer = AddEditExpensePaymentSerializer(data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        data_id = data.get('id', None)
+
+        serializer = GetExpensePaymentSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)     
+
+        serializer = AddEditExpensePaymentSerializer(instance, data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        data_id = data.get('id', None)
+
+        serializer = GetExpensePaymentSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)           
+        instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
+ 
 #PDF
 class PDFGeneratorAPIView(APIView):
     authentication_classes = []
