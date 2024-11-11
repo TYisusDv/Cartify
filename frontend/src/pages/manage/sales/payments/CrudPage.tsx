@@ -10,6 +10,7 @@ import Select from '../../../../components/Select';
 import { CustomChangeEvent } from '../../../../types/componentsType';
 import { addPayment, editPayment, getPayment } from '../../../../services/SalesService';
 import { URL_BACKEND } from '../../../../services/apiService';
+import { UTCToLocalTimeInput } from '../../../../utils/DateFuncs';
 
 interface CrudPageProps {
     saleId: number | undefined;
@@ -41,11 +42,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                     const response = await getPayment(formValues);
                     const response_resp = response.resp;
 
-                    setFormValues(() => {
-                        let response = response_resp;
-                        response['sale_id'] = saleId;
-                        return response;
-                    });
+                    setFormValues({...response_resp, sale_id: saleId, date_limit: UTCToLocalTimeInput(response_resp.date_limit)});
                 } catch (error) {
                 }
             };
@@ -305,6 +302,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                                     type: 'number',
                                     value: formValues.discount_per || 0,
                                     min: 0,
+                                    step: 0.01,
                                     onChange: (e) => {
                                         setFormValues(prev => ({
                                             ...prev,
@@ -328,6 +326,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                                     type: 'number',
                                     value: formValues.discount || 0,
                                     min: 0,
+                                    step: 0.01,
                                     onChange: (e) => {
                                         setFormValues(prev => ({
                                             ...prev,
@@ -438,14 +437,12 @@ const CrudPage: React.FC<CrudPageProps> = ({ saleId, onClose, handleTableReload,
                         props={{
                             id: 'date_limit',
                             name: 'date_limit',
-                            type: 'datetime-local',
-                            value: formValues.date_limit
-                                ? new Date(formValues.date_limit).toISOString().slice(0, 16)
-                                : '',
+                            type: 'date',
+                            value: formValues.date_limit,
                             onChange: (e) => {
                                 setFormValues(prev => ({
                                     ...prev,
-                                    date_limit: e.target.value ? new Date(e.target.value).toISOString() : undefined
+                                    date_limit: e.target.value
                                 }));
                             },
                             disabled: ['details', 'delete'].includes(type)

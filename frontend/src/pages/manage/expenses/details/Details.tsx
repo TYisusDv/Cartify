@@ -43,6 +43,7 @@ const Details: React.FC = () => {
         { name: 'product.name', headerName: translations.product },
         { name: 'quantity', headerName: translations.quantity },
         { name: 'cost', headerName: 'Costo' },
+        { name: 'user.first_name', headerName: 'Empleado' },
     ];
 
     useEffect(() => {

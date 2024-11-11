@@ -184,5 +184,6 @@
     "manage_client_types_info": "Administra los tipos de clientes aquí. ¡Agrega, edita y elimina!",
     "add_client_type": "Agregar tipo de cliente",
     "edit_client_type": "Editar tipo de cliente",
-    "delete_client_type_sure": "¿Está seguro/a de que desea eliminar el tipo de cliente?"
+    "delete_client_type_sure": "¿Está seguro/a de que desea eliminar el tipo de cliente?",
+    "available": "Disponible"
 }

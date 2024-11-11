@@ -29,7 +29,41 @@ export const calculateDaysRemaining = (dateLimit?: Date) => {
 
     const differenceInTime = limitDate.getTime() - today.getTime();
 
-    const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24)); // 1000 ms * 3600 s * 24 h
+    const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
 
     return differenceInDays;
 };
+
+export const UTCToLocalTime = (utcDate?: string) => {
+    if(!utcDate){
+        return null;
+    }
+
+    const localDate = new Date(utcDate);
+  
+    const formattedDate = localDate.toLocaleString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  
+    return formattedDate;
+  };
+
+  export const UTCToLocalTimeInput = (utcDate?: string) => {
+    if(!utcDate){
+        return null;
+    }
+
+    const localDate = new Date(utcDate);
+
+    const year = localDate.getFullYear();
+    const month = String(localDate.getMonth() + 1).padStart(2, '0');
+    const day = String(localDate.getDate()).padStart(2, '0');
+
+    const formattedDate = `${year}-${month}-${day}`;
+  
+    return formattedDate;
+  };

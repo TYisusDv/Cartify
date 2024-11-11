@@ -199,6 +199,13 @@
   }
 }
 
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  margin-top: -10px;
+  filter: invert(1);
+  font-size: 22px;
+}
+
 @keyframes l1 {
   0% {
     background-position: 0 0, 0 100%;

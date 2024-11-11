@@ -249,7 +249,7 @@ class SalesModel(models.Model):
     quantity_of_payments = models.IntegerField(default = 1, null = False, blank = False)
     payment_days = models.IntegerField(null = True, blank = False)
     note = models.CharField(max_length = 100, null = True, blank = False)
-    date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
+    date_reg = models.DateField(null = False, blank = False, default = timezone.now)
     client = models.ForeignKey(ClientsModel, null = False, blank = False, on_delete = models.RESTRICT)
     location = models.ForeignKey(LocationsModel, null = False, blank = False, on_delete = models.RESTRICT)
     user = models.ForeignKey(User, null = False, blank = False, on_delete = models.RESTRICT)
@@ -336,8 +336,9 @@ class ExpensesModel(models.Model):
     no = models.CharField(unique = True, null = False, blank = False)
     total = models.FloatField(default = 0, null = False, blank = False)
     date_limit = models.DateField(null = True, blank = False)
-    date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
+    date_reg = models.DateField(null = False, blank = False, default = timezone.now)
     supplier = models.ForeignKey(SuppliersModel, null = False, blank = False, on_delete = models.RESTRICT) 
+    user = models.ForeignKey(User, null = False, blank = False, on_delete = models.RESTRICT)
     
     class Meta: 
         db_table = 'expenses'
@@ -348,15 +349,28 @@ class ExpenseDetailsModel(models.Model):
     quantity = models.FloatField(default = 0, null = False, blank = False)
     product = models.ForeignKey(ProductsModel, on_delete = models.RESTRICT)
     expense = models.ForeignKey(ExpensesModel, on_delete = models.RESTRICT)
+    user = models.ForeignKey(User, null = False, blank = False, on_delete = models.RESTRICT)
     
     class Meta: 
         db_table = 'expense_details'
 
+class BanksModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    name = models.CharField(null = False, blank = False)
+    status = models.BooleanField(default = True, null = False, blank = False)
+    
+    class Meta: 
+        db_table = 'banks'
+
 class ExpensePaymentsModel(models.Model):
     id = models.AutoField(primary_key = True)
     amount = models.FloatField(default = 0, null = False, blank = False)
-    date_reg = models.DateTimeField(null = False, blank = False, default = timezone.now)
+    note = models.CharField(max_length = 100, null = True, blank = False)
+    date_reg = models.DateField(null = False, blank = False, default = timezone.now)
     expense = models.ForeignKey(ExpensesModel, on_delete = models.RESTRICT)
+    user = models.ForeignKey(User, null = False, blank = False, on_delete = models.RESTRICT)
+    payment_method = models.ForeignKey(PaymentMethodsModel, null = False, blank = False, on_delete = models.RESTRICT)
+    bank = models.ForeignKey(BanksModel, null = False, blank = False, on_delete = models.RESTRICT)
     
     class Meta: 
         db_table = 'expense_payments'

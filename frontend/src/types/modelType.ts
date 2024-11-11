@@ -285,9 +285,10 @@ export interface Expense {
     no?: string;
     total?: number;
     date_limit?: string;
-    date_reg?: Date;
+    date_reg?: string;
     supplier_id?: string;
     supplier?: Supplier;
+    user?: User,
 
     //More
     total_paid?: number;
@@ -302,13 +303,27 @@ export interface ExpenseDetails {
     product_id?: string;
     product?: Product;
     expense?: Expense;
+    user?: User,
+}
+
+//Bank
+export interface Bank {
+    id?: number;
+    name?: string;
+    status?: boolean | '0' | '1' | 0 | 1;
 }
 
 //Expense payments
 export interface ExpensePayments {
     id?: number;    
     amount?: number;
-    date_reg?: Date;
+    note?: string;
+    date_reg?: string;
     expense_id?: string;
     expense?: Expense;
+    payment_method_id?: number;
+    payment_method?: PaymentMethod;
+    bank_id?: number;
+    bank?: Bank;
+    user?: User;
 }

@@ -116,6 +116,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                                 id: 'value',
                                 name: 'value',
                                 type: 'number',
+                                step: 0.01,
                                 value: formValues.value,
                                 onChange: (e) => setFormValues(prev => ({
                                     ...prev,

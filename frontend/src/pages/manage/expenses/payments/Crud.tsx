@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ExpensePayments } from '../../../../types/modelType';
-import { BarCode02Icon } from 'hugeicons-react';
+import { BankIcon, BarCode02Icon, Calendar01Icon, CreditCardIcon, Note01Icon } from 'hugeicons-react';
 import useTranslations from '../../../../hooks/useTranslations';
 import Input from '../../../../components/Input';
 import { addAlert } from '../../../../utils/Alerts';
@@ -8,6 +8,8 @@ import { generateUUID } from '../../../../utils/uuidGen';
 import { extractMessages } from '../../../../utils/formUtils';
 import Select from '../../../../components/Select';
 import { addExpensePayments, deleteExpensePayments, editExpensePayments, getExpensePayments } from '../../../../services/ExprensePayments';
+import { UTCToLocalTimeInput } from '../../../../utils/DateFuncs';
+import { CustomChangeEvent } from '../../../../types/componentsType';
 
 interface CrudProps {
     onClose: () => void;
@@ -38,7 +40,7 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                     const response = await getExpensePayments(formValues);
                     const response_resp = response.resp;
 
-                    setFormValues({ ...response_resp, expense_id: expenseId, product_id: response_resp.product.id });
+                    setFormValues({ ...response_resp, expense_id: expenseId, bank_id: response_resp.bank.id, payment_method_id: response_resp.payment_method.id, date_reg: UTCToLocalTimeInput(response_resp.date_reg) });
                 } catch (error) {
                 }
             };
@@ -92,7 +94,23 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
 
     return (
         <form autoComplete='off' onSubmit={onSubmit}>
-            <div className='flex flex-col gap-2 w-full'>                
+            <div className='flex flex-col gap-2 w-full'>
+                <Input
+                    props={{
+                        id: 'date_reg',
+                        name: 'date_reg',
+                        value: formValues.date_reg,
+                        type: 'date',
+                        onChange: (e) => setFormValues(prev => ({
+                            ...prev,
+                            date_reg: e.target.value
+                        })),
+                        disabled: ['details', 'delete'].includes(type)
+                    }}
+                    label='Fecha de registro'
+                    icon={<Calendar01Icon className='icon' size={24} />}
+                    color={colorPage}
+                />
                 <Input
                     props={{
                         id: 'amount',
@@ -107,6 +125,74 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                     }}
                     label='Monto'
                     icon={'Q'}
+                    color={colorPage}
+                />
+                <div className='w-full z-10'>
+                    <Select
+                        props={{
+                            id: 'paymentmethod',
+                            name: 'paymentmethod',
+                            onChange: (e: CustomChangeEvent) => {
+                                setFormValues(prev => ({
+                                    ...prev,
+                                    note: undefined,
+                                    payment_method_id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                    payment_method: {
+                                        ...e.object,
+                                        id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                    }
+                                }));
+                            },
+                            value: formValues.payment_method_id,
+                            disabled: ['details', 'delete'].includes(type)
+                        }}
+                        endpoint='manage/paymentmethods'
+                        endpoint_value='id'
+                        endpoint_text='{name} ({value}%)'
+                        icon={<CreditCardIcon size={20} />}
+                        label={translations.payment_method}
+                    />
+                </div>
+                <div className='w-full z-[9]'>
+                    <Select
+                        props={{
+                            id: 'bank',
+                            name: 'bank',
+                            onChange: (e: CustomChangeEvent) => {
+                                setFormValues(prev => ({
+                                    ...prev,
+                                    bank_id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                    bank: {
+                                        ...e.object,
+                                        id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                    }
+                                }));
+                            },
+                            value: formValues.bank_id,
+                            disabled: ['details', 'delete'].includes(type)
+                        }}
+                        endpoint='manage/banks'
+                        endpoint_value='id'
+                        endpoint_text='{name}'
+                        icon={<BankIcon size={20} />}
+                        label='Banco'
+                    />
+                </div>
+                <Input
+                    props={{
+                        name: 'note',
+                        value: formValues.note,
+                        onChange: (e) => {
+                            setFormValues(prev => ({
+                                ...prev,
+                                note: e.target.value
+                            }));
+                        },
+                        disabled: ['details', 'delete'].includes(type)
+                    }}
+                    label='Nota'
+                    icon={<Note01Icon />}
+                    required={false}
                     color={colorPage}
                 />
             </div>

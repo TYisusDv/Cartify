@@ -44,6 +44,10 @@ const Payments: React.FC = () => {
     const table_header = [
         { name: 'date_reg', headerName: 'Fecha de registro' },
         { name: 'amount', headerName: 'Monto' },
+        { name: 'payment_method.name', headerName: 'Metodo de pago' },
+        { name: 'bank.name', headerName: 'Banco' },
+        { name: 'note', headerName: 'Nota' },
+        { name: 'user.first_name', headerName: 'Empleado' },
     ];
 
     useEffect(() => {

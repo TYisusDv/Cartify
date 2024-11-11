@@ -41,18 +41,18 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, toggleModal, setS
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'><Layers01Icon size={22} /> {row.category?.name || '-'}</span>
                         </td>
                         <td className='px-6 py-6'>
-                            <span className='flex items-center gap-[1px]'><DollarCircleIcon size={18} /> {row.cost_price || '-'}</span>
+                            <span className='flex items-center gap-[1px]'>Q{row.cost_price || '-'}</span>
                         </td> 
                         <td className='px-6 py-6'>
-                            <span className='flex items-center gap-[1px]'><DollarCircleIcon size={18} /> {row.cash_price || '-'}</span>
+                            <span className='flex items-center gap-[1px]'>Q{row.cash_price || '-'}</span>
                         </td>
                         <td className='px-6 py-6'>
-                            <span className='flex items-center gap-[1px]'><DollarCircleIcon size={18} /> {row.credit_price || '-'}</span>
+                            <span className='flex items-center gap-[1px]'>Q{row.credit_price || '-'}</span>
                         </td>  
                         <td className='px-6 py-4'>
                             {
                             row.status ? 
-                                <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-blue-600 text-white rounded-xl'><EyeIcon size={22} /> {translations.visible}</span>
+                                <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-green-600 text-white rounded-xl'><EyeIcon size={22} /> {translations.available}</span>
                             :
                                 <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-red-600 text-white rounded-xl'><ViewOffSlashIcon size={22} /> {translations.hidden}</span>
                             }

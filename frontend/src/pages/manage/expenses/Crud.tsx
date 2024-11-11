@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Expense } from '../../../types/modelType';
-import { DistributionIcon, Invoice01Icon } from 'hugeicons-react';
+import { Calendar01Icon, DistributionIcon, Invoice01Icon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import Input from '../../../components/Input';
 import { addAlert } from '../../../utils/Alerts';
@@ -8,6 +8,7 @@ import { generateUUID } from '../../../utils/uuidGen';
 import { extractMessages } from '../../../utils/formUtils';
 import { addExpense, deleteExpense, editExpense, getExpense } from '../../../services/Exprenses';
 import Select from '../../../components/Select';
+import { UTCToLocalTimeInput } from '../../../utils/DateFuncs';
 
 interface CrudProps {
     onClose: () => void;
@@ -37,7 +38,7 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                     const response = await getExpense(formValues);
                     const response_resp = response.resp;
                     
-                    setFormValues({...response_resp, supplier_id: response_resp.supplier?.id});
+                    setFormValues({...response_resp, supplier_id: response_resp.supplier?.id, date_reg: UTCToLocalTimeInput(response_resp.date_reg)});
                 } catch (error) {
                 }
             };
@@ -94,6 +95,22 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
             <div className='flex flex-col gap-2 w-full'>
                 <Input
                     props={{
+                        id: 'date_reg',
+                        name: 'date_reg',
+                        value: formValues.date_reg,
+                        type: 'date',
+                        onChange: (e) => setFormValues(prev => ({
+                            ...prev,
+                            date_reg: e.target.value
+                        })),
+                        disabled: ['details', 'delete'].includes(type)
+                    }}
+                    label='Fecha de registro'
+                    icon={<Calendar01Icon className='icon' size={24} />}
+                    color={colorPage}
+                />
+                <Input
+                    props={{
                         id: 'no',
                         name: 'no',
                         value: formValues.no,
@@ -113,6 +130,7 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                         name: 'total',
                         value: formValues.total,
                         type: 'number',
+                        step: 0.01,
                         min: 0,
                         onChange: (e) => setFormValues(prev => ({
                             ...prev,

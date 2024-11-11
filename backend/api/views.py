@@ -3360,10 +3360,15 @@ class ManageExpensesAPIView(APIView):
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
 
+        supplier_id = data.get('supplier[id]', None)
+
         if query == 'table':
             model = ExpensesModel.objects.filter(
                 Q(id__icontains = search)
             )
+
+            if supplier_id not in [None,  0, '0']:
+                model = model.filter(supplier_id = supplier_id)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -3403,7 +3408,7 @@ class ManageExpensesAPIView(APIView):
         elif query == 'list':
             model = ExpensesModel.objects.filter(
                 Q(id__icontains = search) |
-                Q(name__icontains = search)
+                Q(name__icontains = search)                
             )[:10]
             serialized = ExpensesSerializer(model, many = True)
             
@@ -3431,7 +3436,10 @@ class ManageExpensesAPIView(APIView):
         }, status = 404) 
 
     def post(self, request):
+        user = request.user
         data = request.data
+
+        data['user_id'] = user.id
 
         serializer = AddEditExpenseSerializer(data = data)
         if not serializer.is_valid():
@@ -3442,7 +3450,10 @@ class ManageExpensesAPIView(APIView):
         return JsonResponse({'success': True, 'resp': 'Added successfully.'})
 
     def put(self, request):
+        user = request.user
         data = request.data
+
+        data['user_id'] = user.id
 
         data_id = data.get('id', None)
 
@@ -3573,7 +3584,10 @@ class ManageExpenseDetailsAPIView(APIView):
         }, status = 404) 
 
     def post(self, request):
+        user = request.user
         data = request.data
+
+        data['user_id'] = user.id
 
         serializer = AddEditExpenseDetailsSerializer(data = data)
         if not serializer.is_valid():
@@ -3584,7 +3598,10 @@ class ManageExpenseDetailsAPIView(APIView):
         return JsonResponse({'success': True, 'resp': 'Added successfully.'})
 
     def put(self, request):
+        user = request.user
         data = request.data
+
+        data['user_id'] = user.id
 
         data_id = data.get('id', None)
 
@@ -3732,7 +3749,10 @@ class ManageExpensePaymentsAPIView(APIView):
         }, status = 404) 
 
     def post(self, request):
+        user = request.user
         data = request.data
+
+        data['user_id'] = user.id
         expense_id = data.get('expense_id', None)
         amount = data.get('amount', 0)
         amount = int(amount) if str(amount).isnumeric() else 0
@@ -3757,7 +3777,10 @@ class ManageExpensePaymentsAPIView(APIView):
         return JsonResponse({'success': True, 'resp': 'Added successfully.'})
 
     def put(self, request):
+        user = request.user
         data = request.data
+
+        data['user_id'] = user.id
 
         data_id = data.get('id', None)
 
@@ -3784,6 +3807,148 @@ class ManageExpensePaymentsAPIView(APIView):
         data_id = data.get('id', None)
 
         serializer = GetExpensePaymentSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)           
+        instance.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'resp': 'Deleted successfully.'
+        }, status = 200)
+
+#Banks
+class ManageBanksAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    @classmethod
+    def get_object(self, pk) :
+        try:
+            return BanksModel.objects.get(pk = pk)
+        except BanksModel.DoesNotExist:
+            raise Http404('Bank not found.')
+        
+    def get(self, request):
+        data = request.query_params
+        data_id = data.get('id', None)
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = data.get('page', 1)
+        order_by = data.get('order_by', 'id').replace('.', '__')
+        order = data.get('order', 'desc')
+        show = data.get('show', 10)
+
+        if query == 'table':
+            model = BanksModel.objects.filter(
+                Q(id__icontains = search)
+            )
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = BanksSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            data_id = data.get('id', None)
+
+            serializer = GetBankSerializer(data = data)  
+            if not serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': serializer.errors
+                }, status = 400)    
+                    
+            instance = self.get_object(pk = data_id)
+
+            serialized = BanksSerializer(instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = BanksModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = BanksSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = BanksModel.objects.filter().count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def post(self, request):
+        data = request.data
+        
+        serializer = AddEditBankSerializer(data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+
+    def put(self, request):
+        data = request.data
+
+        data_id = data.get('id', None)
+
+        serializer = GetBankSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = self.get_object(pk = data_id)     
+
+        serializer = AddEditBankSerializer(instance, data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
+    def delete(self, request):
+        data = request.query_params
+
+        data_id = data.get('id', None)
+
+        serializer = GetBankSerializer(data = data)  
         if not serializer.is_valid():
             return JsonResponse({
                 'success': False, 

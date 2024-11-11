@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Tax } from '../../../types/modelType';
-import { addTax, deleteTax, editTax, getTax } from '../../../services/taxesService';
-import { PercentCircleIcon, ProfileIcon } from 'hugeicons-react';
+import { Bank } from '../../../types/modelType';
+import { ProfileIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import Input from '../../../components/Input';
 import Switch from '../../../components/Switch';
 import { addAlert } from '../../../utils/Alerts';
 import { generateUUID } from '../../../utils/uuidGen';
 import { extractMessages } from '../../../utils/formUtils';
+import { addBank, deleteBank, editBank, getBank } from '../../../services/Banks';
 
-interface CrudPageProps {
+interface CrudProps {
     onClose: () => void;
     handleTableReload?: () => void;
     setSelected?: (value: number) => void;
@@ -17,20 +17,13 @@ interface CrudPageProps {
     selected_id?: number;
 }
 
-const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSelected, type, selected_id }) => {
+const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, type, selected_id }) => {
     const { translations } = useTranslations();
-    const [formValues, setFormValues] = useState<Tax>(() => {
-        const savedForm = sessionStorage.getItem('taxFormValues');
-        return savedForm ? JSON.parse(savedForm) : { id: selected_id, value: 0, status: true };
-    });
+    const [formValues, setFormValues] = useState<Bank>({ id: selected_id, status: true });
     const [colorPage, setColorPage] = useState<'blue' | 'orange' | 'red' | 'yellow'>('blue');
 
     useEffect(() => {
-        sessionStorage.setItem('taxFormValues', JSON.stringify(formValues));
-    }, [formValues]);
-    
-    useEffect(() => {
-        const colorMapping: { [key in CrudPageProps['type']]: string } = {
+        const colorMapping: { [key in CrudProps['type']]: string } = {
             delete: 'red',
             details: 'orange',
             edit: 'yellow',
@@ -41,7 +34,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
         if ((type === 'details' || type === 'delete' || type === 'edit') && selected_id) {
             const fetchGet = async () => {
                 try {
-                    const response = await getTax(selected_id);
+                    const response = await getBank(formValues);
                     const response_resp = response.resp;
 
                     setFormValues(response_resp);
@@ -59,13 +52,13 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
         try {
             let response_resp;
             if (type === 'add') {
-                const response = await addTax(formValues);
+                const response = await addBank(formValues);
                 response_resp = response?.resp;
             } else if (type === 'edit') {
-                const response = await editTax(formValues);
+                const response = await editBank(formValues);
                 response_resp = response?.resp;
             } else if (type === 'delete' && selected_id) {
-                const response = await deleteTax(selected_id);
+                const response = await deleteBank(formValues);
                 response_resp = response?.resp;
             }
 
@@ -94,50 +87,26 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                 });
             });
         }
-    }; 
+    };
 
     return (
         <form autoComplete='off' onSubmit={onSubmit}>
             <div className='flex flex-col gap-2 w-full'>
-                <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
-                    <div className='col-span-1'>
-                        <Input
-                            props={{
-                                id: 'name',
-                                name: 'name',
-                                value: formValues.name,
-                                onChange: (e) => setFormValues(prev => ({
-                                    ...prev,
-                                    name: e.target.value || ''
-                                })),
-                                disabled: ['details', 'delete'].includes(type)
-                            }}
-                            label={translations.name}
-                            icon={<ProfileIcon className='icon' size={24} />}
-                            color={colorPage}
-                        />
-                    </div>
-                    <div className='col-span-1'>
-                        <Input
-                            props={{
-                                id: 'value',
-                                name: 'value',
-                                type: 'number',
-                                step: 0.01,
-                                value: formValues.value,
-                                onChange: (e) => setFormValues(prev => ({
-                                    ...prev,
-                                    value: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
-                                })),
-                                disabled: ['details', 'delete'].includes(type)
-                            }}
-                            label={translations.value_per}
-                            icon={<PercentCircleIcon className='icon' size={24} />}
-                            color={colorPage}
-                            required={false}
-                        />
-                    </div>
-                </div>
+                <Input
+                    props={{
+                        id: 'name',
+                        name: 'name',
+                        value: formValues.name,
+                        onChange: (e) => setFormValues(prev => ({
+                            ...prev,
+                            name: e.target.value || ''
+                        })),
+                        disabled: ['details', 'delete'].includes(type)
+                    }}
+                    label={translations.name}
+                    icon={<ProfileIcon className='icon' size={24} />}
+                    color={colorPage}
+                />
                 <Switch
                     props={{
                         id: 'status',
@@ -166,4 +135,4 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
     );
 };
 
-export default CrudPage;
+export default Crud;

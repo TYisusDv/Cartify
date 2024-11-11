@@ -1,6 +1,6 @@
 import React, { Suspense, useState } from 'react';
 import { Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
-import { Analytics02Icon, BarCode02Icon, BrandfetchIcon, Cash01Icon, CreditCardIcon, DashboardBrowsingIcon, DashboardSquare01Icon, DistributionIcon, Invoice02Icon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserAccountIcon, UserGroupIcon, WaterfallDown01Icon, WaterfallUp01Icon } from 'hugeicons-react';
+import { Analytics02Icon, BankIcon, BarCode02Icon, BrandfetchIcon, Cash01Icon, CreditCardIcon, DashboardBrowsingIcon, DashboardSquare01Icon, DistributionIcon, Invoice02Icon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserAccountIcon, UserGroupIcon, WaterfallDown01Icon, WaterfallUp01Icon } from 'hugeicons-react';
 import useTranslations from '../hooks/useTranslations';
 import SkeletonLoader from '../components/SkeletonLoader';
 import ErrorPage from '../pages/errorPage';
@@ -33,6 +33,7 @@ const ManageCashRegisterSales = React.lazy(() => import('../pages/manage/cashreg
 const ManageExpenses = React.lazy(() => import('../pages/manage/expenses/Expenses'));
 const ManageExpenseDetails = React.lazy(() => import('../pages/manage/expenses/details/Details'));
 const ManageExpensePayments = React.lazy(() => import('../pages/manage/expenses/payments/Payments'));
+const ManageBanks = React.lazy(() => import('../pages/manage/banks/Banks'));
 const SettingGeneralPage = React.lazy(() => import('../pages/settings/settingGeneralPage'));
 
 const PanelPage: React.FC = () => {
@@ -107,10 +108,11 @@ const PanelPage: React.FC = () => {
             <DropdownMenu 
               label='Gastos'
               icon={<WaterfallDown01Icon className='w-7' />}
-              links={['/manage/expenses']}
+              links={['/manage/expenses','/manage/banks']}
 
             >
-                <li><Link to='/manage/expenses' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/expenses')}`}><WaterfallDown01Icon size={20} /> Gastos</Link></li>
+              <li><Link to='/manage/expenses' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/expenses')}`}><WaterfallDown01Icon size={20} /> Gastos</Link></li>
+              <li><Link to='/manage/banks' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/banks')}`}><BankIcon size={20} /> Bancos</Link></li>
             </DropdownMenu>
           </li>
           <li><Link to='/manage/users' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/users')}`}><UserGroupIcon />  {translations.users}</Link></li>
@@ -192,6 +194,7 @@ const PanelPage: React.FC = () => {
             <Route path='/manage/expenses' element={<ManageExpenses />} />
             <Route path='/manage/expenses/details' element={<ManageExpenseDetails />} />
             <Route path='/manage/expenses/payments' element={<ManageExpensePayments />} />
+            <Route path='/manage/banks' element={<ManageBanks />} />
             <Route path='/auth/logout' element={<AuthLogoutPage />} />
             <Route path='*' element={<ErrorPage code={404} detail={translations.error_404} />} />
           </Routes>

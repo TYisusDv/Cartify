@@ -1,7 +1,8 @@
 import React from 'react';
-import { Calendar03Icon, DistributionIcon, WaterfallDown01Icon } from 'hugeicons-react';
+import { Calendar01Icon, Calendar03Icon, DistributionIcon, UserIcon, WaterfallDown01Icon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import { Expense } from '../../../types/modelType';
+import { calculateDaysRemaining } from '../../../utils/DateFuncs';
 
 interface TBodyProps {
     data?: Array<Expense>;
@@ -24,10 +25,7 @@ const TBody: React.FC<TBodyProps> = ({ data, selected, setSelected }) => {
                                     new Date(row.date_reg).toLocaleString('es-MX', {
                                         day: '2-digit',
                                         month: '2-digit',
-                                        year: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: true
+                                        year: 'numeric'
                                     }).replace(',', '')
                                     : '-'}
                             </span>
@@ -46,7 +44,7 @@ const TBody: React.FC<TBodyProps> = ({ data, selected, setSelected }) => {
                         </td>
                         <td className='px-6 py-6'>
                             <span className='flex items-center gap-[1px]'><DistributionIcon size={18} /> {row.supplier?.company_name || '-'}</span>
-                        </td>         
+                        </td>
                         <td className='px-6 py-4'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
                                 <Calendar03Icon size={22} />
@@ -58,12 +56,23 @@ const TBody: React.FC<TBodyProps> = ({ data, selected, setSelected }) => {
                                     })
                                     : '-'}
                             </span>
-                        </td>               
+                            <br />
+                            <span className={`inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold rounded-xl ${(calculateDaysRemaining(row.date_limit ? new Date(row.date_limit) : undefined) || 0) < 0 ? 'bg-red-500' : (calculateDaysRemaining(row.date_limit ? new Date(row.date_limit) : undefined) || 0) <= 3 ? 'bg-yellow-500' : 'bg-green-500'}`}>
+                                <Calendar01Icon size={22} />
+                                {calculateDaysRemaining(row.date_limit ? new Date(row.date_limit) : undefined)} dias.
+                            </span>
+                        </td>
+                        <td className='px-6 py-4'>
+                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
+                                <UserIcon size={22} />
+                                {row.user?.first_name || '-'}
+                            </span>
+                        </td>
                     </tr>
                 ))
             ) : (
                 <tr>
-                    <td colSpan={4} className='px-6 py-4 text-center dark:text-white'>{translations.no_data}</td>
+                    <td colSpan={8} className='px-6 py-4 text-center dark:text-white'>{translations.no_data}</td>
                 </tr>
             )}
         </tbody>

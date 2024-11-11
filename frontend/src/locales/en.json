@@ -184,5 +184,6 @@
     "manage_client_types_info": "Manage client types here. Add, edit, and delete!",
     "add_client_type": "Add client type",
     "edit_client_type": "Edit client type",
-    "delete_client_type_sure": "Are you sure you want to delete the client type?"
+    "delete_client_type_sure": "Are you sure you want to delete the client type?",
+    "available": "Available"
 }

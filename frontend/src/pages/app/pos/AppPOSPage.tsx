@@ -615,6 +615,7 @@ const AppPOSPage: React.FC = () => {
                                                 id: 'subtotal',
                                                 name: 'subtotal',
                                                 type: 'number',
+                                                step: 0.01,
                                                 value: formValuesPayment.subtotal || 0,
                                                 min: 0,
                                                 onChange: (e) => {
@@ -664,6 +665,7 @@ const AppPOSPage: React.FC = () => {
                                                 id: 'discount_per',
                                                 name: 'discount_per',
                                                 type: 'number',
+                                                step: 0.01,
                                                 value: formValuesPayment.discount_per || 0,
                                                 min: 0,
                                                 onChange: (e) => {
@@ -685,6 +687,7 @@ const AppPOSPage: React.FC = () => {
                                                 id: 'discount',
                                                 name: 'discount',
                                                 type: 'number',
+                                                step: 0.01,
                                                 value: formValuesPayment.discount || 0,
                                                 min: 0,
                                                 onChange: (e) => {
@@ -725,6 +728,7 @@ const AppPOSPage: React.FC = () => {
                                         id: 'pay',
                                         name: 'pay',
                                         type: 'number',
+                                        step: 0.01,
                                         value: formValuesPayment.pay || 0,
                                         min: 0,
                                         onChange: (e) => {
@@ -812,6 +816,7 @@ const AppPOSPage: React.FC = () => {
                                     name: 'newPrice',
                                     type: 'number',
                                     value: newPrice,
+                                    step: 0.01,
                                     min: selectedProductIndex !== null ? (formValuesDetails[selectedProductIndex]?.product?.credit_price || 0) : 0,
                                     onChange: (e: React.ChangeEvent<HTMLInputElement>) => setNewPrice(Number(e.target.value)),
                                 }}

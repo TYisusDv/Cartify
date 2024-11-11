@@ -532,6 +532,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, toggleModal, handleTableRe
                                         name: 'cost_price',
                                         type: 'number',
                                         value: formValues.cost_price,
+                                        step: 0.01,
                                         onChange: (e) => {
                                             setFormValues(prev => ({
                                                 ...prev,
@@ -556,6 +557,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, toggleModal, handleTableRe
                                         name: 'cash_profit',
                                         type: 'number',
                                         value: formValues.cash_profit,
+                                        step: 0.01,
                                         onChange: (e) => {
                                             setFormValues(prev => ({
                                                 ...prev,
@@ -578,6 +580,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, toggleModal, handleTableRe
                                         name: 'cash_price',
                                         type: 'number',
                                         value: formValues.cash_price,
+                                        step: 0.01,
                                         onChange: (e) => {
                                             setFormValues(prev => ({
                                                 ...prev,
@@ -602,6 +605,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, toggleModal, handleTableRe
                                         name: 'credit_profit',
                                         type: 'number',
                                         value: formValues.credit_profit,
+                                        step: 0.01,
                                         onChange: (e) => {
                                             setFormValues(prev => ({
                                                 ...prev,
@@ -624,6 +628,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, toggleModal, handleTableRe
                                         name: 'credit_price',
                                         type: 'number',
                                         value: formValues.credit_price,
+                                        step: 0.01,
                                         onChange: (e) => {
                                             setFormValues(prev => ({
                                                 ...prev,

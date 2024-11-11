@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface InputProps {
     props?: React.InputHTMLAttributes<HTMLInputElement>;
@@ -37,9 +37,12 @@ const Input: React.FC<InputProps> = ({ props, icon, label, color = 'blue', requi
                 className='input'
                 onClick={handleClick}
             />
-            <span className='font-medium text-black dark:text-white'>
-                {icon}
-            </span>
+            { props?.type !== 'date' && props?.type !== 'datetime-local' && (
+                <span className='font-medium text-black dark:text-white'>
+                    {icon}
+                </span>
+            )}
+            
         </div>
     );
 };

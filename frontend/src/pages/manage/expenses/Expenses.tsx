@@ -9,6 +9,7 @@ import TablePage from './TBody';
 import CrudPage from './Crud';
 import { getCount } from '../../../services/Exprenses';
 import { Link } from 'react-router-dom';
+import Filters from './Filters';
 
 const Expenses: React.FC = () => {
     const { translations } = useTranslations();
@@ -32,12 +33,13 @@ const Expenses: React.FC = () => {
 
     const table_header = [
         { name: 'date_reg', headerName: 'Fecha de registro' },
-        { name: 'no', headerName: 'Numero' },
-        { name: 'total', headerName: 'Total' },
-        { name: '', headerName: 'Total dado' },
+        { name: 'no', headerName: 'No. Factura' },
+        { name: 'total', headerName: 'Total de factura' },
+        { name: '', headerName: 'Total abonado' },
         { name: '', headerName: 'Total restante' },
         { name: 'supplier.company_name', headerName: translations.supplier },
         { name: 'date_limit', headerName: 'Fecha limite' },
+        { name: 'user.first_name', headerName: 'Empleado' },
     ];
 
     useEffect(() => {
@@ -109,7 +111,20 @@ const Expenses: React.FC = () => {
                     </div>
                 </div>
                 <div className='w-full mt-6'>
-                    <Table endpoint='manage/expenses' order='desc' order_by='date_reg' reloadTable={reloadTable} header={table_header} tbody={<TablePage selected={selected} setSelected={setSelected} />} />
+                    <Table 
+                        endpoint='manage/expenses' 
+                        order='desc' 
+                        order_by='date_reg' 
+                        reloadTable={reloadTable} 
+                        header={table_header} 
+                        tbody={
+                            <TablePage 
+                                selected={selected} 
+                                setSelected={setSelected} 
+                            />
+                        } 
+                        filters={<Filters />}
+                    />
                 </div>
             </div>
             {isModalOpen.add && (

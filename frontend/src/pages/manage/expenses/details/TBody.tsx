@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarCode02Icon, More03Icon } from 'hugeicons-react';
+import { BarCode02Icon, More03Icon, UserIcon } from 'hugeicons-react';
 import useTranslations from '../../../../hooks/useTranslations';
 import { ExpenseDetails } from '../../../../types/modelType';
 
@@ -27,12 +27,17 @@ const TBody: React.FC<TBodyProps> = ({ data, selected, setSelected }) => {
                         </td>
                         <td className='px-6 py-4'>
                             <span className='flex items-center gap-1'>Q{row.cost || '-'}</span>
-                        </td>                      
+                        </td>    
+                        <td className='px-6 py-4'>
+                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
+                                <UserIcon size={22} /> {row.user?.first_name || '-'}
+                            </span>
+                        </td>                   
                     </tr>
                 ))
             ) : (
                 <tr>
-                    <td colSpan={3} className='px-6 py-4 text-center dark:text-white'>{translations.no_data}</td>
+                    <td colSpan={4} className='px-6 py-4 text-center dark:text-white'>{translations.no_data}</td>
                 </tr>
             )}
         </tbody>

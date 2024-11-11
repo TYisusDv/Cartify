@@ -1748,6 +1748,7 @@ class GetCashRegisterSerializer(serializers.ModelSerializer):
 class ExpensesSerializer(serializers.ModelSerializer):
     total_paid = serializers.SerializerMethodField()
     supplier = SuppliersSerializer(read_only = True)
+    user = UserExcludeSerializer(read_only = True)
 
     def get_total_paid(self, obj):
         model = ExpensePaymentsModel.objects.filter(expense_id = obj.id)
@@ -1781,16 +1782,30 @@ class AddEditExpenseSerializer(serializers.ModelSerializer):
         'invalid': 'The date limit is invalid.',
     })
 
+    date_reg = serializers.DateField(error_messages = {
+        'required': 'The date registration is required.',
+        'blank': 'The date registration cannot be blank.',
+        'null': 'The date registration cannot be blank.',
+        'invalid': 'The date registration is invalid.',
+    })
+
     supplier_id = serializers.UUIDField(error_messages = {
         'required': 'The supplier is required.',
         'blank': 'The supplier cannot be blank.',
         'null': 'The supplier cannot be blank.',
         'invalid': 'The supplier is invalid.',
     })
+
+    user_id = serializers.IntegerField(error_messages = {
+        'required': 'The user is required.',
+        'blank': 'The user cannot be blank.',
+        'null': 'The user cannot be blank.',
+        'invalid': 'The user is invalid.',
+    })
     
     class Meta:
         model = ExpensesModel
-        exclude = ['id', 'supplier']
+        exclude = ['id', 'supplier', 'user']
 
 class GetExpenseSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(error_messages = {
@@ -1807,6 +1822,7 @@ class GetExpenseSerializer(serializers.ModelSerializer):
 #Expense details
 class ExpenseDetailsSerializer(serializers.ModelSerializer):
     product = ProductsSerializer(read_only = True)
+    user = UserExcludeSerializer(read_only = True)
 
     class Meta:
         model = ExpenseDetailsModel
@@ -1827,6 +1843,13 @@ class AddEditExpenseDetailsSerializer(serializers.ModelSerializer):
         'invalid': 'The quantity is invalid.',
     })
 
+    date_reg = serializers.DateField(error_messages = {
+        'required': 'The date registration is required.',
+        'blank': 'The date registration cannot be blank.',
+        'null': 'The date registration cannot be blank.',
+        'invalid': 'The date registration is invalid.',
+    })
+
     product_id = serializers.UUIDField(error_messages = {
         'required': 'The product is required.',
         'blank': 'The product cannot be blank.',
@@ -1840,10 +1863,17 @@ class AddEditExpenseDetailsSerializer(serializers.ModelSerializer):
         'null': 'The expense cannot be blank.',
         'invalid': 'The expense is invalid.',
     })
+
+    user_id = serializers.IntegerField(error_messages = {
+        'required': 'The user is required.',
+        'blank': 'The user cannot be blank.',
+        'null': 'The user cannot be blank.',
+        'invalid': 'The user is invalid.',
+    })
     
     class Meta:
         model = ExpenseDetailsModel
-        exclude = ['id', 'product', 'expense']
+        exclude = ['id', 'product', 'expense', 'user']
 
 class GetExpenseDetailsSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(error_messages = {
@@ -1857,8 +1887,42 @@ class GetExpenseDetailsSerializer(serializers.ModelSerializer):
         model = ExpenseDetailsModel
         fields = ['id']
 
+#Banks
+class BanksSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BanksModel
+        fields = '__all__'
+
+class AddEditBankSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(error_messages = {
+        'required': 'The name is required.',
+        'blank': 'The name cannot be blank.',
+        'null': 'The name cannot be blank.',
+        'max_length': 'The name cannot exceed 254 characters.',
+    })
+    
+    class Meta:
+        model = BanksModel
+        exclude = ['id']
+
+class GetBankSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The bank is required.',
+        'blank': 'The bank cannot be blank.',
+        'null': 'The bank cannot be blank.',
+        'invalid': 'The bank is invalid.',
+    })
+    
+    class Meta:
+        model = BanksModel
+        fields = ['id']
+
 #Expense payments
 class ExpensePaymentsSerializer(serializers.ModelSerializer):
+    user = UserExcludeSerializer(read_only = True)
+    payment_method = PaymentMethodsSerializer(read_only = True)
+    bank = BanksSerializer(read_only = True)
+
     class Meta:
         model = ExpensePaymentsModel
         fields = '__all__'
@@ -1871,6 +1935,20 @@ class AddEditExpensePaymentSerializer(serializers.ModelSerializer):
         'invalid': 'The amount is invalid.',
     })
 
+    note = serializers.CharField(error_messages = {
+        'required': 'The note is required.',
+        'blank': 'The note cannot be blank.',
+        'null': 'The note cannot be blank.',
+        'max_length': 'The note cannot exceed 100 characters.',
+    }, required = False, max_length = 100, allow_blank = True, allow_null = True)
+
+    date_reg = serializers.DateField(error_messages = {
+        'required': 'The date registration is required.',
+        'blank': 'The date registration cannot be blank.',
+        'null': 'The date registration cannot be blank.',
+        'invalid': 'The date registration is invalid.',
+    })
+
     expense_id = serializers.UUIDField(error_messages = {
         'required': 'The expense is required.',
         'blank': 'The expense cannot be blank.',
@@ -1878,9 +1956,30 @@ class AddEditExpensePaymentSerializer(serializers.ModelSerializer):
         'invalid': 'The expense is invalid.',
     })
     
+    payment_method_id = serializers.IntegerField(error_messages = {
+        'required': 'The payment method is required.',
+        'blank': 'The payment method cannot be blank.',
+        'null': 'The payment method cannot be blank.',
+        'invalid': 'The payment method is invalid.',
+    })
+
+    user_id = serializers.IntegerField(error_messages = {
+        'required': 'The user is required.',
+        'blank': 'The user cannot be blank.',
+        'null': 'The user cannot be blank.',
+        'invalid': 'The user is invalid.',
+    })
+
+    bank_id = serializers.IntegerField(error_messages = {
+        'required': 'The bank is required.',
+        'blank': 'The bank cannot be blank.',
+        'null': 'The bank cannot be blank.',
+        'invalid': 'The bank is invalid.',
+    })
+    
     class Meta:
         model = ExpensePaymentsModel
-        exclude = ['id', 'expense']
+        exclude = ['id', 'expense', 'user', 'payment_method', 'bank']
 
 class GetExpensePaymentSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(error_messages = {
