@@ -39,6 +39,7 @@ const Expenses: React.FC = () => {
         { name: '', headerName: 'Total restante' },
         { name: 'supplier.company_name', headerName: translations.supplier },
         { name: 'date_limit', headerName: 'Fecha limite' },
+        { name: 'isactive', headerName: 'Estado' },
         { name: 'user.first_name', headerName: 'Empleado' },
     ];
 

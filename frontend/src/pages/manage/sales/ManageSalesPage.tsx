@@ -78,6 +78,7 @@ const ManageSalesPage: React.FC = () => {
                 </div>
                 <div className='w-full mt-6'>
                     <Table endpoint='manage/sales' 
+                        unique='manage-sales'
                         reloadTable={reloadTable} 
                         header={table_header} 
                         tbody={<TablePage selected={selected} setSelected={setSelected} />} 

@@ -67,7 +67,7 @@ const Receipt: React.FC = () => {
                     </div>
                 </div>
                 <div className='w-full mt-6'>
-                    <Table endpoint='manage/sale/receipt' reloadTable={reloadTable} header={table_header} tbody={<TablePage selected={selected} setSelected={setSelected} />} />
+                    <Table unique='manage-sale-receipt' endpoint='manage/sale/receipt' reloadTable={reloadTable} header={table_header} tbody={<TablePage selected={selected} setSelected={setSelected} />} />
                 </div>
             </div>
             {isModalOpen.add && (

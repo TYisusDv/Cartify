@@ -244,6 +244,8 @@ class SaleStatusModel(models.Model):
 
 class SalesModel(models.Model):
     id = models.IntegerField(primary_key = True)
+    discount_per = models.FloatField(default = 0, null = False, blank = False)
+    discount = models.FloatField(default = 0, null = False, blank = False)
     total = models.FloatField(default = 0, null = False, blank = False)
     type = models.IntegerField(default = 1, null = False, blank = False)
     quantity_of_payments = models.IntegerField(default = 1, null = False, blank = False)
@@ -339,6 +341,7 @@ class ExpensesModel(models.Model):
     date_reg = models.DateField(null = False, blank = False, default = timezone.now)
     supplier = models.ForeignKey(SuppliersModel, null = False, blank = False, on_delete = models.RESTRICT) 
     user = models.ForeignKey(User, null = False, blank = False, on_delete = models.RESTRICT)
+    isactive = models.BooleanField(default = True, null = False, blank = False)
     
     class Meta: 
         db_table = 'expenses'

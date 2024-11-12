@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar01Icon, Calendar03Icon, DistributionIcon, UserIcon, WaterfallDown01Icon } from 'hugeicons-react';
+import { Calendar01Icon, Calendar03Icon, DistributionIcon, Tick01Icon, ToggleOnIcon, UserIcon, WaterfallDown01Icon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import { Expense } from '../../../types/modelType';
 import { calculateDaysRemaining } from '../../../utils/DateFuncs';
@@ -63,11 +63,19 @@ const TBody: React.FC<TBodyProps> = ({ data, selected, setSelected }) => {
                             </span>
                         </td>
                         <td className='px-6 py-4'>
+                            {
+                            row.isactive ? 
+                                <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-blue-600 text-white rounded-xl'><ToggleOnIcon size={22} /> Activo</span>
+                            :
+                                <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-green-600 text-white rounded-xl'><Tick01Icon size={22} /> Completado</span>
+                            }
+                        </td>   
+                        <td className='px-6 py-4'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
                                 <UserIcon size={22} />
                                 {row.user?.first_name || '-'}
                             </span>
-                        </td>
+                        </td>                         
                     </tr>
                 ))
             ) : (

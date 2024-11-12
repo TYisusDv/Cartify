@@ -1,4 +1,5 @@
 import React, { cloneElement, ReactElement, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Search01Icon } from 'hugeicons-react';
 import { getTable } from '../services/componentsService';
 import Input from "./Input";
@@ -17,6 +18,7 @@ interface DataRow {
 }
 
 interface TableProps {
+    unique?: string;
     endpoint: string;
     header: Header[];
     reloadTable: number;
@@ -32,19 +34,36 @@ interface TableProps {
     show_pagination?: boolean;
 }
 
-const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, filters, order_by = 'id', order = 'desc', query = 'table', id, classNameFilters, filters_params, show_search = true, show_pagination = true }) => {
+const Table: React.FC<TableProps> = ({ unique, endpoint, header, reloadTable, tbody, filters, order_by = 'id', order = 'desc', query = 'table', id, classNameFilters, filters_params, show_search = true, show_pagination = true }) => {
     const { translations } = useTranslations();
     const [data, setData] = useState<DataRow[]>([]);
     const itemsPerPage = 10;
     const [totalPages, setTotalPages] = useState(1);
-    const [formValues, setFormValues] = useState({ query: query, id: id, page: 1, show: itemsPerPage, search: '', order_by: order_by, order: order, filters: filters_params });
+    const [formValues, setFormValues] = useState(() => {
+        const savedForm = unique ? sessionStorage.getItem(`table-${unique}`) : null;
+        return savedForm ? JSON.parse(savedForm) : { 
+            query: query,
+            id: id,
+            page: 1,
+            show: itemsPerPage,
+            search: '',
+            order_by: order_by,
+            order: order,
+            filters: filters_params
+        };
+    });   
+
+    useEffect(() => {
+        if(unique){
+            sessionStorage.setItem(`table-${unique}`, JSON.stringify(formValues));
+        }
+    }, [formValues, unique]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await getTable(endpoint, formValues);
                 const response_resp = response.resp;
-
                 setData(response_resp);
                 setTotalPages(response.total_pages);
             } catch (error) {
@@ -65,15 +84,9 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
         fetchData();
     }, [endpoint, reloadTable, formValues]);
 
-    useEffect(() => {
-        setFormValues((prev) => ({ ...prev, filters: filters_params }));
-    }, [filters_params]);
-
     const handlePageChange = (page: number) => {
-        setFormValues(prev => ({
-            ...prev,
-            page: page
-        }));
+        const newFormValues = { ...formValues, page };
+        setFormValues(newFormValues);
     };
 
     const toggleOrder = (column: string) => {
@@ -81,11 +94,9 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
             return;
         }
 
-        setFormValues(prev => ({
-            ...prev,
-            order_by: column,
-            order: prev.order_by === column && prev.order === 'asc' ? 'desc' : 'asc'
-        }));
+        const newOrder = formValues.order_by === column && formValues.order === 'asc' ? 'desc' : 'asc';
+        const newFormValues = { ...formValues, order_by: column, order: newOrder };
+        setFormValues(newFormValues);
     };
 
     const getOrderIcon = (column: string) => {
@@ -94,6 +105,11 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
         }
         return '';
     };
+
+    
+    useEffect(() => {
+        setFormValues((prev: any) => ({ ...prev, filters: filters_params }));
+    }, [filters_params]);
 
     return (
         <div className='flex flex-col gap-2'>
@@ -104,10 +120,10 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
                             props={{
                                 id: 'search',
                                 name: 'search',
-                                onChange: (e) => setFormValues(prev => ({
-                                    ...prev,
-                                    search: e.target.value
-                                })),
+                                onChange: (e) => {
+                                    const newFormValues = { ...formValues, search: e.target.value };
+                                    setFormValues(newFormValues);
+                                },
                                 value: formValues.search || ''
                             }}
                             label={translations.search}
@@ -169,6 +185,5 @@ const Table: React.FC<TableProps> = ({ endpoint, header, reloadTable, tbody, fil
         </div>
     );
 };
-
 
 export default Table;

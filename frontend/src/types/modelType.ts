@@ -221,6 +221,8 @@ export interface SaleStatus {
 //Sale
 export interface Sale {
     id?: number;    
+    discount_per?: number;
+    discount?: number;
     total?: number;
     type?: number;  
     quantity_of_payments?: number;
@@ -289,6 +291,7 @@ export interface Expense {
     supplier_id?: string;
     supplier?: Supplier;
     user?: User,
+    isactive?: boolean | '0' | '1' | 0 | 1;
 
     //More
     total_paid?: number;

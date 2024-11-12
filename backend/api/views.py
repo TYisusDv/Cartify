@@ -1345,15 +1345,19 @@ class ManageProductsAPIView(APIView):
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
 
-        if query == 'table':   
-            brand_id = request.query_params.get('brand[id]', None)
-            category_id = request.query_params.get('category[id]', None)
-
+        brand_id = request.query_params.get('brand[id]', None)
+        category_id = request.query_params.get('category[id]', None)
+        filter_type = request.query_params.get('filters[type]', None)
+        
+        if query == 'table':
             model = ProductsModel.objects.filter(
                 Q(id__icontains = search) |
                 Q(name__icontains = search) |
                 Q(model__icontains = search)
             )
+            
+            if filter_type == 'pos':
+                model = model.filter(status = True)
 
             if brand_id not in [None,  0, '0']:
                 model = model.filter(brand_id = brand_id)
@@ -3361,6 +3365,7 @@ class ManageExpensesAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         supplier_id = data.get('supplier[id]', None)
+        isactive = data.get('status', None)
 
         if query == 'table':
             model = ExpensesModel.objects.filter(
@@ -3369,7 +3374,13 @@ class ManageExpensesAPIView(APIView):
 
             if supplier_id not in [None,  0, '0']:
                 model = model.filter(supplier_id = supplier_id)
-
+            
+            if isactive not in [None,  0, '0']:
+                if isactive in [2, '2']:
+                    model = model.filter(isactive = False)
+                else:
+                    model = model.filter(isactive = isactive)
+  
             if order == 'desc':
                 order_by = f'-{order_by}'
 
@@ -3752,29 +3763,39 @@ class ManageExpensePaymentsAPIView(APIView):
         user = request.user
         data = request.data
 
-        data['user_id'] = user.id
-        expense_id = data.get('expense_id', None)
-        amount = data.get('amount', 0)
-        amount = int(amount) if str(amount).isnumeric() else 0
-        
-        if amount <= 0:
-            return JsonResponse({
-                'success': False, 
-                'resp': 'The amount to be paid is equal to or less than 0.'
-            }, status = 400)
-        elif self.get_remaining(expense_id) < amount:
-            return JsonResponse({
-                'success': False, 
-                'resp': 'The amount to be paid exceeds the total payment.'
-            }, status = 400)
-        
-        serializer = AddEditExpensePaymentSerializer(data = data)
-        if not serializer.is_valid():
-            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+        with transaction.atomic():
+            data['user_id'] = user.id
+            expense_id = data.get('expense_id', None)
+            amount = data.get('amount', 0)
+            amount = int(amount) if str(amount).isnumeric() else 0
+            
+            if amount <= 0:
+                transaction.set_rollback(True)
+                return JsonResponse({
+                    'success': False, 
+                    'resp': 'The amount to be paid is equal to or less than 0.'
+                }, status = 400)
+            elif self.get_remaining(expense_id) < amount:
+                transaction.set_rollback(True)
+                return JsonResponse({
+                    'success': False, 
+                    'resp': 'The amount to be paid exceeds the total payment.'
+                }, status = 400)
+            
+            serializer = AddEditExpensePaymentSerializer(data = data)
+            if not serializer.is_valid():
+                transaction.set_rollback(True)
+                return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
 
-        serializer.save()
+            serializer.save()
 
-        return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+            remaining = self.get_remaining(expense_id)
+            if remaining <= 0:
+                expense = ManageExpensesAPIView.get_object(expense_id)
+                expense.isactive = False
+                expense.save()
+
+            return JsonResponse({'success': True, 'resp': 'Added successfully.'})
 
     def put(self, request):
         user = request.user
@@ -3783,6 +3804,7 @@ class ManageExpensePaymentsAPIView(APIView):
         data['user_id'] = user.id
 
         data_id = data.get('id', None)
+        
 
         serializer = GetExpensePaymentSerializer(data = data)  
         if not serializer.is_valid():
@@ -3791,7 +3813,7 @@ class ManageExpensePaymentsAPIView(APIView):
                 'resp': serializer.errors
             }, status = 400)    
                 
-        instance = self.get_object(pk = data_id)     
+        instance = self.get_object(pk = data_id) 
 
         serializer = AddEditExpensePaymentSerializer(instance, data = data)
         if not serializer.is_valid():
@@ -3813,7 +3835,15 @@ class ManageExpensePaymentsAPIView(APIView):
                 'resp': serializer.errors
             }, status = 400)    
                 
-        instance = self.get_object(pk = data_id)           
+        instance = self.get_object(pk = data_id)  
+
+        expense = ManageExpensesAPIView.get_object(instance.expense.id)  
+        if not expense.isactive:
+            return JsonResponse({
+                'success': False, 
+                'resp': 'It cannot be deleted because it is already complete.'
+            }, status = 400)    
+
         instance.delete()
         
         return JsonResponse({

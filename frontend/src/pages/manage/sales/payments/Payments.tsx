@@ -132,7 +132,15 @@ const Payments: React.FC = () => {
                     </div>
                 </div>
                 <div className='w-full mt-6'>
-                    <Table endpoint='manage/sale/payments' id={saleId || 0} order='asc' order_by='date_limit' reloadTable={reloadTable} header={table_header} tbody={<TablePage selected={selected} setSelected={setSelected} />} />
+                    <Table 
+                    unique='manage-sale-payments'
+                    endpoint='manage/sale/payments' 
+                    id={saleId || 0} 
+                    order='asc' 
+                    order_by='date_limit' 
+                    reloadTable={reloadTable} 
+                    header={table_header} 
+                    tbody={<TablePage selected={selected} setSelected={setSelected} />} />
                 </div>
             </div>
             {isModalOpen.add && (

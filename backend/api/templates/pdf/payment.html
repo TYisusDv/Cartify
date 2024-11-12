@@ -64,16 +64,32 @@
         {% endfor %}
         <tr style="border-top: 1px solid black;">
           <td></td>
+          <td class="font-bold">SUBTOTAL</td>
+          <td></td>
+          <td>Q{{sale.total|add:sale.discount|floatformat:2}}</td>          
+        </tr>
+        {% if sale.type == 2 %}
+        <tr>
+          <td></td>
+          <td class="font-bold">DESCUENTO</td>
+          <td></td>
+          <td>Q{{sale.discount|floatformat:2}}</td>
+        </tr>
+        <tr>
+          <td></td>
           <td class="font-bold">TOTAL</td>
           <td></td>
-          <td>Q{{sale.total}}</td>
+          <td>Q{{sale.total|floatformat:2}}</td>
         </tr>
+        {% endif %}
       </tbody>
     </table>
     <div class="pay">
+      {% if sale.type == 2 %}
       <div class="item">
-        <p>{% if sale.type == 2 %}Abono:{% else %}Subtotal:{% endif %}</p> <span>Q{{payment.subtotal|floatformat:2}}</span>
+        <p>Abono:</p> <span>Q{{payment.subtotal|floatformat:2}}</span>
       </div>
+      {% endif %}
       {% if sale.type == 2 %}
       <div class="item">
         <p>Recargo:</p> <span>Q{{payment.surcharge|floatformat:2}}</span>
@@ -83,7 +99,7 @@
         <p>{{payment.payment_method.name}}:</p> <span>Q{{payment.commission|floatformat:2}}</span>
       </div>
       <div class="item">
-        <p>Descuento:</p> <span>Q{{payment.discount|floatformat:2}}</span>
+        <p>Descuento:</p> <span>Q{% if sale.type == 1 %}{{sale.discount|floatformat:2}}{% else %}{{payment.discount|floatformat:2}}{% endif %}</span>
       </div>
       <div class="item">
         <p>Total:</p> <span>Q{{payment.total|floatformat:2}}</span>

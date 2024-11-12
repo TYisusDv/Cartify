@@ -143,6 +143,18 @@ const AppPOSPage: React.FC = () => {
         { name: 'person.addresses[0].city.name', headerName: translations.address_city },
     ];
 
+    const table_header_products = [
+        { name: 'image', headerName: '' },
+        { name: 'name', headerName: translations.name },
+        { name: 'model', headerName: translations.model },
+        { name: 'brand.name', headerName: translations.brand },
+        { name: 'category.name', headerName: translations.category },
+        { name: 'cost_price', headerName: translations.cost_price },
+        { name: 'cash_price', headerName: translations.cash_price },
+        { name: 'credit_price', headerName: translations.credit_price },
+        { name: 'status', headerName: translations.status },
+    ];
+
     const type_of_sales_options = [
         { value: 1, label: translations.in_cash },
         { value: 2, label: translations.on_credit },
@@ -152,6 +164,8 @@ const AppPOSPage: React.FC = () => {
         setFormValues({
             ...formValues,
             id: (formValues.id || 0) + 1,
+            discount_per: 0,
+            discount: 0,
             total: 0,
         });
 
@@ -196,6 +210,8 @@ const AppPOSPage: React.FC = () => {
             if (updatedDetails.length) {
                 sale_total = updatedDetails.reduce((subtotal, row) => subtotal + (row.price || 0) * (row.quantity || 0), 0);
             }
+
+            sale_total -= formValues.discount || 0;
 
             if (formValues.type === 1) {
                 cart_subtotal = sale_total;
@@ -272,6 +288,40 @@ const AppPOSPage: React.FC = () => {
 
         setUpdateFlag(false);
     }, [formValuesPayment.discount]);
+
+    useEffect(() => {
+        if (!updateFlag) return;
+
+        const discount_per = formValues.discount_per || 0;
+
+        if (discount_per >= 0) {
+            const newDiscount = (discount_per * (formValues.total || 0)) / 100;
+
+            setFormValues(prev => ({
+                ...prev,
+                discount: parseFloat(newDiscount.toFixed(2))
+            }));
+        }
+
+        setUpdateFlag(false);
+    }, [formValues.discount_per]);
+
+    useEffect(() => {
+        if (!updateFlag) return;
+
+        const discount = formValues.discount || 0;
+
+        if (discount >= 0) {
+            const newDiscountPer = (discount * 100) / (formValues.total || 0);
+
+            setFormValues(prev => ({
+                ...prev,
+                discount_per: parseFloat(newDiscountPer.toFixed(2))
+            }));
+        }
+
+        setUpdateFlag(false);
+    }, [formValues.discount]);
 
     const handleInvoice = (id: string) => {
         window.open(`${URL_BACKEND}/pdf/payment?id=${id}&one=true`, '_blank');
@@ -434,8 +484,8 @@ const AppPOSPage: React.FC = () => {
                             <div className='flex flex-col gap-2 h-80'>
                                 {formValuesDetails && formValuesDetails.length > 0 ? (
                                     formValuesDetails.map((row, index) => (
-                                        <div 
-                                            className='flex gap-3 w-full p-4 rounded-lg cursor-pointer hover:scale-[1.02] dark:bg-slate-600 dark:text-white transition-all ease-in-out duration-200'      
+                                        <div
+                                            className='flex gap-3 w-full p-4 rounded-lg cursor-pointer hover:scale-[1.02] dark:bg-slate-600 dark:text-white transition-all ease-in-out duration-200'
                                         >
                                             <div
                                                 className='w-[4.4rem] h-16 bg-cover rounded-full border-[3px] dark:border-slate-500'
@@ -460,7 +510,7 @@ const AppPOSPage: React.FC = () => {
                                                             onChange={(e) => handleQuantityChange(index, Number(e.target.value))}
                                                         />
                                                     </span>
-                                                    <span 
+                                                    <span
                                                         className='font-bold uppercase ml-2'
                                                         onClick={() => handleProductClick(index)}
                                                     >Q{((row.price || 0) * (row.quantity || 0)).toFixed(2)}</span>
@@ -481,32 +531,23 @@ const AppPOSPage: React.FC = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className='grid grid-cols-1 md:grid-cols-2 gap-2 pt-3 border-t-2 border-slate-600'>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-2 pt-3 border-t-2 border-slate-600'>                                
                                 <div className='col-span-1 flex flex-col justify-end text-lg dark:text-slate-300'>
                                     <div className='flex justify-between gap-1'>
                                         <h2 className='font-bold dark:text-white'>Subtotal:</h2>
-                                        <span className='font-medium'>Q{(formValuesPayment.subtotal || 0)}</span>
-                                    </div>
-                                    <div className='flex justify-between gap-1'>
-                                        <h2 className='font-bold dark:text-white'>Comisión:</h2>
-                                        <span className='font-medium'>Q{(formValuesPayment.commission || 0)}</span>
+                                        <span className='font-medium'>Q{(formValues.total || 0) + (formValues.discount || 0)}</span>
                                     </div>
                                     <div className='flex justify-between gap-1'>
                                         <h2 className='font-bold dark:text-white'>Descuento:</h2>
-                                        <span className='font-medium'>Q{(formValuesPayment.discount || 0)}</span>
+                                        <span className='font-medium'>Q{(formValues.discount || 0)}</span>
                                     </div>
                                 </div>
                                 <div className='col-span-1 flex flex-col justify-end text-lg gap-2 dark:text-slate-300'>
                                     <div className='flex flex-col items-end'>
                                         <h2 className='font-bold dark:text-white'>Total:</h2>
                                         <div className='flex items-center gap-1'>
-                                            {formValues.type === 2 && (<span className='font-medium text-sm'>(Q{(formValues.total || 0)})</span>)}
-                                            <span className='font-medium'>Q{(formValuesPayment.total || 0)}</span>
+                                            <span className='font-medium'>Q{(formValues.total || 0)}</span>
                                         </div>
-                                    </div>
-                                    <div className='flex flex-col items-end'>
-                                        <h2 className='font-bold dark:text-white'>Cambio:</h2>
-                                        <span className='font-medium'>Q{(formValuesPayment.change || 0)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -564,9 +605,55 @@ const AppPOSPage: React.FC = () => {
                                     label={translations.type_of_sale}
                                 />
                             </div>
-                            <hr className='w-full border dark:border-slate-600 my-2' />
+                            <hr className='w-full border dark:border-slate-600 my-2' />                                                     
+                            <div className='grid grid-cols-2 gap-2'>
+                                <div className='col-span-1 w-full'>
+                                    <Input
+                                        props={{
+                                            id: 'discount_per',
+                                            name: 'discount_per',
+                                            type: 'number',
+                                            step: 0.01,
+                                            value: formValues.discount_per || 0,
+                                            min: 0,
+                                            onChange: (e) => {
+                                                setFormValues(prev => ({
+                                                    ...prev,
+                                                    discount_per: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                                }));
+                                                setUpdateFlag(true);
+                                            },
+                                        }}
+                                        label='Descuento'
+                                        icon={<PercentCircleIcon className='icon' size={24} />}
+                                        required={false}
+                                    />
+                                </div>
+                                <div className='col-span-1 w-full'>
+                                    <Input
+                                        props={{
+                                            id: 'discount',
+                                            name: 'discount',
+                                            type: 'number',
+                                            step: 0.01,
+                                            value: formValues.discount || 0,
+                                            min: 0,
+                                            onChange: (e) => {
+                                                setFormValues(prev => ({
+                                                    ...prev,
+                                                    discount: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                                }));
+                                                setUpdateFlag(true);
+                                            },
+                                        }}
+                                        label='Descuento'
+                                        icon={'Q'}
+                                        required={false}
+                                    />
+                                </div>
+                            </div>
                             {formValues.type === 2 && (
-                                <>
+                                <>                                    
                                     <div className='grid grid-cols-2 gap-2'>
                                         <div className='col-span-1 w-full'>
                                             <Input
@@ -609,142 +696,9 @@ const AppPOSPage: React.FC = () => {
                                             />
                                         </div>
                                     </div>
-                                    <div className='w-full'>
-                                        <Input
-                                            props={{
-                                                id: 'subtotal',
-                                                name: 'subtotal',
-                                                type: 'number',
-                                                step: 0.01,
-                                                value: formValuesPayment.subtotal || 0,
-                                                min: 0,
-                                                onChange: (e) => {
-                                                    setFormValuesPayment(prev => ({
-                                                        ...prev,
-                                                        subtotal: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
-                                                    }));
-                                                },
-                                            }}
-                                            label='Primer pago'
-                                            icon={'Q'}
-                                            required={false}
-                                        />
-                                    </div>
                                 </>
                             )}
-                            <div className='w-full z-[8]'>
-                                <Select
-                                    props={{
-                                        id: 'paymentmethod',
-                                        name: 'paymentmethod',
-                                        onChange: (e: CustomChangeEvent) => {
-                                            setFormValuesPayment(prev => ({
-                                                ...prev,
-                                                payment_method: {
-                                                    id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
-                                                    value: e.object?.value,
-                                                    allow_discount: e.object?.allow_discount,
-                                                    allow_note: e.object?.allow_note,
-                                                }
-                                            }));
-                                        },
-                                        value: formValuesPayment.payment_method?.id,
-                                    }}
-                                    endpoint='manage/paymentmethods'
-                                    endpoint_value='id'
-                                    endpoint_text='{name} ({value}%)'
-                                    icon={<CreditCardIcon size={20} />}
-                                    label={translations.payment_method}
-                                />
-                            </div>
-                            {formValuesPayment.payment_method?.allow_discount && (
-                                <div className='grid grid-cols-2 gap-2'>
-                                    <div className='col-span-1 w-full'>
-                                        <Input
-                                            props={{
-                                                id: 'discount_per',
-                                                name: 'discount_per',
-                                                type: 'number',
-                                                step: 0.01,
-                                                value: formValuesPayment.discount_per || 0,
-                                                min: 0,
-                                                onChange: (e) => {
-                                                    setFormValuesPayment(prev => ({
-                                                        ...prev,
-                                                        discount_per: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
-                                                    }));
-                                                    setUpdateFlag(true);
-                                                },
-                                            }}
-                                            label='Descuento'
-                                            icon={<PercentCircleIcon className='icon' size={24} />}
-                                            required={false}
-                                        />
-                                    </div>
-                                    <div className='col-span-1 w-full'>
-                                        <Input
-                                            props={{
-                                                id: 'discount',
-                                                name: 'discount',
-                                                type: 'number',
-                                                step: 0.01,
-                                                value: formValuesPayment.discount || 0,
-                                                min: 0,
-                                                onChange: (e) => {
-                                                    setFormValuesPayment(prev => ({
-                                                        ...prev,
-                                                        discount: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
-                                                    }));
-                                                    setUpdateFlag(true);
-                                                },
-                                            }}
-                                            label='Descuento'
-                                            icon={'Q'}
-                                            required={false}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-                            {formValuesPayment.payment_method?.allow_note && (
-                                <Input
-                                    props={{
-                                        name: 'note',
-                                        value: formValuesPayment.note || '',
-                                        onChange: (e) => {
-                                            setFormValuesPayment(prev => ({
-                                                ...prev,
-                                                note: e.target.value
-                                            }));
-                                        },
-                                    }}
-                                    label='Nota'
-                                    icon={<Note01Icon />}
-                                    required={false}
-                                />
-                            )}
-                            <div className='w-full'>
-                                <Input
-                                    props={{
-                                        id: 'pay',
-                                        name: 'pay',
-                                        type: 'number',
-                                        step: 0.01,
-                                        value: formValuesPayment.pay || 0,
-                                        min: 0,
-                                        onChange: (e) => {
-                                            setFormValuesPayment(prev => ({
-                                                ...prev,
-                                                pay: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
-                                            }));
-                                        },
-                                    }}
-                                    label='Con cuanto pago?'
-                                    icon={'Q'}
-                                    required={false}
-                                />
-                            </div>
                         </div>
-
                     </div>
                     <div className='flex flex-col items-center w-full gap-2 p-4 rounded-xl shadow-sm shadow-slate-600/30 dark:bg-slate-700'>
                         <div className='flex justify-between w-full gap-1 mb-2'>
@@ -755,7 +709,7 @@ const AppPOSPage: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                        <button type='submit' className={`btn btn-blue w-full h-12`} onClick={() => setIsModalOpen({ ...isModalOpen, finish: true })} disabled={(formValues.total || 0) <= 0 || (formValuesPayment.change || 0) < 0}>
+                        <button type='submit' className={`btn btn-blue w-full h-12`} onClick={() => setIsModalOpen({ ...isModalOpen, finish: true })}>
                             <CheckmarkCircle02Icon size={22} />
                         </button>
                     </div>
@@ -786,7 +740,7 @@ const AppPOSPage: React.FC = () => {
                         <Table
                             endpoint='manage/products'
                             reloadTable={reloadTableClient}
-                            header={table_header}
+                            header={table_header_products}
                             tbody={
                                 <ProductsTablePage
                                     selected={selectedProduct}
@@ -795,6 +749,7 @@ const AppPOSPage: React.FC = () => {
                                 />
                             }
                             filters={<ProductsFiltersPage />}
+                            filters_params={{ type: 'pos' }}
                         />
                     </div>
                 </Modal>
@@ -830,7 +785,7 @@ const AppPOSPage: React.FC = () => {
                             <div className='col-span-1 md:col-end-3 w-full mt-2'>
                                 <button type='submit' className={`btn btn-yellow max-w-full h-12`}>
                                     Editar
-                                </button>                          
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -839,7 +794,169 @@ const AppPOSPage: React.FC = () => {
 
             {isModalOpen.finish && (
                 <Modal title={translations.finish_sale_sure} onClose={() => setIsModalOpen({ ...isModalOpen, finish: false })}>
-                    <form onSubmit={onSubmit} autoComplete='off'>
+                    <form className='flex flex-col gap-2' onSubmit={onSubmit} autoComplete='off'>
+                        {formValues.type === 2 && (
+                            <div className='w-full'>
+                                <Input
+                                    props={{
+                                        id: 'subtotal',
+                                        name: 'subtotal',
+                                        type: 'number',
+                                        step: 0.01,
+                                        value: formValuesPayment.subtotal || 0,
+                                        min: 0,
+                                        onChange: (e) => {
+                                            setFormValuesPayment(prev => ({
+                                                ...prev,
+                                                subtotal: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                            }));
+                                        },
+                                    }}
+                                    label='Primer pago'
+                                    icon={'Q'}
+                                    required={false}
+                                />
+                            </div>
+                        )}
+                        <div className='w-full z-[8]'>
+                            <Select
+                                props={{
+                                    id: 'paymentmethod',
+                                    name: 'paymentmethod',
+                                    onChange: (e: CustomChangeEvent) => {
+                                        setFormValuesPayment(prev => ({
+                                            ...prev,
+                                            payment_method: {
+                                                id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
+                                                value: e.object?.value,
+                                                allow_discount: e.object?.allow_discount,
+                                                allow_note: e.object?.allow_note,
+                                            }
+                                        }));
+                                    },
+                                    value: formValuesPayment.payment_method?.id,
+                                }}
+                                endpoint='manage/paymentmethods'
+                                endpoint_value='id'
+                                endpoint_text='{name} ({value}%)'
+                                icon={<CreditCardIcon size={20} />}
+                                label={translations.payment_method}
+                            />
+                        </div>                        
+                        {formValues.type === 2 && formValuesPayment.payment_method?.allow_discount && (
+                            <div className='grid grid-cols-2 gap-2'>
+                                <div className='col-span-1 w-full'>
+                                    <Input
+                                        props={{
+                                            id: 'discount_per',
+                                            name: 'discount_per',
+                                            type: 'number',
+                                            step: 0.01,
+                                            value: formValuesPayment.discount_per || 0,
+                                            min: 0,
+                                            onChange: (e) => {
+                                                setFormValuesPayment(prev => ({
+                                                    ...prev,
+                                                    discount_per: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                                }));
+                                                setUpdateFlag(true);
+                                            },
+                                        }}
+                                        label='Descuento'
+                                        icon={<PercentCircleIcon className='icon' size={24} />}
+                                        required={false}
+                                    />
+                                </div>
+                                <div className='col-span-1 w-full'>
+                                    <Input
+                                        props={{
+                                            id: 'discount',
+                                            name: 'discount',
+                                            type: 'number',
+                                            step: 0.01,
+                                            value: formValuesPayment.discount || 0,
+                                            min: 0,
+                                            onChange: (e) => {
+                                                setFormValuesPayment(prev => ({
+                                                    ...prev,
+                                                    discount: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                                }));
+                                                setUpdateFlag(true);
+                                            },
+                                        }}
+                                        label='Descuento'
+                                        icon={'Q'}
+                                        required={false}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                        {formValuesPayment.payment_method?.allow_note && (
+                            <Input
+                                props={{
+                                    name: 'note',
+                                    value: formValuesPayment.note || '',
+                                    onChange: (e) => {
+                                        setFormValuesPayment(prev => ({
+                                            ...prev,
+                                            note: e.target.value
+                                        }));
+                                    },
+                                }}
+                                label='Nota'
+                                icon={<Note01Icon />}
+                                required={false}
+                            />
+                        )}
+                        <div className='w-full'>
+                            <Input
+                                props={{
+                                    id: 'pay',
+                                    name: 'pay',
+                                    type: 'number',
+                                    step: 0.01,
+                                    value: formValuesPayment.pay || 0,
+                                    min: 0,
+                                    onChange: (e) => {
+                                        setFormValuesPayment(prev => ({
+                                            ...prev,
+                                            pay: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+                                        }));
+                                    },
+                                }}
+                                label='Con cuanto pago?'
+                                icon={'Q'}
+                                required={false}
+                            />
+                        </div>
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-2 pt-3 border-t-2 border-slate-600'>
+                            <div className='col-span-1 flex flex-col justify-end text-lg dark:text-slate-300'>
+                                <div className='flex justify-between gap-1'>
+                                    <h2 className='font-bold dark:text-white'>Subtotal:</h2>
+                                    <span className='font-medium'>Q{(formValuesPayment.subtotal || 0)}</span>
+                                </div>
+                                <div className='flex justify-between gap-1'>
+                                    <h2 className='font-bold dark:text-white'>Comisión:</h2>
+                                    <span className='font-medium'>Q{(formValuesPayment.commission || 0)}</span>
+                                </div>
+                                {formValues.type === 2 && (
+                                    <div className='flex justify-between gap-1'>
+                                        <h2 className='font-bold dark:text-white'>Descuento:</h2>
+                                        <span className='font-medium'>Q{(formValuesPayment.discount || 0)}</span>
+                                    </div>
+                                )}
+                                <div className='flex justify-between gap-1'>
+                                    <h2 className='font-bold dark:text-white'>Total:</h2>
+                                    <span className='font-medium'>Q{(formValuesPayment.total || 0)}</span>
+                                </div>
+                            </div>
+                            <div className='col-span-1 flex flex-col justify-end text-lg gap-2 dark:text-slate-300'> 
+                                <div className='flex flex-col items-end text-black dark:text-white'>
+                                    <h2 className='font-bold '>Cambio:</h2>
+                                    <span className='font-medium'>Q{(formValuesPayment.change || 0)}</span>
+                                </div>
+                            </div>
+                        </div>
                         <button type='submit' className={`btn btn-blue w-full h-12`} disabled={(formValues.total || 0) <= 0 || (formValuesPayment.change || 0) < 0}>
                             <CheckmarkCircle02Icon size={22} /> Finish
                         </button>

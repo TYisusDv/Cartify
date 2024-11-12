@@ -120,6 +120,7 @@ const Sales: React.FC = () => {
                         </div>
                         <div className='w-full mt-6'>
                             <Table
+                                unique='manage-cashregister-sales'
                                 classNameFilters='md:!grid-cols-2 lg:!grid-cols-3 xl:!grid-cols-3'
                                 endpoint='manage/cashregister/sales'
                                 reloadTable={reloadTable}
@@ -151,6 +152,7 @@ const Sales: React.FC = () => {
                         </div>
                         <div className='w-full mt-6'>
                             <Table
+                                unique='manage-cashregister-sales-1'
                                 classNameFilters='md:!grid-cols-2 lg:!grid-cols-3 xl:!grid-cols-3'
                                 endpoint='manage/cashregister/sales'
                                 query='table_payments'
