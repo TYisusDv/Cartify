@@ -171,6 +171,7 @@ class ProductBrandsModel(models.Model):
 class ProductCategoriesModel(models.Model):
     id = models.AutoField(primary_key = True)
     name = models.CharField(max_length = 100, null = False, blank = False)
+    page_number = models.IntegerField(default = 1, null = False, blank = False)
     status = models.BooleanField(default = True, null = False, blank = False)
     
     class Meta: 

@@ -107,6 +107,23 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                     icon={<ProfileIcon className='icon' size={24} />}
                     color={colorPage}
                 />
+                <Input
+                    props={{
+                        id: 'page_number',
+                        name: 'page_number',
+                        value: formValues.page_number,
+                        min: 0,
+                        type: 'number',
+                        onChange: (e) => setFormValues(prev => ({
+                            ...prev,
+                            page_number: !isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : 0
+                        })),
+                        disabled: ['details', 'delete'].includes(type)
+                    }}
+                    label='Numero de pagina'
+                    icon={<ProfileIcon className='icon' size={24} />}
+                    color={colorPage}
+                />
                 <Switch
                     props={{
                         id: 'status',

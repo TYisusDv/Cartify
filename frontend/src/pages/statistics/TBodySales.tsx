@@ -2,6 +2,7 @@ import React from 'react';
 import { CreditCardIcon } from 'hugeicons-react';
 import useTranslations from '../../hooks/useTranslations';
 import { generateKey } from '../../utils/uuidGen';
+import { formatNumber } from '../../utils/formUtils';
 
 interface TBodySalesProps {
     data?: Array<{ [key: string]: any }>;
@@ -22,7 +23,7 @@ const TBodySales: React.FC<TBodySalesProps> = ({ data }) => {
                             </span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'>Q{row.total_sales || 0}</span>
+                            <span className='flex items-center gap-1'>Q{formatNumber(row.total_sales || 0)}</span>
                         </td>                        
                     </tr>
                 ))

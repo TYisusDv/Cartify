@@ -3,6 +3,7 @@ import { Calendar03Icon, Invoice03Icon, LocationUser04Icon, ShoppingBasketSecure
 import useTranslations from '../../../../hooks/useTranslations';
 import { SalePayment } from '../../../../types/modelType';
 import { generateKey } from '../../../../utils/uuidGen';
+import { formatNumber } from '../../../../utils/formUtils';
 
 interface TBodyPaymentsProps {
     data?: Array<SalePayment>;
@@ -50,7 +51,7 @@ const TBodyPayments: React.FC<TBodyPaymentsProps> = ({ data, selected, setSelect
                             }
                         </td>       
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'>Q {row.total || '-'}</span>
+                            <span className='flex items-center gap-1'>Q{formatNumber(row.total || 0)}</span>
                         </td>
                         <td className='px-6 py-4'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>

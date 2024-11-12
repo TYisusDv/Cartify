@@ -12,7 +12,7 @@ import Filters from './Filters';
 import { CashRegister as CashRegisterType } from '../../../../types/modelType';
 import { addAlert } from '../../../../utils/Alerts';
 import { generateUUID } from '../../../../utils/uuidGen';
-import { extractMessages } from '../../../../utils/formUtils';
+import { extractMessages, formatNumber } from '../../../../utils/formUtils';
 import apiService from '../../../../services/apiService';
 import { IconFileExcel } from '@tabler/icons-react';
 
@@ -126,7 +126,7 @@ const Sales: React.FC = () => {
                         </div>
                         <div>
                             <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Gastos</h2>
-                            <h3 className='text-lg font-bold dark:text-white'>Q{countData.expense}</h3>
+                            <h3 className='text-lg font-bold dark:text-white'>Q{formatNumber(countData.expense)}</h3>
                         </div>
                     </div>
                 </div>

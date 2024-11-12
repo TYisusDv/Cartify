@@ -10,6 +10,7 @@ import CrudPage from './Crud';
 import { getCount } from '../../../services/Exprenses';
 import { Link } from 'react-router-dom';
 import Filters from './Filters';
+import { formatNumber } from '../../../utils/formUtils';
 
 const Expenses: React.FC = () => {
     const { translations } = useTranslations();
@@ -89,7 +90,7 @@ const Expenses: React.FC = () => {
                         </div>
                         <div>
                             <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total facturado</h2>
-                            <h3 className='text-lg font-bold dark:text-white'>Q{countData.total_sum}</h3>
+                            <h3 className='text-lg font-bold dark:text-white'>Q{formatNumber(countData.total_sum)}</h3>
                         </div>
                     </div>
                     <div className='col-span-1 flex items-center gap-3 border-r-0 border-b-2 pb-5 pt-3 border-gray-100 md:pt-0 md:border-r-0 lg:border-r-2 lg:border-b-0 lg:p-0 dark:border-slate-600'>
@@ -98,7 +99,7 @@ const Expenses: React.FC = () => {
                         </div>
                         <div>
                             <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total pagado</h2>
-                            <h3 className='text-lg font-bold dark:text-white'>Q{countData.total_paid}</h3>
+                            <h3 className='text-lg font-bold dark:text-white'>Q{formatNumber(countData.total_paid)}</h3>
                         </div>
                     </div>
                     <div className='col-span-1 flex items-center gap-3 border-r-0 pt-3 border-gray-100 md:border-r-0 lg:border-r-0 lg:p-0 dark:border-slate-600'>
@@ -107,7 +108,7 @@ const Expenses: React.FC = () => {
                         </div>
                         <div>
                             <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total pendiente</h2>
-                            <h3 className='text-lg font-bold dark:text-white'>Q{countData.total_remaining}</h3>
+                            <h3 className='text-lg font-bold dark:text-white'>Q{formatNumber(countData.total_remaining)}</h3>
                         </div>
                     </div>
                 </div>

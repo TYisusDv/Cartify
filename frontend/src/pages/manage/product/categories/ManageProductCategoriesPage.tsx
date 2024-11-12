@@ -11,7 +11,7 @@ import CrudPage from './CrudPage';
 
 const ManageProductCategoriesPage: React.FC = () => {
     const { translations } = useTranslations();
-    const [selected, setSelected] = useState<number>(0);
+    const [selected, setSelected] = useState<number | undefined>();
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false });
     const [reloadTable, setReloadTable] = useState(0);
     const [countData, setCountData] = useState(0);
@@ -26,6 +26,7 @@ const ManageProductCategoriesPage: React.FC = () => {
 
     const table_header = [
         { name: 'name', headerName: translations.name },
+        { name: 'page_number', headerName: 'Numero de pagina del certificado' },
         { name: 'status', headerName: translations.status },
     ];
 
@@ -51,8 +52,8 @@ const ManageProductCategoriesPage: React.FC = () => {
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_product_categories_info}</span>
                 </div>
                 <div className='flex gap-2'>
-                    <button className='bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('delete', true)} disabled={selected === 0}><Delete02Icon /></button>
-                    <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === 0}><PencilEdit02Icon /></button>
+                    <button className='bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('delete', true)} disabled={selected === undefined}><Delete02Icon /></button>
+                    <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === undefined}><PencilEdit02Icon /></button>
                     <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('add', true)}><Add01Icon /></button>
                 </div>
             </div>

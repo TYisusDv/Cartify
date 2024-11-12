@@ -3,6 +3,7 @@ import { Calendar01Icon, Calendar03Icon, DistributionIcon, Tick01Icon, ToggleOnI
 import useTranslations from '../../../hooks/useTranslations';
 import { Expense } from '../../../types/modelType';
 import { calculateDaysRemaining } from '../../../utils/DateFuncs';
+import { formatNumber } from '../../../utils/formUtils';
 
 interface TBodyProps {
     data?: Array<Expense>;
@@ -34,13 +35,13 @@ const TBody: React.FC<TBodyProps> = ({ data, selected, setSelected }) => {
                             <span className='flex items-center gap-[1px]'><WaterfallDown01Icon size={22} /> {row.no || '-'}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-[1px]'>Q{row.total || 0}</span>
+                            <span className='flex items-center gap-[1px]'>Q{formatNumber(row.total || 0)}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-[1px]'>Q{row.total_paid || 0}</span>
+                            <span className='flex items-center gap-[1px]'>Q{formatNumber(row.total_paid || 0)}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-[1px]'>Q{(row.total || 0) - (row.total_paid || 0)}</span>
+                            <span className='flex items-center gap-[1px]'>Q{formatNumber((row.total || 0) - (row.total_paid || 0))}</span>
                         </td>
                         <td className='px-6 py-6'>
                             <span className='flex items-center gap-[1px]'><DistributionIcon size={18} /> {row.supplier?.company_name || '-'}</span>

@@ -135,6 +135,7 @@ export interface ProductBrand {
 export interface ProductCategory {
     id?: number;
     name?: string;
+    page_number?: number;
     status?: boolean | '0' | '1' | 0 | 1;
 }
 

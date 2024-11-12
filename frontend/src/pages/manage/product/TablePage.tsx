@@ -2,6 +2,7 @@ import React from 'react';
 import { BrandfetchIcon, DollarCircleIcon, EyeIcon, Layers01Icon, ProfileIcon, ViewOffSlashIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import { URL_BACKEND } from '../../../services/apiService';
+import { formatNumber } from '../../../utils/formUtils';
 
 interface TablePageProps {
     data?: Array<{ [key: string]: any }>;
@@ -41,13 +42,13 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, toggleModal, setS
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'><Layers01Icon size={22} /> {row.category?.name || '-'}</span>
                         </td>
                         <td className='px-6 py-6'>
-                            <span className='flex items-center gap-[1px]'>Q{row.cost_price || '-'}</span>
+                            <span className='flex items-center gap-[1px]'>Q{formatNumber(row.cost_price || 0)}</span>
                         </td> 
                         <td className='px-6 py-6'>
-                            <span className='flex items-center gap-[1px]'>Q{row.cash_price || '-'}</span>
+                            <span className='flex items-center gap-[1px]'>Q{formatNumber(row.cash_price || 0)}</span>
                         </td>
                         <td className='px-6 py-6'>
-                            <span className='flex items-center gap-[1px]'>Q{row.credit_price || '-'}</span>
+                            <span className='flex items-center gap-[1px]'>Q{formatNumber(row.credit_price || 0)}</span>
                         </td>  
                         <td className='px-6 py-4'>
                             {

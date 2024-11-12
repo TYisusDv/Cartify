@@ -4,6 +4,7 @@ import useTranslations from '../../../hooks/useTranslations';
 import { Sale } from '../../../types/modelType';
 import { generateKey } from '../../../utils/uuidGen';
 import { calculateDaysRemaining } from '../../../utils/DateFuncs';
+import { formatNumber } from '../../../utils/formUtils';
 
 interface TablePageProps {
     data?: Array<Sale>;
@@ -52,7 +53,7 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                             }
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'>Q {row.total || '-'}</span>
+                            <span className='flex items-center gap-1'>Q {formatNumber(row.total || 0)}</span>
                         </td>
                         <td className='px-6 py-4'>
                             {row.last_pending_payment ? 

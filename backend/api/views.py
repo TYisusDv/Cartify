@@ -18,7 +18,7 @@ from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from django.conf import settings
-import uuid, qrcode, io, openpyxl
+import uuid, qrcode, io, openpyxl, fitz
 
 #Login
 class LoginAPIView(APIView):
@@ -1662,7 +1662,6 @@ class AppInventoryAPIView(APIView):
         except InventoryModel.DoesNotExist:
             raise Http404('Inventory not found.')
         
-    
     @classmethod
     def get_product_entries(cls, product_id, location_id):
         try:
@@ -2142,17 +2141,17 @@ class ManageSalePaymentsAPIView(APIView):
         
     def get(self, request):
         data = request.query_params
-        query = data.get('query', None)
-        data_id = data.get('id', None)
+        query = data.get('query', None)        
         search = data.get('search', '')
         page_number = request.query_params.get('page', 1)
         order_by = request.query_params.get('order_by', 'id').replace('.', '__')
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
 
+        data_id = data.get('id', None)
+        type = request.query_params.get('type', None)   
+
         if query == 'table':
-            type = request.query_params.get('type', None)   
-           
             model = SalePaymentsModel.objects.filter(
                 Q(id__icontains = search),
                 sale_id = data_id
@@ -2465,6 +2464,7 @@ class ManageSalesAPIView(APIView):
             location_id = location.get('id', None)
             inventory = data.get('inventory', [])
             sale_payment = data.get('sale_payment', None)
+            first_payment_amount = sale_payment.get('subtotal', 0)
             invoice_id = None
 
             sale['id'] = self.get_max_id()
@@ -2505,46 +2505,65 @@ class ManageSalesAPIView(APIView):
                     return JsonResponse({'success': False, 'resp': inventory_serializer.errors}, status = 400)
 
                 inventory_serializer.save()
+            
+            if first_payment_amount > 0:
+                sale_payment['no'] = ManageSalePaymentsAPIView.get_max_no()
+                sale_payment['sale_id'] = sale_instance.id
+                sale_payment['user_id'] = user_id
+                sale_payment['location'] = location
+                sale_payment['date_reg'] = timezone.now()
+                sale_payment['date_limit'] = timezone.now()
 
-            sale_payment['no'] = ManageSalePaymentsAPIView.get_max_no()
-            sale_payment['sale_id'] = sale_instance.id
-            sale_payment['user_id'] = user_id
-            sale_payment['location'] = location
-            sale_payment['date_reg'] = timezone.now()
-            sale_payment['date_limit'] = timezone.now()
+                sale_payment_serializer = AddEditSalePaymentSerializer(data = sale_payment, payment_method_required = True)
+                if not sale_payment_serializer.is_valid():
+                    transaction.set_rollback(True)
+                    return JsonResponse({'success': False, 'resp': sale_payment_serializer.errors}, status = 400)
 
-            sale_payment_serializer = AddEditSalePaymentSerializer(data = sale_payment, payment_method_required = True)
-            if not sale_payment_serializer.is_valid():
-                transaction.set_rollback(True)
-                return JsonResponse({'success': False, 'resp': sale_payment_serializer.errors}, status = 400)
-
-            sale_payment_instance = sale_payment_serializer.save()
-            invoice_id = sale_payment_instance.id
-            sale_payment_instance.total_paid = ManageSalePaymentsAPIView.get_paid(sale_instance.id)
-            sale_payment_instance.total_remaining = ManageSalePaymentsAPIView.get_remaining(sale_instance.id)
-            sale_payment_instance.save()
+                sale_payment_instance = sale_payment_serializer.save()
+                invoice_id = sale_payment_instance.id
+                sale_payment_instance.total_paid = ManageSalePaymentsAPIView.get_paid(sale_instance.id)
+                sale_payment_instance.total_remaining = ManageSalePaymentsAPIView.get_remaining(sale_instance.id)
+                sale_payment_instance.save()
 
             if type in [2, '2']:
-                quantity_of_payments = int(quantity_of_payments) - 1
+                if first_payment_amount > 0:
+                    quantity_of_payments = int(quantity_of_payments) - 1
+                else:
+                    quantity_of_payments = int(quantity_of_payments)
+
+                total_remaining = sale_instance.total - sale_payment.get('subtotal', 0)
+                
+                integer_payment_amount = int(total_remaining // quantity_of_payments)
+                
+                remainder = total_remaining - (integer_payment_amount * (quantity_of_payments - 1))
+                
                 date_limit = timezone.now()
                 for i in range(quantity_of_payments):
                     item_sale_payment = {}
-                    item_sale_payment['subtotal'] = (sale_instance.total - sale_payment.get('subtotal', 0)) / quantity_of_payments
+                    
+                    if i < quantity_of_payments - 1:
+                        item_sale_payment['subtotal'] = integer_payment_amount
+                    else:
+                        item_sale_payment['subtotal'] = remainder
+                    
                     item_sale_payment['sale_id'] = sale_instance.id
                     
-                    if(int(payment_days) == 30 or int(payment_days) == 31):
-                        date_limit += relativedelta(months = 1)
+                    if int(payment_days) in [30, 31]:
+                        date_limit += relativedelta(months=1)
                     else:
-                        date_limit += timedelta(days = payment_days)
-
+                        date_limit += timedelta(days=payment_days)
+                    
                     item_sale_payment['date_limit'] = date_limit
 
-                    item_sale_payment_serializer = AddEditSalePaymentSerializer(data = item_sale_payment)
+                    item_sale_payment_serializer = AddEditSalePaymentSerializer(data=item_sale_payment)
                     if not item_sale_payment_serializer.is_valid():
                         transaction.set_rollback(True)
-                        return JsonResponse({'success': False, 'resp': item_sale_payment_serializer.errors}, status = 400)
+                        return JsonResponse({'success': False, 'resp': item_sale_payment_serializer.errors}, status=400)
 
-                    item_sale_payment_serializer.save()
+                    item_sale_payment_instance = item_sale_payment_serializer.save()
+                    
+                    if not invoice_id and first_payment_amount <= 0:
+                        invoice_id = item_sale_payment_instance.id
 
             return JsonResponse({
                 'success': True, 
@@ -4067,7 +4086,116 @@ class PDFGeneratorAPIView(APIView):
             'success': False, 
             'resp': 'Error generating PDF.'
         }, status = 500)
-    
+
+# PDF Certificate
+class PDFCertificateAPIView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request):
+        data = request.query_params
+        sale_id = data.get('id', None)
+
+        instance_sale = ManageSalesAPIView.get_object(sale_id)
+        inventory_items = instance_sale.inventory_sale.all()
+
+        pdf_path = settings.BASE_DIR / 'api/templates/pdf/certificate.pdf'
+        pdf_document = fitz.open(pdf_path)
+
+        coordinates_name = {
+            0: (110, 655),
+            1: (110, 666),
+            2: (110, 655),
+            3: (110, 653),
+            4: (110, 638),
+            5: (110, 638),
+            6: (110, 604),
+            7: (110, 610),
+            8: (110, 622),
+        }
+        coordinates_date = {
+            0: (305, 688),
+            1: (305, 699),
+            2: (305, 687), 
+            3: (305, 687),
+            4: (305, 671),
+            5: (305, 671),
+            6: (305, 638),
+            7: (305, 643),
+            8: (305, 654),  
+        }
+
+        new_pdf = fitz.open()
+        
+        added_pages = {}
+        for item in inventory_items:
+            product = item.product
+            category = product.category
+            page_number = category.page_number - 1 
+
+            if page_number in added_pages:
+                continue
+
+            original_page = pdf_document[page_number]
+
+            new_page = new_pdf.new_page(width = original_page.rect.width, height = original_page.rect.height)
+            new_page.show_pdf_page(new_page.rect, pdf_document, page_number)
+
+            new_page.insert_text(
+                coordinates_name.get(page_number, (110, 655)),
+                f'{instance_sale.client.person.firstname} {instance_sale.client.person.middlename} {instance_sale.client.person.lastname} {instance_sale.client.person.second_lastname}',
+                fontname='helv',
+                fontsize=9,
+                color=(0, 0, 0)
+            )
+
+            new_page.insert_text(
+                coordinates_date.get(page_number, (305, 688)),
+                str(instance_sale.date_reg),
+                fontname='helv',
+                fontsize=9,
+                color=(0, 0, 0)
+            )
+
+            added_pages[page_number] = True
+        
+        '''
+        for page_number in range(min(pdf_document.page_count, 9)):  # Cambia 9 según el total de páginas
+            original_page = pdf_document[page_number]
+
+            # Crea una nueva página en el nuevo documento para cada página del original
+            new_page = new_pdf.new_page(width=original_page.rect.width, height=original_page.rect.height)
+            new_page.show_pdf_page(new_page.rect, pdf_document, page_number)
+
+            # Inserta el nombre y la fecha en las coordenadas especificadas para esa página
+            new_page.insert_text(
+                coordinates_name.get(page_number, (110, 655)),
+                f'{instance_sale.client.person.firstname} {instance_sale.client.person.middlename} {instance_sale.client.person.lastname} {instance_sale.client.person.second_lastname}',
+                fontname='helv',
+                fontsize=9,
+                color=(0, 0, 0)
+            )
+
+            new_page.insert_text(
+                coordinates_date.get(page_number, (305, 688)),
+                str(instance_sale.date_reg),
+                fontname='helv',
+                fontsize=9,
+                color=(0, 0, 0)
+            )
+        '''
+
+        pdf_bytes = io.BytesIO()
+        new_pdf.save(pdf_bytes)
+        pdf_bytes.seek(0)
+
+        pdf_document.close()
+        new_pdf.close()
+
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename=certificate_page.pdf'
+        return response
+        
 #Excel clients
 class ExcelClientsAPIView(APIView):
     #authentication_classes = [JWTAuthentication]

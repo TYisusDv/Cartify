@@ -13,7 +13,7 @@ import Modal from '../../components/Modal';
 import Crud from './Crud';
 import { IconFileExcel } from '@tabler/icons-react';
 import { addAlert } from '../../utils/Alerts';
-import { extractMessages } from '../../utils/formUtils';
+import { extractMessages, formatNumber } from '../../utils/formUtils';
 import apiService from '../../services/apiService';
 
 interface PaymentMethod {
@@ -192,7 +192,7 @@ const Sales: React.FC = () => {
                         </div>
                         <div>
                             <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total</h2>
-                            <h3 className='text-lg font-bold dark:text-white'>Q{countData.total_sales}</h3>
+                            <h3 className='text-lg font-bold dark:text-white'>Q{formatNumber(countData.total_sales)}</h3>
                         </div>
                     </div>
                 </div>
@@ -241,11 +241,11 @@ const Sales: React.FC = () => {
                                         </td>
                                         {locations.map((location, index) => (
                                             <td key={generateKey(index)} className='px-6 py-4'>
-                                                Q{data[method][location] || 0}
+                                                Q{formatNumber(data[method][location] || 0)}
                                             </td>
                                         ))}
                                         <td className='px-6 py-4'>
-                                            Q{locations.reduce((acc, location) => acc + (data[method][location] || 0), 0)}
+                                            Q{formatNumber(locations.reduce((acc, location) => acc + (data[method][location] || 0), 0))}
                                         </td>
                                     </tr>
                                 ))}
@@ -258,11 +258,11 @@ const Sales: React.FC = () => {
                                     </td>
                                     {locations.map((location, index) => (
                                         <td key={generateKey(index)} className='px-6 py-4'>
-                                            Q{locationTotals[location] || 0}
+                                            Q{formatNumber(locationTotals[location] || 0)}
                                         </td>
                                     ))}
                                     <td className='px-6 py-4'>
-                                        Q{Object.values(locationTotals).reduce((acc, curr) => acc + curr, 0)}
+                                        Q{formatNumber(Object.values(locationTotals).reduce((acc, curr) => acc + curr, 0))}
                                     </td>
                                 </tr>
                             </tbody>

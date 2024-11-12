@@ -18,7 +18,7 @@ import ProductsFiltersPage from '../../manage/product/filtersPage';
 import { getProduct } from '../../../services/productsService';
 import { generateUUID } from '../../../utils/uuidGen';
 import { addSale } from '../../../services/SalesService';
-import { extractMessages } from '../../../utils/formUtils';
+import { extractMessages, formatNumber } from '../../../utils/formUtils';
 import { addAlert } from '../../../utils/Alerts';
 
 const AppPOSPage: React.FC = () => {
@@ -501,7 +501,7 @@ const AppPOSPage: React.FC = () => {
                                                     <span className='text-sm -mt-1 font-medium dark:text-slate-400'>{row.product?.model || '-'}</span>
                                                 </div>
                                                 <div className='flex gap-1 h-full items-center'>
-                                                    <span className='font-medium uppercase dark:text-slate-200'>Q{row.price || 0}</span>
+                                                    <span className='font-medium uppercase dark:text-slate-200'>Q{formatNumber(row.price || 0)}</span>
                                                     <span className='font-medium dark:text-slate-100'>x
                                                         <input
                                                             type='number'
@@ -513,7 +513,7 @@ const AppPOSPage: React.FC = () => {
                                                     <span
                                                         className='font-bold uppercase ml-2'
                                                         onClick={() => handleProductClick(index)}
-                                                    >Q{((row.price || 0) * (row.quantity || 0)).toFixed(2)}</span>
+                                                    >Q{formatNumber((row.price || 0) * (row.quantity || 0))}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -535,18 +535,18 @@ const AppPOSPage: React.FC = () => {
                                 <div className='col-span-1 flex flex-col justify-end text-lg dark:text-slate-300'>
                                     <div className='flex justify-between gap-1'>
                                         <h2 className='font-bold dark:text-white'>Subtotal:</h2>
-                                        <span className='font-medium'>Q{(formValues.total || 0) + (formValues.discount || 0)}</span>
+                                        <span className='font-medium'>Q{formatNumber((formValues.total || 0) + (formValues.discount || 0))}</span>
                                     </div>
                                     <div className='flex justify-between gap-1'>
                                         <h2 className='font-bold dark:text-white'>Descuento:</h2>
-                                        <span className='font-medium'>Q{(formValues.discount || 0)}</span>
+                                        <span className='font-medium'>Q{formatNumber(formValues.discount || 0)}</span>
                                     </div>
                                 </div>
                                 <div className='col-span-1 flex flex-col justify-end text-lg gap-2 dark:text-slate-300'>
                                     <div className='flex flex-col items-end'>
                                         <h2 className='font-bold dark:text-white'>Total:</h2>
                                         <div className='flex items-center gap-1'>
-                                            <span className='font-medium'>Q{(formValues.total || 0)}</span>
+                                            <span className='font-medium'>Q{formatNumber(formValues.total || 0)}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -933,27 +933,27 @@ const AppPOSPage: React.FC = () => {
                             <div className='col-span-1 flex flex-col justify-end text-lg dark:text-slate-300'>
                                 <div className='flex justify-between gap-1'>
                                     <h2 className='font-bold dark:text-white'>Subtotal:</h2>
-                                    <span className='font-medium'>Q{(formValuesPayment.subtotal || 0)}</span>
+                                    <span className='font-medium'>Q{formatNumber(formValuesPayment.subtotal || 0)}</span>
                                 </div>
                                 <div className='flex justify-between gap-1'>
                                     <h2 className='font-bold dark:text-white'>Comisión:</h2>
-                                    <span className='font-medium'>Q{(formValuesPayment.commission || 0)}</span>
+                                    <span className='font-medium'>Q{formatNumber(formValuesPayment.commission || 0)}</span>
                                 </div>
                                 {formValues.type === 2 && (
                                     <div className='flex justify-between gap-1'>
                                         <h2 className='font-bold dark:text-white'>Descuento:</h2>
-                                        <span className='font-medium'>Q{(formValuesPayment.discount || 0)}</span>
+                                        <span className='font-medium'>Q{formatNumber(formValuesPayment.discount || 0)}</span>
                                     </div>
                                 )}
                                 <div className='flex justify-between gap-1'>
                                     <h2 className='font-bold dark:text-white'>Total:</h2>
-                                    <span className='font-medium'>Q{(formValuesPayment.total || 0)}</span>
+                                    <span className='font-medium'>Q{formatNumber(formValuesPayment.total || 0)}</span>
                                 </div>
                             </div>
                             <div className='col-span-1 flex flex-col justify-end text-lg gap-2 dark:text-slate-300'> 
                                 <div className='flex flex-col items-end text-black dark:text-white'>
                                     <h2 className='font-bold '>Cambio:</h2>
-                                    <span className='font-medium'>Q{(formValuesPayment.change || 0)}</span>
+                                    <span className='font-medium'>Q{formatNumber(formValuesPayment.change || 0)}</span>
                                 </div>
                             </div>
                         </div>

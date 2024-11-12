@@ -3,6 +3,7 @@ import { Calendar01Icon, Calendar03Icon, CreditCardIcon, Invoice04Icon, Note01Ic
 import useTranslations from '../../../../hooks/useTranslations';
 import { SalePayment } from '../../../../types/modelType';
 import { calculateDaysRemaining } from '../../../../utils/DateFuncs';
+import { formatNumber } from '../../../../utils/formUtils';
 
 interface TablePageProps {
     data?: Array<SalePayment>;
@@ -46,13 +47,13 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                             <span className='flex items-center gap-1'><Note01Icon size={22} /> {row.note || '-'}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'>Q {row.subtotal ? row.subtotal.toFixed(2) : 0}</span>
+                            <span className='flex items-center gap-1'>Q {formatNumber(row.subtotal || 0)}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'>Q {row.total ? (((row.total || 0) - (row.commission || 0) - (row.surcharge || 0)) + (row.discount || 0)).toFixed(2)  : '-'}</span>
+                            <span className='flex items-center gap-1'>Q {formatNumber(((row.total || 0) - (row.commission || 0) - (row.surcharge || 0)) + (row.discount || 0))}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='flex items-center gap-1'>Q {((row.subtotal || 0) - (((row.total || 0) - (row.commission || 0) - (row.surcharge || 0)) + (row.discount || 0))).toFixed(2)}</span>
+                            <span className='flex items-center gap-1'>Q {formatNumber((row.subtotal || 0) - (((row.total || 0) - (row.commission || 0) - (row.surcharge || 0)) + (row.discount || 0)))}</span>
                         </td>
                         <td className='px-6 py-4'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>

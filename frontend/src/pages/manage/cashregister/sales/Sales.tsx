@@ -13,6 +13,7 @@ import TBodyPayments from './TBodyPayments';
 import FiltersPayments from './FiltersPayments';
 import Modal from '../../../../components/Modal';
 import Crud from './Crud';
+import { formatNumber } from '../../../../utils/formUtils';
 
 const Sales: React.FC = () => {
     const { translations } = useTranslations();
@@ -114,7 +115,7 @@ const Sales: React.FC = () => {
                                 </div>
                                 <div>
                                     <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total vendido</h2>
-                                    <h3 className='text-lg font-bold dark:text-white'>Q{countData.total}</h3>
+                                    <h3 className='text-lg font-bold dark:text-white'>Q{formatNumber(countData.total)}</h3>
                                 </div>
                             </div>
                         </div>
@@ -146,7 +147,7 @@ const Sales: React.FC = () => {
                                 </div>
                                 <div>
                                     <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total pagado</h2>
-                                    <h3 className='text-lg font-bold dark:text-white'>Q{countDataPayments.total}</h3>
+                                    <h3 className='text-lg font-bold dark:text-white'>Q{formatNumber(countDataPayments.total)}</h3>
                                 </div>
                             </div>
                         </div>

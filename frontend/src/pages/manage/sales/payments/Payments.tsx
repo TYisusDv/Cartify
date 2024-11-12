@@ -10,6 +10,7 @@ import CrudPage from './CrudPage';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getCountPayments } from '../../../../services/SalesService';
 import { URL_BACKEND } from '../../../../services/apiService';
+import { formatNumber } from '../../../../utils/formUtils';
 
 const Payments: React.FC = () => {
     const { translations } = useTranslations();
@@ -118,7 +119,7 @@ const Payments: React.FC = () => {
                         </div>
                         <div>
                             <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total a pagar</h2>
-                            <h3 className='text-lg font-bold dark:text-white'>Q{countData.total_payment}</h3>
+                            <h3 className='text-lg font-bold dark:text-white'>Q{formatNumber(countData.total_payment)}</h3>
                         </div>
                     </div>
                     <div className='col-span-1 flex items-center gap-3 border-r-0 pt-3 border-gray-100 md:border-r-0 lg:border-r-0 lg:p-0 dark:border-slate-600'>
@@ -127,13 +128,12 @@ const Payments: React.FC = () => {
                         </div>
                         <div>
                             <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total restante</h2>
-                            <h3 className='text-lg font-bold dark:text-white'>Q{countData.remaining}</h3>
+                            <h3 className='text-lg font-bold dark:text-white'>Q{formatNumber(countData.remaining)}</h3>
                         </div>
                     </div>
                 </div>
                 <div className='w-full mt-6'>
                     <Table 
-                    unique='manage-sale-payments'
                     endpoint='manage/sale/payments' 
                     id={saleId || 0} 
                     order='asc' 
