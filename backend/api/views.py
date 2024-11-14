@@ -4231,7 +4231,7 @@ class PDFContractAPIView(APIView):
         pdf = pdfkit.from_string(html_content, False, options = options, configuration = settings.PDFKIT_CONFIG_2)
 
         response = HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = 'inline; filename="output.pdf"'
+        response['Content-Disposition'] = f'inline; filename="Contract-{sale_id}.pdf"'
         return response
         
 

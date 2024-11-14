@@ -39,7 +39,7 @@
     </div>
     <p class="text-justify -mt-10">
       En la Aldea San Lorenzo el Cubo, departamento de Sácatepéquez el día ___ compadecen, por una parte, la sociedad
-      guatemalteca GRUPO INNOVACIÓN EMPRESARIAL, S.A., quien se identifica con el número de patente comercial ___ y
+      guatemalteca GRUPO INNOVACIÓN EMPRESARIAL, S.A., quien se identifica con el número de patente comercial <strong>491493</strong> y
       quien en este contrato se denominará como el VENDEDOR; y por otra parte el señor(a), quien para los efectos del
       presente contrato se denominará como COMPRADOR:
     </p>
@@ -47,46 +47,52 @@
       <table class="min-w-full table-auto">
         <thead>
           <tr>
-            <th colspan="8" class="px-4 py-1 text-lg text-center border border-black">DATOS DEL COMPRADOR</th>
+            <th colspan="8" class="px-2 py-px text-lg text-center border border-black">DATOS DEL COMPRADOR</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nombre completo:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">{{sale.client.person.firstname}}
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Nombre completo:</td>
+            <td colspan="3" class="px-2 py-px border border-black">{{sale.client.person.firstname}}
               {{sale.client.person.middlename}} {{sale.client.person.lastname}} {{sale.client.person.second_lastname}}
             </td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">DPI:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">{{sale.client.person.identification_id}}</td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">DPI:</td>
+            <td colspan="3" class="px-2 py-px border border-black">{{sale.client.person.identification_id}}</td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Estado civil:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nacionalidad:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Estado civil:</td>
+            <td colspan="2" class="px-2 py-px border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Edad:</td>
+            <td colspan="2" class="px-2 py-px border border-black">{{sale.client.person.birthdate|years_since}} años</td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Nacionalidad:</td>
+            <td colspan="2" class="px-2 py-px border border-black"></td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Profesión y oficio:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Teléfono:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-          </tr>
-          <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Residencia actual:</td>
-            <td colspan="7" class="px-4 py-2 border border-black"></td>
-          </tr>
-          <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Correo electrónico:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Monto de ingresos mensuales:
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Profesión y oficio:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
+              {{sale.client.person.occupation}}
             </td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Teléfono:</td>
+            <td colspan="3" class="px-2 py-px border border-black">{{sale.client.person.mobile}}</td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Trabajo actual:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Tiempo:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Residencia actual:</td>
+            <td colspan="7" class="px-2 py-px border border-black"></td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Correo electrónico:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
+              {{sale.client.email}}
+            </td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Monto de ingresos mensuales:
+            </td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Trabajo actual:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Tiempo:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
           </tr>
         </tbody>
       </table>
@@ -98,46 +104,46 @@
       <table class="min-w-full table-auto">
         <thead>
           <tr>
-            <th colspan="8" class="px-4 py-1 text-lg text-center border border-black">DATOS DEL FIADOR</th>
+            <th colspan="8" class="px-2 py-px text-lg text-center border border-black">DATOS DEL FIADOR</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nombre completo:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Nombre completo:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
               {{sale.client.person.firstname}} {{sale.client.person.middlename}} {{sale.client.person.lastname}} {{sale.client.person.second_lastname}}
             </td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">DPI:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">{{sale.client.person.identification_id}}</td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">DPI:</td>
+            <td colspan="3" class="px-2 py-px border border-black">{{sale.client.person.identification_id}}</td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Estado civil:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nacionalidad:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Estado civil:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Nacionalidad:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Profesión y oficio:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Teléfono:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Profesión y oficio:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Teléfono:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Residencia actual:</td>
-            <td colspan="7" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Residencia actual:</td>
+            <td colspan="7" class="px-2 py-px border border-black"></td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Correo electrónico:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Monto de ingresos mensuales:
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Correo electrónico:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Monto de ingresos mensuales:
             </td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Trabajo actual:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Tiempo:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Trabajo actual:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Tiempo:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
           </tr>
         </tbody>
       </table>
@@ -151,70 +157,68 @@
       <table class="min-w-full table-auto">
         <thead>
           <tr>
-            <th colspan="8" class="px-4 py-1 text-lg text-center border border-black">CONDICIONES DE LA VENTA</th>
+            <th colspan="8" class="px-2 py-px text-lg text-center border border-black">CONDICIONES DE LA VENTA</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Artículo:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Artículo:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
               {% for item in inventory %}
               {{ item.product.name|default:"N/A" }}{% if not forloop.last %} + {% endif %}
               {% endfor %}
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Marca:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Marca:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
               {% for item in inventory %}
               {{ item.product.brand.name|default:"N/A" }}{% if not forloop.last %} + {% endif %}
               {% endfor %}
             </td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Modelo / Código:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Modelo / Código:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
               {% for item in inventory %}
               {{ item.product.model|default:"N/A" }}{% if not forloop.last %} + {% endif %}
               {% endfor %}
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Serie:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Serie:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
               {% for item in inventory %}
               {{ item.product.barcode|default:"N/A" }}{% if not forloop.last %} + {% endif %}
               {% endfor %}
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Precio:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Precio:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
               {% for item in inventory %}
               Q{{ item.price|format_number|default:"N/A" }}{% if not forloop.last %} + {% endif %}
               {% endfor %}
             </td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Cantidad de abonos:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Cantidad de abonos:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
               {{ sale.quantity_of_payments|default:"N/A" }}
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Enganche:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Monto de cada abono:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Enganche:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Monto de cada abono:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Saldo pendiente:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Día de pago:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Saldo pendiente:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Día de pago:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
           </tr>
         </tbody>
       </table>
-    </div>
-  </div>
-  <div class="page">
-    <p class="text-justify">
+    </div>  
+    <p class="text-justify mt-2">
       Lugar de pago: MI HOGAR ELECTRODOMÉSTICOS 5ª. Av. casa No. 17 A Zona 0 San Loreno el Cubo, Ciudad Vieja
       Sacatepéquez. INTERESES MORATORIOS, en tal concepto será del cinco por ciento (5%) mensual sobre el saldo más
       gastos administrativos y de cobranza. Los intereses serán aplicados a partir del primer mes de atraso.
@@ -281,12 +285,10 @@
         <p class="w-full text-center border-t border-black">(Fiador)</p>
       </div>
     </div>
-  </div>
-  <div class="page">
-    <p class="text-justify">
+    <p class="text-justify mt-20">
       En el municipio de Ciudad Vieja, departamento de Sácatepéquez el día ___ como notario, DOY FE: que las firmas que
       anteceden son auténticas, por haberlas puesto hoy en este municipio y en mi presencia, y en su orden GRUPO
-      INNOVACIÓN EMPRESARIAL, S.A., quien se identifica con número de patente comerical 491493, y el señor(a) ___ quien
+      INNOVACIÓN EMPRESARIAL, S.A., quien se identifica con número de patente comerical <strong>491493</strong>, y el señor(a) ___ quien
       se identifica con documento personal de identificación CUI ___ persona de mi conocimiento el primero, no así el
       segundo ni el tecero quienes por tal motivo identifico por medio de su documento de identificación que tengo a la
       vista, en este domicilio y quienes para constancia y previa lectura, aceptación y ratificación firman de nuevo la
@@ -317,16 +319,16 @@
       <table class="min-w-full table-auto">
         <tbody>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nombre del cliente:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Nombre del cliente:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
               {{sale.client.person.firstname}} {{sale.client.person.middlename}} {{sale.client.person.lastname}} {{sale.client.person.second_lastname}}
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Fecha:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Teléfono:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Fecha:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Teléfono:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
           </tr>
         </tbody>
       </table>
@@ -335,63 +337,63 @@
       <table class="min-w-full table-auto">
         <thead>
           <tr>
-            <th colspan="8" class="px-4 py-1 text-lg text-center border border-black">CONDICIONES DE LA VENTA</th>
+            <th colspan="8" class="px-2 py-px text-lg text-center border border-black">CONDICIONES DE LA VENTA</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Artículo:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Artículo:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
               {% for item in inventory %}
               {{ item.product.name|default:"N/A" }}{% if not forloop.last %} + {% endif %}
               {% endfor %}
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Marca:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Marca:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
               {% for item in inventory %}
               {{ item.product.brand.name|default:"N/A" }}{% if not forloop.last %} + {% endif %}
               {% endfor %}
             </td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Modelo / Código:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Modelo / Código:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
               {% for item in inventory %}
               {{ item.product.model|default:"N/A" }}{% if not forloop.last %} + {% endif %}
               {% endfor %}
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Serie:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Serie:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
               {% for item in inventory %}
               {{ item.product.barcode|default:"N/A" }}{% if not forloop.last %} + {% endif %}
               {% endfor %}
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Precio:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Precio:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
               {% for item in inventory %}
               Q{{ item.price|format_number|default:"N/A" }}{% if not forloop.last %} + {% endif %}
               {% endfor %}
             </td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Cantidad de abonos:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Cantidad de abonos:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
               {{ sale.quantity_of_payments|default:"N/A" }}
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Enganche:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Monto de cada abono:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Enganche:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Monto de cada abono:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Saldo pendiente:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Día de pago:</td>
-            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Saldo pendiente:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Día de pago:</td>
+            <td colspan="3" class="px-2 py-px border border-black"></td>
           </tr>
         </tbody>
       </table>
@@ -400,112 +402,110 @@
       <table class="min-w-full table-auto">
         <thead>
           <tr>
-            <th colspan="8" class="px-4 py-1 text-lg text-center border border-black">REFERENCIAS PERSONALES DEL COMPRADOR</th>
+            <th colspan="8" class="px-2 py-px text-lg text-center border border-black">REFERENCIAS PERSONALES DEL COMPRADOR</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td colspan="8" class="px-4 py-2 font-medium border border-black">REFERENCIA 1</td>
+            <td colspan="8" class="px-2 py-px font-medium border border-black">REFERENCIA 1</td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nombre:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Nombre:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Direccion:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Direccion:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Teléfono:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">            
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Teléfono:</td>
+            <td colspan="3" class="px-2 py-px border border-black">            
             </td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Parentesco:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">
-            </td>
-          </tr>
-          <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Comentario:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Parentesco:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
             </td>
           </tr>
           <tr>
-            <td colspan="8" class="px-4 py-2 font-medium border border-black">REFERENCIA 2</td>
-          </tr>
-          <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nombre:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Comentario:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Direccion:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="8" class="px-2 py-px font-medium border border-black">REFERENCIA 2</td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Nombre:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Teléfono:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">            
-            </td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Parentesco:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Direccion:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Comentario:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Teléfono:</td>
+            <td colspan="3" class="px-2 py-px border border-black">            
+            </td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Parentesco:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
             </td>
           </tr>
           <tr>
-            <td colspan="8" class="px-4 py-2 font-medium border border-black">REFERENCIA 3</td>
-          </tr>
-          <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nombre:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Comentario:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Direccion:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="8" class="px-2 py-px font-medium border border-black">REFERENCIA 3</td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Nombre:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Teléfono:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">            
-            </td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Parentesco:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Direccion:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Comentario:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Teléfono:</td>
+            <td colspan="3" class="px-2 py-px border border-black">            
+            </td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Parentesco:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Comentario:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-  </div>
-  <div class="page">
-    <div class="container mx-auto">
+    <div class="container mx-auto mt-2">
       <table class="min-w-full table-auto">
         <thead>
           <tr>
-            <th colspan="8" class="px-4 py-1 text-lg text-center border border-black">AUTORIZACIÓN DE CRÉDITO</th>
+            <th colspan="8" class="px-2 py-px text-lg text-center border border-black">AUTORIZACIÓN DE CRÉDITO</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Comentario:</td>
-            <td colspan="7" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Comentario:</td>
+            <td colspan="7" class="px-2 py-px border border-black">
             </td>
           </tr>
           <tr>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Firma:</td>
-            <td colspan="3" class="px-4 py-2 border border-black">            
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Firma:</td>
+            <td colspan="3" class="px-2 py-px border border-black">            
             </td>
-            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Fecha</td>
-            <td colspan="3" class="px-4 py-2 border border-black">
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Fecha</td>
+            <td colspan="3" class="px-2 py-px border border-black">
             </td>
           </tr>
         </tbody>
