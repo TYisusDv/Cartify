@@ -1,0 +1,552 @@
+{% load math_filters %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Contract</title>
+  <link rel="stylesheet" type="text/css" href="{{base_url}}/static/css/contract.css?v={{uuid}}">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+    rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+    }
+
+    .page {
+      page-break-after: always;
+    }
+
+    .logo {
+      width: 200px;
+      height: 200px;
+      background-image: url('{{base_url}}/static/images/logo.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="flex items-center">
+      <div class="logo"></div>
+      <h1 class="text-2xl text-center font-bold">
+        CONTRATO DE COMPRAVENTA CON PACTO DE RESERVA DE DOMINIO
+      </h1>
+    </div>
+    <p class="text-justify -mt-10">
+      En la Aldea San Lorenzo el Cubo, departamento de Sácatepéquez el día ___ compadecen, por una parte, la sociedad
+      guatemalteca GRUPO INNOVACIÓN EMPRESARIAL, S.A., quien se identifica con el número de patente comercial ___ y
+      quien en este contrato se denominará como el VENDEDOR; y por otra parte el señor(a), quien para los efectos del
+      presente contrato se denominará como COMPRADOR:
+    </p>
+    <div class="container mx-auto mt-2">
+      <table class="min-w-full table-auto">
+        <thead>
+          <tr>
+            <th colspan="8" class="px-4 py-1 text-lg text-center border border-black">DATOS DEL COMPRADOR</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nombre completo:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">{{sale.client.person.firstname}}
+              {{sale.client.person.middlename}} {{sale.client.person.lastname}} {{sale.client.person.second_lastname}}
+            </td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">DPI:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">{{sale.client.person.identification_id}}</td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Estado civil:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nacionalidad:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Profesión y oficio:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Teléfono:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Residencia actual:</td>
+            <td colspan="7" class="px-4 py-2 border border-black"></td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Correo electrónico:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Monto de ingresos mensuales:
+            </td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Trabajo actual:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Tiempo:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-justify mt-2">
+      y el señor(a), quien para los efectos del presente contrato se denominará FIADOR:
+    </p>
+    <div class="container mx-auto mt-2">
+      <table class="min-w-full table-auto">
+        <thead>
+          <tr>
+            <th colspan="8" class="px-4 py-1 text-lg text-center border border-black">DATOS DEL FIADOR</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nombre completo:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">
+              {{sale.client.person.firstname}} {{sale.client.person.middlename}} {{sale.client.person.lastname}} {{sale.client.person.second_lastname}}
+            </td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">DPI:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">{{sale.client.person.identification_id}}</td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Estado civil:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nacionalidad:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Profesión y oficio:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Teléfono:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Residencia actual:</td>
+            <td colspan="7" class="px-4 py-2 border border-black"></td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Correo electrónico:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Monto de ingresos mensuales:
+            </td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Trabajo actual:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Tiempo:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-justify mt-2">
+      manifiestan que celebran éste CONTRATO DE COMPRAVENTA CON PACTO DE RESERVA DEL DOMINIO EN ABONOS DE BIEN INMUEBLE,
+      conforme lo que para el efecto se consigna en las cláusulas siguientes: PRIMERA: El vendedor se obliga a entregar
+      al comprador en calidad de VENTA CON PACTO DE RESERVA DE DOMINIO PARA SI, en abonos.
+    </p>
+    <div class="container mx-auto mt-2">
+      <table class="min-w-full table-auto">
+        <thead>
+          <tr>
+            <th colspan="8" class="px-4 py-1 text-lg text-center border border-black">CONDICIONES DE LA VENTA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Artículo:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+              {% for item in inventory %}
+              {{ item.product.name|default:"N/A" }}{% if not forloop.last %} + {% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Marca:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">
+              {% for item in inventory %}
+              {{ item.product.brand.name|default:"N/A" }}{% if not forloop.last %} + {% endif %}
+              {% endfor %}
+            </td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Modelo / Código:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">
+              {% for item in inventory %}
+              {{ item.product.model|default:"N/A" }}{% if not forloop.last %} + {% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Serie:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+              {% for item in inventory %}
+              {{ item.product.barcode|default:"N/A" }}{% if not forloop.last %} + {% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Precio:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">
+              {% for item in inventory %}
+              Q{{ item.price|format_number|default:"N/A" }}{% if not forloop.last %} + {% endif %}
+              {% endfor %}
+            </td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Cantidad de abonos:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">
+              {{ sale.quantity_of_payments|default:"N/A" }}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Enganche:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Monto de cada abono:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Saldo pendiente:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Día de pago:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="page">
+    <p class="text-justify">
+      Lugar de pago: MI HOGAR ELECTRODOMÉSTICOS 5ª. Av. casa No. 17 A Zona 0 San Loreno el Cubo, Ciudad Vieja
+      Sacatepéquez. INTERESES MORATORIOS, en tal concepto será del cinco por ciento (5%) mensual sobre el saldo más
+      gastos administrativos y de cobranza. Los intereses serán aplicados a partir del primer mes de atraso.
+      <strong>SEGUNDA:</strong> El COMPRADOR acepta tal y como lo condiciona el VENDEDOR que: la presente venta quede
+      sujeta al Pacto Expreso de reserva del dominio a favor del vendedor en las siguientes condiciones: a) El vendedor
+      conservará el dominio de lo vendido, hasta que el precio de venta se encuentre totalmente cancelado por el
+      comprador, teniendo mientras tanto este último la calidad de DEPOSITARIO del mueble objeto de la venta, con todas
+      las obligaciones, efectos y condiciones inherentes al depósito, bajo el entendido y la condición que durante el
+      tiempo que lo posea, el uso que haga del mismo, lo realizará bajo su propio riesgo y responsabilidad, asumiendo en
+      todo caso las obligaciones que de los riesgos de su manejo se deriven; b) El comprador queda obligado por este
+      contrato a cancelar en su totalidad el precio de la venta en forma, lugar y tiempo estipulados, aunque el mueble
+      que adquiere, se destruya, deteriore, pierda o deje de funcionar como corresponde según destino, aún en caso
+      fortuito o de fuerza mayor, dado a que la entrega se le hace en absoluto y perfecto estado de funcionamiento y
+      condiciones; c) Que mientras no haya pagado totalmente el precio o adquirido en plena propiedad el mueble, objeto
+      de este contrato, le es prohibido negociarlo o enajenarlo, darlo en arrendamiento, uso o en garantía de alguna
+      obligación. <strong>TERCERA:</strong> A mantener el bien mueble en buenas y perfectas condiciones de estado y
+      funcionamiento y hacer los gastos de reparación y los que sea mantener. <strong>CUARTA:</strong> Queda
+      categóricamente convenido que la falta de pago de uno de los abonos en la fecha y condiciones convenidas, dará
+      derecho al VENDEDOR para dar por rescindido este contrato,dando por caducada ipso-facto la venta y por vencido el
+      plazo de la obligación y por consiguiente a entablar acción ejecutiva sobre cosa cierta y determinada o a cobrar
+      en la vía ejecutiva el saldo de precio de venta pendiente. Si optare por lo primero, es decir, si el VENDEDOR
+      considerase rescindido el contrato y tuviese por caducada ipso-facto la venta, requerirá judicialmente ante Juez
+      competente como corresponde, la devolución del bien objeto de la venta, cuya extracción se hará del lugar donde se
+      encuentre o del poder de la persona que lo tenga o guarde quedando en tal caso el mismo en posesión y legítimo
+      dominio del vendedor quien podrá disponer de dicho bien en la forma que mejor convenga a sus intereses, fundado el
+      en la situación legar en que se encuentre el comprador, según lo estipulado en este contrato y, en caso de negarse
+      el comprador o la persona que guarde o tenga en su poder el bien mueble vendido, a la devolución del mismo, se
+      solicitará que se ordene sin más trámite el secuestro judicial, para lo cual se tendrá el mismo por situado en
+      este municipio; pero si el VENDEDOR optare por cobrar ejecutivamente el saldo del precio de venta, pendiente,
+      demandará bajo protesta ante Juez competente, la suma adeudada, aceptando desde ya el COMPRADOR como buenas,
+      exactas, líquidas y exigibles así como requeribles y de plazo vencido las cuentas que se le formulen de parte del
+      VENDEDOR respecto a este contrato y si el caso lo exige que se le embarguen bienes suficientes para tales efectos,
+      constituyendo el presente documento, título ejecutivo suficiente para el cobro. Queda expresamente convenido y
+      acordado que, en cualquier situación de las antes indicadas, la cantidad del precio que ya hubiese cancelado el
+      COMPRADOR, quedará a favor del VENDEDOR, en concepto de indemnización por el uso y depreciación que el bien
+      vendido hubiese hecho el COMPRADOR y por los daños y perjuicios que al VENDEDOR cause el incumplimiento de este
+      contrato. <strong>QUINTA:</strong> El comprador se obliga a la vez a firmar letras de cambio a favor del vendedor,
+      en caso éste lo solicite, quien podrá descontarlas y ceder este crédito sin necesidad de aviso previo o posterior
+      aviso al comprador. <strong>SEXTA:</strong> Para los efectos del debido cumplimiento de contrato y de las
+      obligaciones que el comprador sume por el mismo, él renuncia al fuero de su domicilio y se somete a los Tribunales
+      que el VENDEDOR elija para el efecto, acepta los gastos de este documento y todos los que su cobranza judicial o
+      extrajudicialmente ocasione este contrato por incumplimiento del COMPRADOR. <strong>SÉPTIMA:</strong> El FIADOR,
+      manifiesta que por medio de este acto, se constituye en FIADOR SOLIDARIO Y MANCOMUNADO DE EL COMPRADOR durante la
+      vigencia de este contrato y mientras esté pendiente de pago cualquier saldo del precio de venta y se mantenga
+      inalterable el Pacto de Reserva del Dominio a favor del VENDEDOR, garantiza el cumplimiento de su obligación con
+      el porcentaje del sueldo o salario que devenga y con sus bienes presentes y futuros, acepta como buenas, líquidas,
+      exigibles y de plazo vencido las cuentas que se le demanden en su oportunidad y para tales efectos renuncia al
+      fuero de su domicilio y se somete expresamente a los Tribunales que elija el VENDEDOR y que cualquier citación o
+      notificación o emplazamiento puede hacerse en la dirección de su residencia actual. <strong>OCTAVA:</strong> Leído
+      y bien enterados de su contenido, objeto, validez y efectos legales, todos los comparecientes aceptan este
+      contrato y para constancia y seguridad, se extiende y firman en el mismo lugar y fecha indicados al principio del
+      presente.
+    </p>
+    <div class="flex justify-center gap-3 mt-32">
+      <div class="w-96 px-2">
+        <p class="w-full text-center border-t border-black">(Vendedor)</p>
+      </div>
+      <div class="w-96 px-2">
+        <p class="w-full text-center border-t border-black">(Comprador)</p>
+      </div>
+    </div>
+    <div class="flex justify-center gap-2 mt-20">
+      <div class="w-96 px-2">
+        <p class="w-full text-center border-t border-black">(Fiador)</p>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+    <p class="text-justify">
+      En el municipio de Ciudad Vieja, departamento de Sácatepéquez el día ___ como notario, DOY FE: que las firmas que
+      anteceden son auténticas, por haberlas puesto hoy en este municipio y en mi presencia, y en su orden GRUPO
+      INNOVACIÓN EMPRESARIAL, S.A., quien se identifica con número de patente comerical 491493, y el señor(a) ___ quien
+      se identifica con documento personal de identificación CUI ___ persona de mi conocimiento el primero, no así el
+      segundo ni el tecero quienes por tal motivo identifico por medio de su documento de identificación que tengo a la
+      vista, en este domicilio y quienes para constancia y previa lectura, aceptación y ratificación firman de nuevo la
+      presente.
+    </p>
+    <div class="flex justify-center gap-3 mt-20">
+      <div class="w-96 px-2">
+        <p class="w-full text-center border-t border-black">(Vendedor)</p>
+      </div>
+      <div class="w-96 px-2">
+        <p class="w-full text-center border-t border-black">(Comprador)</p>
+      </div>
+    </div>
+    <div class="flex justify-center gap-2 mt-20">
+      <div class="w-96 px-2">
+        <p class="w-full text-center border-t border-black">(Fiador)</p>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+    <div class="flex items-center gap-3">
+      <div class="logo"></div>
+      <h1 class="text-2xl text-center font-bold">
+        AUTORIZACIÓN Y REFERENCIAS PERSONALES DE CRÉDITO
+      </h1>
+    </div>
+    <div class="container mx-auto -mt-6">
+      <table class="min-w-full table-auto">
+        <tbody>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nombre del cliente:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+              {{sale.client.person.firstname}} {{sale.client.person.middlename}} {{sale.client.person.lastname}} {{sale.client.person.second_lastname}}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Fecha:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Teléfono:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="container mx-auto mt-2">
+      <table class="min-w-full table-auto">
+        <thead>
+          <tr>
+            <th colspan="8" class="px-4 py-1 text-lg text-center border border-black">CONDICIONES DE LA VENTA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Artículo:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+              {% for item in inventory %}
+              {{ item.product.name|default:"N/A" }}{% if not forloop.last %} + {% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Marca:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">
+              {% for item in inventory %}
+              {{ item.product.brand.name|default:"N/A" }}{% if not forloop.last %} + {% endif %}
+              {% endfor %}
+            </td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Modelo / Código:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">
+              {% for item in inventory %}
+              {{ item.product.model|default:"N/A" }}{% if not forloop.last %} + {% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Serie:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+              {% for item in inventory %}
+              {{ item.product.barcode|default:"N/A" }}{% if not forloop.last %} + {% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Precio:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">
+              {% for item in inventory %}
+              Q{{ item.price|format_number|default:"N/A" }}{% if not forloop.last %} + {% endif %}
+              {% endfor %}
+            </td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Cantidad de abonos:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">
+              {{ sale.quantity_of_payments|default:"N/A" }}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Enganche:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Monto de cada abono:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Saldo pendiente:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Día de pago:</td>
+            <td colspan="3" class="px-4 py-2 border border-black"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="container mx-auto mt-2">
+      <table class="min-w-full table-auto">
+        <thead>
+          <tr>
+            <th colspan="8" class="px-4 py-1 text-lg text-center border border-black">REFERENCIAS PERSONALES DEL COMPRADOR</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="8" class="px-4 py-2 font-medium border border-black">REFERENCIA 1</td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nombre:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Direccion:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Teléfono:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">            
+            </td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Parentesco:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Comentario:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="8" class="px-4 py-2 font-medium border border-black">REFERENCIA 2</td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nombre:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Direccion:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Teléfono:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">            
+            </td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Parentesco:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Comentario:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="8" class="px-4 py-2 font-medium border border-black">REFERENCIA 3</td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Nombre:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Direccion:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Teléfono:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">            
+            </td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Parentesco:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Comentario:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="page">
+    <div class="container mx-auto">
+      <table class="min-w-full table-auto">
+        <thead>
+          <tr>
+            <th colspan="8" class="px-4 py-1 text-lg text-center border border-black">AUTORIZACIÓN DE CRÉDITO</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Comentario:</td>
+            <td colspan="7" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+          <tr>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Firma:</td>
+            <td colspan="3" class="px-4 py-2 border border-black">            
+            </td>
+            <td colspan="1" class="px-4 py-2 text-right font-medium border border-black">Fecha</td>
+            <td colspan="3" class="px-4 py-2 border border-black">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="page">
+    <div class="flex items-center gap-3">
+      <div class="logo"></div>
+      <h1 class="text-2xl text-center font-bold">
+        CONSENTIMIENTO DE COMPRA AL CRÉDITO
+      </h1>
+    </div>
+    <p class="text-justify -mt-6">
+      Por medio del presente documento hacemos de su conocimiento los siguientes artículos de ley, teniendo en cuenta
+      como principio de ley que la ignorancia de la ley no exime de su cumplimiento:
+      <br /><br />
+      Artículo 1834 del Código Civil de Guatemala. - Artículo 109 del Decreto-Ley número 218.- Es válida la venta con
+      pacto de reserva del dominio, mientras el comprador no pague totalmente el precio o no se realice la condición a
+      que las partes sujetan la consumación del contrato.
+      <br /><br />
+      Artículos 263 y 264 del Código Penal de Guatemala. Estafa propia y casos especiales de estafa. Comete estafa
+      quien, induciendo a error a otro, mediante ardid o engaño, lo defraudare en su patrimonio en perjuicio propio o
+      ajeno. Numeral 16: Quien comprare a plazos un bien y lo enajenare posteriormente o dispusiere de él, en cualquier
+      otra forma, sin haber pagado la totalidad del precio. El responsable de este delito será sancionado con prisión de
+      seis meses a cuatro años y multa de doscientos a diez mil quetzales.
+      <br /><br />
+      Por tanto, y en base a los artículos anteriores tome en cuenta que si compra un artículo al crédito y lo vende,
+      empeña o dispone de él en cualquier otra forma sin haber pagado la totalidad del precio COMETE DELITO de CASO
+      ESPECIAL DE ESTAFA y será condenado con prisión de hasta cuatro años y multas de hasta diez mil quetzales.
+    </p>
+    <p class="mt-10">Firma de enterado:</p>
+    <div class="flex justify-center gap-3 mt-32">
+      <div class="w-96 px-2">
+        <p class="w-full text-center border-t border-black">(Comprador)</p>
+      </div>
+      <div class="w-96 px-2">
+        <p class="w-full text-center border-t border-black">(Fiador)</p>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

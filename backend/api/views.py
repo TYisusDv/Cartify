@@ -18,7 +18,7 @@ from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from django.conf import settings
-import uuid, qrcode, io, openpyxl, fitz
+import uuid, qrcode, io, openpyxl, fitz, pdfkit
 
 #Login
 class LoginAPIView(APIView):
@@ -4195,7 +4195,46 @@ class PDFCertificateAPIView(APIView):
         response = HttpResponse(pdf_bytes, content_type='application/pdf')
         response['Content-Disposition'] = 'inline; filename=certificate_page.pdf'
         return response
+
+# PDF Contract
+class PDFContractAPIView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request):
+        data = request.query_params
+        sale_id = data.get('id', None)
+
+        instance_sale = ManageSalesAPIView.get_object(sale_id)
+        inventory_items = instance_sale.inventory_sale.all()
         
+        data = {
+            'base_url': request.build_absolute_uri('/'),
+            'uuid': uuid.uuid4(),
+            'sale': instance_sale,
+            'inventory': inventory_items
+        }
+
+        html = settings.BASE_DIR / 'api/templates/pdf/contract.html'
+        html_content = render_to_string(html, data)
+        #return HttpResponse(html_content)
+
+        options = {
+            'page-size': 'Letter',
+            'margin-top': '0.4in',
+            'margin-right': '0.6in',
+            'margin-bottom': '0.4in',
+            'margin-left': '0.6in',
+            'encoding': 'UTF-8'
+        }
+
+        pdf = pdfkit.from_string(html_content, False, options = options, configuration = settings.PDFKIT_CONFIG_2)
+
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="output.pdf"'
+        return response
+        
+
 #Excel clients
 class ExcelClientsAPIView(APIView):
     #authentication_classes = [JWTAuthentication]

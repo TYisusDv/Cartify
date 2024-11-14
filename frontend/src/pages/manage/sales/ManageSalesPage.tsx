@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getCountSuppliers } from '../../../services/suppliersService';
-import { Invoice02Icon, PencilEdit02Icon, ShoppingBasketSecure03Icon } from 'hugeicons-react';
+import { Invoice02Icon, Pdf01Icon, PencilEdit02Icon, ShoppingBasketSecure03Icon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import DelayedSuspense from '../../../components/DelayedSuspense';
 import SkeletonLoader from '../../../components/SkeletonLoader';
@@ -10,6 +10,7 @@ import FiltersPage from './filtersPage';
 import { Link } from 'react-router-dom';
 import Modal from '../../../components/Modal';
 import CrudPage from './Crud';
+import { URL_BACKEND } from '../../../services/apiService';
 
 const ManageSalesPage: React.FC = () => {
     const { translations } = useTranslations();
@@ -52,6 +53,10 @@ const ManageSalesPage: React.FC = () => {
         { name: '', headerName: 'Productos' }
     ];
 
+    const handleCertificate = () => {
+        window.open(`${URL_BACKEND}/pdf/certificate?id=${selected}`, '_blank');  
+    }
+
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
             <div className='flex items-center justify-between w-full p-8 animate__animated animate__fadeIn animate__faster'>
@@ -60,7 +65,8 @@ const ManageSalesPage: React.FC = () => {
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_sales_info}</span>
                 </div>
                 <div className='flex gap-2'>
-                    <Link to={`/manage/sale/payments?id=${selected}`}><button className='bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === undefined}><Invoice02Icon /></button></Link>
+                   <button className='bg-red-500 text-white border-2 border-red-500 hover:bg-red-500/20 hover:text-red-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={handleCertificate} disabled={selected === undefined}><Pdf01Icon /></button>
+                    <Link to={`/manage/sale/payments?id=${selected}`}><button className='bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' disabled={selected === undefined}><Invoice02Icon /></button></Link>
                     <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === undefined}><PencilEdit02Icon /></button>
                 </div>
             </div>

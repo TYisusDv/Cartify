@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from decouple import config, Csv
-import datetime
+import datetime, pdfkit
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,9 +31,12 @@ ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', cast=Csv())
 CORS_ALLOWED_ORIGINS = config('DJANGO_CORS_ALLOWED', cast=Csv())
 CSRF_TRUSTED_ORIGINS = config('DJANGO_CSRF_TRUSTED_ORIGINS', cast=Csv())
 
+
 PDFKIT_CONFIG = {
     'WKHTMLTOPDF_CMD': '/usr/bin/wkhtmltopdf',
 }
+
+PDFKIT_CONFIG_2 = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
 
 # Application definition
 

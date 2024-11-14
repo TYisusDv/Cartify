@@ -36,6 +36,7 @@ urlpatterns = [
     path('manage/banks', ManageBanksAPIView.as_view(), name='manage-banks'),
     path('pdf/payment', PDFGeneratorAPIView.as_view(), name='pdf-payment'),
     path('pdf/certificate', PDFCertificateAPIView.as_view(), name='pdf-certificate'),
+    path('pdf/contract', PDFContractAPIView.as_view(), name='pdf-contract'),
     path('excel/clients', ExcelClientsAPIView.as_view(), name='excel-client'),
     path('excel/cashregister', ExcelCashRegisterAPIView.as_view(), name='excel-cashregister'),
     path('excel/statistics/sales', ExcelStatisticsSalesAPIView.as_view(), name='excel-statistics-sales'),
