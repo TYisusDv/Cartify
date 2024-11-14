@@ -6,7 +6,7 @@ services:
     volumes:
       - ./backend:/app
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:${DJANGO_PORT}:8000"
     env_file:
       - ./.env
     depends_on:
@@ -21,7 +21,7 @@ services:
     volumes:
       - ./frontend:/app
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:${REACT_PORT}:3000"
     env_file:
       - ./.env
     networks:
