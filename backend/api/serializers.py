@@ -152,7 +152,7 @@ class AddressesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AddressesModel
-        fields = ['id', 'street', 'area', 'city']
+        fields = '__all__'
 
 class AddEditAddressesSerializer(serializers.ModelSerializer):
     street = serializers.CharField(error_messages = {
@@ -176,7 +176,7 @@ class AddEditAddressesSerializer(serializers.ModelSerializer):
         'invalid': 'The city is invalid.',
     })
 
-    person_id = serializers.IntegerField(error_messages = {
+    person_id = serializers.UUIDField(error_messages = {
         'required': 'The person is required.',
         'blank': 'The person cannot be blank.',
         'null': 'The person cannot be blank.',
@@ -498,6 +498,41 @@ class AddEditClientSerializer(serializers.ModelSerializer):
         'null': 'The allow credit cannot be blank.',
         'invalid': 'The allow credit is invalid.',
     }, default = True)
+
+    marital_status = serializers.CharField(error_messages = {
+        'required': 'The marital status is required.',
+        'blank': 'The marital status cannot be blank.',
+        'null': 'The marital status cannot be blank.',
+        'max_length': 'The marital status cannot exceed 100 characters.',
+    }, required = False, max_length = 100, allow_blank = True, allow_null = True)
+
+    nationality = serializers.CharField(error_messages = {
+        'required': 'The nationality is required.',
+        'blank': 'The nationality cannot be blank.',
+        'null': 'The nationality cannot be blank.',
+        'max_length': 'The nationality cannot exceed 100 characters.',
+    }, required = False, max_length = 100, allow_blank = True, allow_null = True)
+
+    income_amount = serializers.FloatField(error_messages = {
+        'required': 'The income amount is required.',
+        'blank': 'The income amount cannot be blank.',
+        'null': 'The income amount cannot be blank.',
+        'invalid': 'The income amount is invalid.',
+    }, required = False)
+
+    current_job = serializers.CharField(error_messages = {
+        'required': 'The current job is required.',
+        'blank': 'The current job cannot be blank.',
+        'null': 'The current job cannot be blank.',
+        'max_length': 'The current job cannot exceed 100 characters.',
+    }, required = False, max_length = 100, allow_blank = True, allow_null = True)
+
+    time_job = serializers.CharField(error_messages = {
+        'required': 'The time job is required.',
+        'blank': 'The time job cannot be blank.',
+        'null': 'The time job cannot be blank.',
+        'max_length': 'The time job cannot exceed 100 characters.',
+    }, required = False, max_length = 100, allow_blank = True, allow_null = True)
 
     note = serializers.CharField(error_messages = {
         'required': 'The note is required.',

@@ -3,7 +3,7 @@ import { Client } from '../../../types/modelType';
 import { addClient, deleteClient, editClient, getClient } from '../../../services/clientsService';
 import useTranslations from '../../../hooks/useTranslations';
 import Select from '../../../components/Select';
-import { Calendar01Icon, ComputerVideoIcon, Delete02Icon, JobSearchIcon, Location01Icon, Mail01Icon, MosqueLocationIcon, Note04Icon, RoadLocation01Icon, StoreLocation01Icon, UserAccountIcon, UserCircleIcon, UserQuestion02Icon } from 'hugeicons-react';
+import { Calendar01Icon, ComputerVideoIcon, Delete02Icon, GlobeIcon, JobSearchIcon, Location01Icon, Mail01Icon, MosqueLocationIcon, Note04Icon, PermanentJobIcon, RoadLocation01Icon, StoreLocation01Icon, UserAccountIcon, UserCircleIcon, UserIcon, UserQuestion02Icon } from 'hugeicons-react';
 import Input from '../../../components/Input';
 import useMedia from '../../../hooks/useMedia';
 import { extractMessages, handleFileChange } from '../../../utils/formUtils';
@@ -120,6 +120,8 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                     const response_resp = response.resp;
 
                     setFormValues(response_resp);
+                    setCountry(response_resp.person.addresses[0].city.state.country.id);
+                    setState(response_resp.person.addresses[0].city.state.id);
                     setIdentificationPictures(response_resp.person?.identification_images || []);
                 } catch (error) {
                 }
@@ -532,7 +534,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                                     endpoint='manage/states'
                                     endpoint_value='id'
                                     endpoint_text='{name}'
-                                    filters={{country_id: country}}
+                                    filters={{ country_id: country }}
                                     icon={<UserAccountIcon size={20} />}
                                     label={translations.address_state}
                                 />
@@ -610,7 +612,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                                     endpoint='manage/cities'
                                     endpoint_value='id'
                                     endpoint_text='{name}'
-                                    filters={{state_id: state}}
+                                    filters={{ state_id: state }}
                                     icon={<Location01Icon size={20} />}
                                     label={translations.address_city}
                                 />
@@ -619,6 +621,99 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                     </div>
                     <div className={`flex flex-col gap-2 w-full tab-item ${'details' === activeTab ? 'block' : 'hidden'}`}>
                         <div className='grid items-center grid-cols-1 md:grid-cols-2 gap-2'>
+                            <div className='col-span-1'>
+                                <Input
+                                    props={{
+                                        id: 'marital_status',
+                                        name: 'marital_status',
+                                        value: formValues.marital_status,
+                                        onChange: (e) => setFormValues(prev => ({
+                                            ...prev,
+                                            marital_status: e.target.value,
+                                        })),
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
+                                    label='Estado civil'
+                                    icon={<UserIcon className='icon' size={24} />}
+                                    color={colorPage}
+                                    required={false}
+                                />
+                            </div>
+                            <div className='col-span-1'>
+                                <Input
+                                    props={{
+                                        id: 'nationality',
+                                        name: 'nationality',
+                                        value: formValues.nationality,
+                                        onChange: (e) => setFormValues(prev => ({
+                                            ...prev,
+                                            nationality: e.target.value,
+                                        })),
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
+                                    label='Nacionalidad'
+                                    icon={<GlobeIcon className='icon' size={24} />}
+                                    color={colorPage}
+                                    required={false}
+                                />
+                            </div>
+                            <div className='col-span-1'>
+                                <Input
+                                    props={{
+                                        id: 'income_amount',
+                                        name: 'income_amount',
+                                        type: 'number',
+                                        min: 0,
+                                        step: 0.01,
+                                        value: formValues.income_amount,
+                                        onChange: (e) => setFormValues(prev => ({
+                                            ...prev,
+                                            income_amount: !isNaN(parseFloat(e.target.value)) ? parseFloat(e.target.value) : 0,
+                                        })),
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
+                                    label='Monto de ingresos mensuales'
+                                    icon={'Q'}
+                                    color={colorPage}
+                                    required={false}
+                                />
+                            </div>
+                            <div className='col-span-1'>
+                                <Input
+                                    props={{
+                                        id: 'current_job',
+                                        name: 'current_job',
+                                        value: formValues.current_job,
+                                        onChange: (e) => setFormValues(prev => ({
+                                            ...prev,
+                                            current_job: e.target.value
+                                        })),
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
+                                    label='Trabajo actual'
+                                    icon={<JobSearchIcon className='icon' size={24} />}
+                                    color={colorPage}
+                                    required={false}
+                                />
+                            </div>
+                            <div className='col-span-1'>
+                                <Input
+                                    props={{
+                                        id: 'time_job',
+                                        name: 'time_job',
+                                        value: formValues.time_job,
+                                        onChange: (e) => setFormValues(prev => ({
+                                            ...prev,
+                                            time_job: e.target.value
+                                        })),
+                                        disabled: ['details', 'delete'].includes(type)
+                                    }}
+                                    label='Tiempo en el trabajo'
+                                    icon={<PermanentJobIcon className='icon' size={24} />}
+                                    color={colorPage}
+                                    required={false}
+                                />
+                            </div>
                             <div className='col-span-1'>
                                 <Input
                                     props={{

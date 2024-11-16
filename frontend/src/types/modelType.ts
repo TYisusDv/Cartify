@@ -85,6 +85,11 @@ export interface Client {
     id?: number;
     email?: string;
     allow_credit?: boolean | '0' | '1' | 0 | 1;
+    marital_status?: string;
+    nationality?: string;
+    income_amount?: number;
+    current_job?: string;
+    time_job?: string;
     note?: string;
     date_reg?: string;
     location?: Location;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getCountSuppliers } from '../../../services/suppliersService';
-import { Invoice02Icon, Pdf01Icon, PencilEdit02Icon, ShoppingBasketSecure03Icon } from 'hugeicons-react';
+import { ContractsIcon, Invoice02Icon, Pdf01Icon, PencilEdit02Icon, ShoppingBasketSecure03Icon, SignatureIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import DelayedSuspense from '../../../components/DelayedSuspense';
 import SkeletonLoader from '../../../components/SkeletonLoader';
@@ -11,11 +11,12 @@ import { Link } from 'react-router-dom';
 import Modal from '../../../components/Modal';
 import CrudPage from './Crud';
 import { URL_BACKEND } from '../../../services/apiService';
+import SignaturePad from '../../../components/Signature';
 
 const ManageSalesPage: React.FC = () => {
     const { translations } = useTranslations();
     const [selected, setSelected] = useState<number | undefined>();
-    const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, details: false });
+    const [isModalOpen, setIsModalOpen] = useState({ edit: false, signature: false });
     const [reloadTable, setReloadTable] = useState(0);
     const [countData, setCountData] = useState(0);
 
@@ -23,7 +24,7 @@ const ManageSalesPage: React.FC = () => {
         setReloadTable(prev => prev + 1);
     };
 
-    const toggleModal = (modalType: 'add' | 'edit' | 'delete' | 'details', isOpen: boolean) => {
+    const toggleModal = (modalType: 'edit' | 'signature', isOpen: boolean) => {
         setIsModalOpen(prev => ({ ...prev, [modalType]: isOpen }));
     };
 
@@ -57,6 +58,30 @@ const ManageSalesPage: React.FC = () => {
         window.open(`${URL_BACKEND}/pdf/certificate?id=${selected}`, '_blank');  
     }
 
+    const handleContract = () => {
+        window.open(`${URL_BACKEND}/pdf/contract?id=${selected}`, '_blank');  
+    }
+
+    const handleSaveSignature = async (signature: string) => {
+        try {
+          const response = await fetch('/api/save-signature/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ signature }),
+          });
+    
+          if (response.ok) {
+            alert("Firma guardada exitosamente.");
+          } else {
+            alert("Hubo un problema al guardar la firma.");
+          }
+        } catch (error) {
+          console.error("Error al enviar la firma:", error);
+        }
+    };
+
     return (
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
             <div className='flex items-center justify-between w-full p-8 animate__animated animate__fadeIn animate__faster'>
@@ -65,7 +90,9 @@ const ManageSalesPage: React.FC = () => {
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_sales_info}</span>
                 </div>
                 <div className='flex gap-2'>
-                   <button className='bg-red-500 text-white border-2 border-red-500 hover:bg-red-500/20 hover:text-red-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={handleCertificate} disabled={selected === undefined}><Pdf01Icon /></button>
+                    <button className='bg-red-500 text-white border-2 border-red-500 hover:bg-red-500/20 hover:text-red-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={handleContract} disabled={selected === undefined}><ContractsIcon /></button>
+                    <button className='bg-red-500 text-white border-2 border-red-500 hover:bg-red-500/20 hover:text-red-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={handleCertificate} disabled={selected === undefined}><Pdf01Icon /></button>
+                    <button className='bg-blue-500 text-white border-2 border-blue-500 hover:bg-blue-500/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('signature', true)} disabled={selected === undefined}><SignatureIcon /></button>
                     <Link to={`/manage/sale/payments?id=${selected}`}><button className='bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' disabled={selected === undefined}><Invoice02Icon /></button></Link>
                     <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === undefined}><PencilEdit02Icon /></button>
                 </div>
@@ -96,7 +123,21 @@ const ManageSalesPage: React.FC = () => {
                 <Modal title={translations.edit_sale} onClose={() => setIsModalOpen({ ...isModalOpen, edit: false })}>
                     <CrudPage type='edit' selected_id={selected} onClose={() => setIsModalOpen({ ...isModalOpen, edit: false })} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
-            )}        
+            )} 
+            {isModalOpen.signature && (
+                <Modal title='Firmar venta' onClose={() => setIsModalOpen({ ...isModalOpen, signature: false })}>
+                    <div className='flex flex-col gap-2'>
+                        <div>
+                            <h2 className='mb-1 text-black dark:text-white'>Firma del comprador</h2>
+                            <SignaturePad onSave={handleSaveSignature} />
+                        </div>
+                        <div>
+                            <h2 className='mb-1 text-black dark:text-white'>Firma del fiador</h2>
+                            <SignaturePad onSave={handleSaveSignature} />
+                        </div>
+                    </div>
+                </Modal>
+            )}       
         </DelayedSuspense>
     );
 };

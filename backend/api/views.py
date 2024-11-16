@@ -672,6 +672,7 @@ class ManageClientsAPIView(APIView):
         with transaction.atomic():
             data = request.data
             person = data.get('person', {})
+            addresses = person.get('addresses', [])
 
             person_serializer = AddEditPersonSerializer(data = person)
             if not person_serializer.is_valid():
@@ -679,6 +680,20 @@ class ManageClientsAPIView(APIView):
                 return JsonResponse({'success': False, 'resp': person_serializer.errors}, status = 400)
 
             person_instance = person_serializer.save()
+
+            if not addresses:
+                transaction.set_rollback(True)
+                return JsonResponse({'success': False, 'resp': 'Address not found'}, status = 400)
+            
+            address = addresses[0]
+            address['person_id'] = str(person_instance.id)
+            
+            address_serializer = AddEditAddressesSerializer(data = address)
+            if not address_serializer.is_valid():
+                transaction.set_rollback(True)
+                return JsonResponse({'success': False, 'resp': address_serializer.errors}, status = 400)
+
+            address_serializer.save()
 
             data['person_id'] = person_instance.id
 
@@ -695,6 +710,8 @@ class ManageClientsAPIView(APIView):
         with transaction.atomic():
             data = request.data
             data_id = data.get('id', None)
+            person = data.get('person', {})
+            addresses = person.get('addresses', [])
 
             client_serializer = GetClientSerializer(data = data)  
             if not client_serializer.is_valid():
@@ -707,8 +724,6 @@ class ManageClientsAPIView(APIView):
             client_instance = self.get_object(pk = data_id)  
             person_instance = client_instance.person   
 
-            person = data.get('person', {})
-
             person_serializer = AddEditPersonSerializer(person_instance, data = person)
             if not person_serializer.is_valid():
                 transaction.set_rollback(True)
@@ -717,6 +732,24 @@ class ManageClientsAPIView(APIView):
             person_serializer.save()
 
             data['person_id'] = person_instance.id
+
+            person_instance = person_serializer.save()
+
+            if not addresses:
+                transaction.set_rollback(True)
+                return JsonResponse({'success': False, 'resp': 'Address not found'}, status = 400)
+            
+            address_instance = person_instance.addresses.all().first()
+
+            address = addresses[0]
+            address['person_id'] = str(person_instance.id)
+
+            address_serializer = AddEditAddressesSerializer(address_instance, data = address)
+            if not address_serializer.is_valid():
+                transaction.set_rollback(True)
+                return JsonResponse({'success': False, 'resp': address_serializer.errors}, status = 400)
+
+            address_serializer.save()
 
             client_serializer = AddEditClientSerializer(client_instance, data = data)
             if not client_serializer.is_valid():
@@ -4207,12 +4240,16 @@ class PDFContractAPIView(APIView):
 
         instance_sale = ManageSalesAPIView.get_object(sale_id)
         inventory_items = instance_sale.inventory_sale.all()
+        sale_payments = instance_sale.sale_payments_sale.all()
+        addresses = instance_sale.client.person.addresses.all()
         
         data = {
             'base_url': request.build_absolute_uri('/'),
             'uuid': uuid.uuid4(),
             'sale': instance_sale,
-            'inventory': inventory_items
+            'inventory': inventory_items,
+            'sale_payments': sale_payments,
+            'addresses': addresses
         }
 
         html = settings.BASE_DIR / 'api/templates/pdf/contract.html'
@@ -4234,7 +4271,6 @@ class PDFContractAPIView(APIView):
         response['Content-Disposition'] = f'inline; filename="Contract-{sale_id}.pdf"'
         return response
         
-
 #Excel clients
 class ExcelClientsAPIView(APIView):
     #authentication_classes = [JWTAuthentication]

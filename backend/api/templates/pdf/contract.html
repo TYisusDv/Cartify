@@ -38,12 +38,12 @@
       </h1>
     </div>
     <p class="text-justify -mt-10">
-      En la Aldea San Lorenzo el Cubo, departamento de Sácatepéquez el día ___ compadecen, por una parte, la sociedad
+      En la Aldea San Lorenzo el Cubo, departamento de Sácatepéquez el día {{sale.date_reg|format_date_spanish}} compadecen, por una parte, la sociedad
       guatemalteca GRUPO INNOVACIÓN EMPRESARIAL, S.A., quien se identifica con el número de patente comercial <strong>491493</strong> y
       quien en este contrato se denominará como el VENDEDOR; y por otra parte el señor(a), quien para los efectos del
       presente contrato se denominará como COMPRADOR:
     </p>
-    <div class="container mx-auto mt-2">
+    <div class="container mx-auto mt-2 p-px">
       <table class="min-w-full table-auto">
         <thead>
           <tr>
@@ -61,11 +61,15 @@
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Estado civil:</td>
-            <td colspan="2" class="px-2 py-px border border-black"></td>
+            <td colspan="2" class="px-2 py-px border border-black">
+              {{sale.client.marital_status}}
+            </td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Edad:</td>
             <td colspan="2" class="px-2 py-px border border-black">{{sale.client.person.birthdate|years_since}} años</td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Nacionalidad:</td>
-            <td colspan="2" class="px-2 py-px border border-black"></td>
+            <td colspan="2" class="px-2 py-px border border-black">
+              {{sale.client.nationality}}
+            </td>
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Profesión y oficio:</td>
@@ -77,22 +81,25 @@
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Residencia actual:</td>
-            <td colspan="7" class="px-2 py-px border border-black"></td>
+            <td colspan="7" class="px-2 py-px border border-black">
+              {{addresses.0.street}}, {{addresses.0.city.name}}, {{addresses.0.city.state.name}}, {{addresses.0.city.state.country.name}}
+            </td>
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Correo electrónico:</td>
             <td colspan="3" class="px-2 py-px border border-black">
               {{sale.client.email}}
             </td>
-            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Monto de ingresos mensuales:
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Monto de ingresos mensuales:</td>
+            <td colspan="3" class="px-2 py-px border border-black">
+              Q{{sale.client.income_amount|format_number}}
             </td>
-            <td colspan="3" class="px-2 py-px border border-black"></td>
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Trabajo actual:</td>
-            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="3" class="px-2 py-px border border-black">{{sale.client.current_job}}</td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Tiempo:</td>
-            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="3" class="px-2 py-px border border-black">{{sale.client.time_job}}</td>
           </tr>
         </tbody>
       </table>
@@ -205,15 +212,15 @@
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Enganche:</td>
-            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="3" class="px-2 py-px border border-black">Q{{sale_payments.0.subtotal|format_number}}</td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Monto de cada abono:</td>
-            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="3" class="px-2 py-px border border-black">Q{{sale_payments.1.subtotal|format_number}}</td>
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Saldo pendiente:</td>
-            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="3" class="px-2 py-px border border-black">Q{{sale_payments.0.total_remaining|format_number}}</td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Día de pago:</td>
-            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="3" class="px-2 py-px border border-black">Día {{sale_payments.0.date_limit|extract_day}}</td>
           </tr>
         </tbody>
       </table>
@@ -286,7 +293,7 @@
       </div>
     </div>
     <p class="text-justify mt-20">
-      En el municipio de Ciudad Vieja, departamento de Sácatepéquez el día ___ como notario, DOY FE: que las firmas que
+      En el municipio de Ciudad Vieja, departamento de Sácatepéquez el día {{sale.date_reg|format_date_spanish}} como notario, DOY FE: que las firmas que
       anteceden son auténticas, por haberlas puesto hoy en este municipio y en mi presencia, y en su orden GRUPO
       INNOVACIÓN EMPRESARIAL, S.A., quien se identifica con número de patente comerical <strong>491493</strong>, y el señor(a) ___ quien
       se identifica con documento personal de identificación CUI ___ persona de mi conocimiento el primero, no así el
@@ -326,9 +333,9 @@
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Fecha:</td>
-            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="3" class="px-2 py-px border border-black">{{sale.date_reg|filter_format_datetime_local}}</td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Teléfono:</td>
-            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="3" class="px-2 py-px border border-black">{{sale.client.person.mobile}}</td>
           </tr>
         </tbody>
       </table>
@@ -385,15 +392,15 @@
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Enganche:</td>
-            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="3" class="px-2 py-px border border-black">Q{{sale_payments.0.subtotal|format_number}}</td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Monto de cada abono:</td>
-            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="3" class="px-2 py-px border border-black">Q{{sale_payments.1.subtotal|format_number}}</td>
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Saldo pendiente:</td>
-            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="3" class="px-2 py-px border border-black">Q{{sale_payments.0.total_remaining|format_number}}</td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Día de pago:</td>
-            <td colspan="3" class="px-2 py-px border border-black"></td>
+            <td colspan="3" class="px-2 py-px border border-black">Día {{sale_payments.0.date_limit|extract_day}}</td>
           </tr>
         </tbody>
       </table>
@@ -506,6 +513,7 @@
             </td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Fecha</td>
             <td colspan="3" class="px-2 py-px border border-black">
+              {{sale.date_reg|filter_format_datetime_local}}
             </td>
           </tr>
         </tbody>
