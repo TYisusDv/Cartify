@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.core.files.storage import default_storage
 import uuid, os
 
 def upload_to_identifications(instance, filename):
@@ -17,6 +18,11 @@ def upload_to_products(instance, filename):
     ext = filename.split('.')[-1]
     filename = f'{uuid.uuid4()}.{ext}'
     return os.path.join('products', filename)
+
+def upload_to_signatures(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f'{uuid.uuid4()}.{ext}'
+    return os.path.join('signatures', filename)
 
 class LocationsModel(models.Model):
     id = models.AutoField(primary_key = True)
@@ -383,3 +389,27 @@ class ExpensePaymentsModel(models.Model):
     
     class Meta: 
         db_table = 'expense_payments'
+
+class SignatureImagesModel(models.Model):
+    sale = models.ForeignKey(SalesModel, related_name = 'signature_images', on_delete = models.CASCADE)
+    type = models.IntegerField(null = False, blank = False)  
+    signature = models.ImageField(null = True, blank = False)
+
+    class Meta: 
+        db_table = 'signature_images'
+        constraints = [
+            models.UniqueConstraint(fields=['sale', 'type'], name='unique_sale_type')
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.signature and not self.pk:
+            ext = self.signature.name.split('.')[-1] 
+            new_name = f'signatures/{uuid.uuid4()}.{ext}' 
+            self.signature.name = new_name
+
+        try:
+            super().save(*args, **kwargs)
+        except Exception as e:
+            if self.signature and default_storage.exists(self.signature.name):
+                default_storage.delete(self.signature.name)
+            raise e

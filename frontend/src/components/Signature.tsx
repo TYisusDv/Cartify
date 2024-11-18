@@ -1,3 +1,4 @@
+import { CleanIcon } from 'hugeicons-react';
 import React, { useRef } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 
@@ -12,41 +13,35 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSave }) => {
         sigCanvas.current?.clear();
     };
 
-    const save = () => {
+    const saveSignature = () => {
         if (sigCanvas.current?.isEmpty()) {
-            alert("Por favor, realiza la firma antes de guardar.");
-            return;
-        } else if (!sigCanvas.current) {
-            alert("Por favor, realiza la firma antes de guardar.");
+            return; 
+        }
+        else if (!sigCanvas.current) {
             return;
         }
 
         const signature = sigCanvas.current.getTrimmedCanvas().toDataURL('image/png');
-        onSave(signature);
+        onSave(signature); 
     };
 
     return (
-        <>
-            <div className='flex justify-center'>
-                <SignatureCanvas
-                    ref={sigCanvas}
-                    penColor="black"
-                    canvasProps={{
-                        width: 400,
-                        height: 200,
-                        style: { border: '1px solid #000', background: "#fff" },
-                    }}
-                />
-            </div>
-            <div className='flex gap-2 mt-2'>
-                <button onClick={clear} className={`btn btn-yellow h-10`}>
-                    Limpiar firma
-                </button>
-                <button onClick={save} className={`btn btn-blue h-10`}>
-                    Guardar firma
+        <div className='flex gap-2'>
+            <SignatureCanvas
+                ref={sigCanvas}
+                penColor="black"
+                canvasProps={{
+                    height: 100,
+                    style: { width: '100%', border: '1px solid #000', background: '#fff' },
+                }}
+                onEnd={saveSignature}
+            />
+            <div>
+                <button type='button' onClick={clear} className='btn rounded-xl btn-yellow w-10 h-full'>
+                    <CleanIcon />
                 </button>
             </div>
-        </>
+        </div>
     );
 };
 

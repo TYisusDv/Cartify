@@ -2,10 +2,9 @@ from rest_framework import serializers
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
-from django.utils.timezone import localtime
 from django.db.models import Q, F, Sum
 from .models import *
-import json, base64
+import base64
 
 #Serializer Base64ImageField
 class Base64ImageField(serializers.ImageField):
@@ -358,7 +357,6 @@ class AddEditPersonSerializer(serializers.ModelSerializer):
         
         instance.save()
         return instance
-
     
     class Meta:
         model = PersonsModel
@@ -1518,6 +1516,37 @@ class GetSalePaymentSerializer(serializers.ModelSerializer):
         model = SalePaymentsModel
         fields = ['id']
 
+#Signature images
+class SignatureImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SignatureImagesModel
+        fields = '__all__'
+
+class AddEditSignatureImageSerializer(serializers.ModelSerializer):
+    type = serializers.ChoiceField(choices=[1, 2, 3])
+    
+    signature = Base64ImageField(
+        error_messages = {
+            'required': 'The signature image is required.',
+            'blank': 'The signature image cannot be blank.',
+            'null': 'The signature image cannot be blank.',
+            'invalid': 'The signature image is invalid.',
+        }, validators=[
+            FileExtensionValidator(allowed_extensions = ['jpg', 'jpeg', 'png'])
+        ]
+    )
+
+    sale_id = serializers.IntegerField(error_messages = {
+        'required': 'The sale is required.',
+        'blank': 'The sale cannot be blank.',
+        'null': 'The sale cannot be blank.',
+        'invalid': 'The sale is invalid.',
+    })
+
+    class Meta:
+        model = SignatureImagesModel
+        exclude = ['sale']
+
 #Sale
 class SalesSerializer(serializers.ModelSerializer):
     last_pending_payment = serializers.SerializerMethodField()
@@ -1527,6 +1556,7 @@ class SalesSerializer(serializers.ModelSerializer):
     location = LocationsSerializer(read_only = True)
     user = UserExcludeSerializer(read_only = True)
     status = SaleStatusSerializer(read_only = True)
+    signature_images = SignatureImagesSerializer(many = True, read_only = True)
 
     def get_last_pending_payment(self, obj):
         sale_payments = SalePaymentsModel.objects.filter(sale_id = obj.id)            

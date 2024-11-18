@@ -38,8 +38,10 @@
       </h1>
     </div>
     <p class="text-justify -mt-10">
-      En la Aldea San Lorenzo el Cubo, departamento de Sácatepéquez el día {{sale.date_reg|format_date_spanish}} compadecen, por una parte, la sociedad
-      guatemalteca GRUPO INNOVACIÓN EMPRESARIAL, S.A., quien se identifica con el número de patente comercial <strong>491493</strong> y
+      En la Aldea San Lorenzo el Cubo, departamento de Sácatepéquez el día {{sale.date_reg|format_date_spanish}}
+      compadecen, por una parte, la sociedad
+      guatemalteca GRUPO INNOVACIÓN EMPRESARIAL, S.A., quien se identifica con el número de patente comercial
+      <strong>491493</strong> y
       quien en este contrato se denominará como el VENDEDOR; y por otra parte el señor(a), quien para los efectos del
       presente contrato se denominará como COMPRADOR:
     </p>
@@ -65,7 +67,8 @@
               {{sale.client.marital_status}}
             </td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Edad:</td>
-            <td colspan="2" class="px-2 py-px border border-black">{{sale.client.person.birthdate|years_since}} años</td>
+            <td colspan="2" class="px-2 py-px border border-black">{{sale.client.person.birthdate|years_since}} años
+            </td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Nacionalidad:</td>
             <td colspan="2" class="px-2 py-px border border-black">
               {{sale.client.nationality}}
@@ -82,7 +85,8 @@
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Residencia actual:</td>
             <td colspan="7" class="px-2 py-px border border-black">
-              {{addresses.0.street}}, {{addresses.0.city.name}}, {{addresses.0.city.state.name}}, {{addresses.0.city.state.country.name}}
+              {{addresses.0.street}}, {{addresses.0.city.name}}, {{addresses.0.city.state.name}},
+              {{addresses.0.city.state.country.name}}
             </td>
           </tr>
           <tr>
@@ -90,7 +94,8 @@
             <td colspan="3" class="px-2 py-px border border-black">
               {{sale.client.email}}
             </td>
-            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Monto de ingresos mensuales:</td>
+            <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Monto de ingresos mensuales:
+            </td>
             <td colspan="3" class="px-2 py-px border border-black">
               Q{{sale.client.income_amount|format_number}}
             </td>
@@ -118,7 +123,8 @@
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Nombre completo:</td>
             <td colspan="3" class="px-2 py-px border border-black">
-              {{sale.client.person.firstname}} {{sale.client.person.middlename}} {{sale.client.person.lastname}} {{sale.client.person.second_lastname}}
+              {{sale.client.person.firstname}} {{sale.client.person.middlename}} {{sale.client.person.lastname}}
+              {{sale.client.person.second_lastname}}
             </td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">DPI:</td>
             <td colspan="3" class="px-2 py-px border border-black">{{sale.client.person.identification_id}}</td>
@@ -218,13 +224,14 @@
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Saldo pendiente:</td>
-            <td colspan="3" class="px-2 py-px border border-black">Q{{sale_payments.0.total_remaining|format_number}}</td>
+            <td colspan="3" class="px-2 py-px border border-black">Q{{sale_payments.0.total_remaining|format_number}}
+            </td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Día de pago:</td>
             <td colspan="3" class="px-2 py-px border border-black">Día {{sale_payments.0.date_limit|extract_day}}</td>
           </tr>
         </tbody>
       </table>
-    </div>  
+    </div>
     <p class="text-justify mt-2">
       Lugar de pago: MI HOGAR ELECTRODOMÉSTICOS 5ª. Av. casa No. 17 A Zona 0 San Loreno el Cubo, Ciudad Vieja
       Sacatepéquez. INTERESES MORATORIOS, en tal concepto será del cinco por ciento (5%) mensual sobre el saldo más
@@ -279,38 +286,58 @@
       contrato y para constancia y seguridad, se extiende y firman en el mismo lugar y fecha indicados al principio del
       presente.
     </p>
-    <div class="flex justify-center gap-3 mt-32">
+    <div class="flex justify-center gap-3 mt-2">
       <div class="w-96 px-2">
+        <div class="flex items-end h-[100px]">
+          <img src="{{base_url}}v1{{signature_seller_url}}" />
+        </div>
         <p class="w-full text-center border-t border-black">(Vendedor)</p>
       </div>
       <div class="w-96 px-2">
+        <div class="flex items-end h-[100px]">
+          <img src="{{base_url}}v1{{signature_buyer_url}}" />
+        </div>
         <p class="w-full text-center border-t border-black">(Comprador)</p>
       </div>
     </div>
-    <div class="flex justify-center gap-2 mt-20">
+    <div class="flex justify-center gap-2 mt-2">
       <div class="w-96 px-2">
+        <div class="flex items-end h-[100px]">
+          <img src="{{base_url}}v1{{signature_guarantor_url}}" />
+        </div>
         <p class="w-full text-center border-t border-black">(Fiador)</p>
       </div>
     </div>
     <p class="text-justify mt-20">
-      En el municipio de Ciudad Vieja, departamento de Sácatepéquez el día {{sale.date_reg|format_date_spanish}} como notario, DOY FE: que las firmas que
+      En el municipio de Ciudad Vieja, departamento de Sácatepéquez el día {{sale.date_reg|format_date_spanish}} como
+      notario, DOY FE: que las firmas que
       anteceden son auténticas, por haberlas puesto hoy en este municipio y en mi presencia, y en su orden GRUPO
-      INNOVACIÓN EMPRESARIAL, S.A., quien se identifica con número de patente comerical <strong>491493</strong>, y el señor(a) ___ quien
+      INNOVACIÓN EMPRESARIAL, S.A., quien se identifica con número de patente comerical <strong>491493</strong>, y el
+      señor(a) ___ quien
       se identifica con documento personal de identificación CUI ___ persona de mi conocimiento el primero, no así el
       segundo ni el tecero quienes por tal motivo identifico por medio de su documento de identificación que tengo a la
       vista, en este domicilio y quienes para constancia y previa lectura, aceptación y ratificación firman de nuevo la
       presente.
     </p>
-    <div class="flex justify-center gap-3 mt-20">
+    <div class="flex justify-center gap-3 mt-2">
       <div class="w-96 px-2">
+        <div class="flex items-end h-[100px]">
+          <img src="{{base_url}}v1{{signature_seller_url}}" />
+        </div>
         <p class="w-full text-center border-t border-black">(Vendedor)</p>
       </div>
       <div class="w-96 px-2">
+        <div class="flex items-end h-[100px]">
+          <img src="{{base_url}}v1{{signature_buyer_url}}" />
+        </div>
         <p class="w-full text-center border-t border-black">(Comprador)</p>
       </div>
     </div>
-    <div class="flex justify-center gap-2 mt-20">
+    <div class="flex justify-center gap-2 mt-2">
       <div class="w-96 px-2">
+        <div class="flex items-end h-[100px]">
+          <img src="{{base_url}}v1{{signature_guarantor_url}}" />
+        </div>
         <p class="w-full text-center border-t border-black">(Fiador)</p>
       </div>
     </div>
@@ -328,7 +355,8 @@
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Nombre del cliente:</td>
             <td colspan="7" class="px-2 py-px border border-black">
-              {{sale.client.person.firstname}} {{sale.client.person.middlename}} {{sale.client.person.lastname}} {{sale.client.person.second_lastname}}
+              {{sale.client.person.firstname}} {{sale.client.person.middlename}} {{sale.client.person.lastname}}
+              {{sale.client.person.second_lastname}}
             </td>
           </tr>
           <tr>
@@ -398,7 +426,8 @@
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Saldo pendiente:</td>
-            <td colspan="3" class="px-2 py-px border border-black">Q{{sale_payments.0.total_remaining|format_number}}</td>
+            <td colspan="3" class="px-2 py-px border border-black">Q{{sale_payments.0.total_remaining|format_number}}
+            </td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Día de pago:</td>
             <td colspan="3" class="px-2 py-px border border-black">Día {{sale_payments.0.date_limit|extract_day}}</td>
           </tr>
@@ -409,7 +438,8 @@
       <table class="min-w-full table-auto">
         <thead>
           <tr>
-            <th colspan="8" class="px-2 py-px text-lg text-center border border-black">REFERENCIAS PERSONALES DEL COMPRADOR</th>
+            <th colspan="8" class="px-2 py-px text-lg text-center border border-black">REFERENCIAS PERSONALES DEL
+              COMPRADOR</th>
           </tr>
         </thead>
         <tbody>
@@ -428,7 +458,7 @@
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Teléfono:</td>
-            <td colspan="3" class="px-2 py-px border border-black">            
+            <td colspan="3" class="px-2 py-px border border-black">
             </td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Parentesco:</td>
             <td colspan="3" class="px-2 py-px border border-black">
@@ -454,7 +484,7 @@
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Teléfono:</td>
-            <td colspan="3" class="px-2 py-px border border-black">            
+            <td colspan="3" class="px-2 py-px border border-black">
             </td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Parentesco:</td>
             <td colspan="3" class="px-2 py-px border border-black">
@@ -480,7 +510,7 @@
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Teléfono:</td>
-            <td colspan="3" class="px-2 py-px border border-black">            
+            <td colspan="3" class="px-2 py-px border border-black">
             </td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Parentesco:</td>
             <td colspan="3" class="px-2 py-px border border-black">
@@ -509,7 +539,10 @@
           </tr>
           <tr>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Firma:</td>
-            <td colspan="3" class="px-2 py-px border border-black">            
+            <td colspan="3" class="px-2 py-px border border-black">
+              <div class="flex items-end h-[100px]">
+                <img src="{{base_url}}v1{{signature_buyer_url}}" />
+              </div>
             </td>
             <td colspan="1" class="px-2 py-px text-right font-medium border border-black">Fecha</td>
             <td colspan="3" class="px-2 py-px border border-black">
@@ -548,9 +581,15 @@
     <p class="mt-10">Firma de enterado:</p>
     <div class="flex justify-center gap-3 mt-32">
       <div class="w-96 px-2">
+        <div class="flex items-end h-[100px]">
+          <img src="{{base_url}}v1{{signature_buyer_url}}" />
+        </div>
         <p class="w-full text-center border-t border-black">(Comprador)</p>
       </div>
       <div class="w-96 px-2">
+        <div class="flex items-end h-[100px]">
+          <img src="{{base_url}}v1{{signature_guarantor_url}}" />
+        </div>
         <p class="w-full text-center border-t border-black">(Fiador)</p>
       </div>
     </div>

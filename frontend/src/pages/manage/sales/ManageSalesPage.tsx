@@ -12,10 +12,17 @@ import Modal from '../../../components/Modal';
 import CrudPage from './Crud';
 import { URL_BACKEND } from '../../../services/apiService';
 import SignaturePad from '../../../components/Signature';
+import { generateUUID } from '../../../utils/uuidGen';
+import { addAlert } from '../../../utils/Alerts';
+import { extractMessages } from '../../../utils/formUtils';
+import { addSignature } from '../../../services/Signature';
 
 const ManageSalesPage: React.FC = () => {
     const { translations } = useTranslations();
     const [selected, setSelected] = useState<number | undefined>();
+    const [signatureBuyer, setSigntureBuyer] = useState<string>('');
+    const [signatureGuarantor, setSigntureGuarantor] = useState<string>('');
+    const [signatureSeller, setSigntureSeller] = useState<string>('');
     const [isModalOpen, setIsModalOpen] = useState({ edit: false, signature: false });
     const [reloadTable, setReloadTable] = useState(0);
     const [countData, setCountData] = useState(0);
@@ -55,30 +62,39 @@ const ManageSalesPage: React.FC = () => {
     ];
 
     const handleCertificate = () => {
-        window.open(`${URL_BACKEND}/pdf/certificate?id=${selected}`, '_blank');  
+        window.open(`${URL_BACKEND}/pdf/certificate?id=${selected}`, '_blank');
     }
 
     const handleContract = () => {
-        window.open(`${URL_BACKEND}/pdf/contract?id=${selected}`, '_blank');  
+        window.open(`${URL_BACKEND}/pdf/contract?id=${selected}`, '_blank');
     }
 
-    const handleSaveSignature = async (signature: string) => {
+    const onSubmitSignature = async (e: React.FormEvent) => {        
         try {
-          const response = await fetch('/api/save-signature/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ signature }),
-          });
-    
-          if (response.ok) {
-            alert("Firma guardada exitosamente.");
-          } else {
-            alert("Hubo un problema al guardar la firma.");
-          }
+            e.preventDefault();
+            
+            const response = await addSignature(signatureBuyer, signatureGuarantor, signatureSeller, selected);
+            const response_resp = response?.resp;
+
+            addAlert({
+                id: generateUUID(),
+                title: 'Success',
+                msg: response_resp,
+                icon: 'CheckmarkCircle02Icon',
+                timeout: 2000
+            });
         } catch (error) {
-          console.error("Error al enviar la firma:", error);
+            const messages = extractMessages(error);
+            messages.forEach(msg => {
+                addAlert({
+                    id: generateUUID(),
+                    title: 'An error has occurred.',
+                    msg: msg,
+                    icon: 'Alert01Icon',
+                    color: 'red',
+                    timeout: 2000
+                });
+            });
         }
     };
 
@@ -110,34 +126,43 @@ const ManageSalesPage: React.FC = () => {
                     </div>
                 </div>
                 <div className='w-full mt-6'>
-                    <Table endpoint='manage/sales' 
+                    <Table endpoint='manage/sales'
                         unique='manage-sales'
-                        reloadTable={reloadTable} 
-                        header={table_header} 
-                        tbody={<TablePage selected={selected} setSelected={setSelected} />} 
+                        reloadTable={reloadTable}
+                        header={table_header}
+                        tbody={<TablePage selected={selected} setSelected={setSelected} />}
                         filters={<FiltersPage />}
                     />
                 </div>
-            </div>    
+            </div>
             {isModalOpen.edit && (
                 <Modal title={translations.edit_sale} onClose={() => setIsModalOpen({ ...isModalOpen, edit: false })}>
                     <CrudPage type='edit' selected_id={selected} onClose={() => setIsModalOpen({ ...isModalOpen, edit: false })} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
-            )} 
+            )}
             {isModalOpen.signature && (
                 <Modal title='Firmar venta' onClose={() => setIsModalOpen({ ...isModalOpen, signature: false })}>
-                    <div className='flex flex-col gap-2'>
+                    <form className='flex flex-col gap-2' autoComplete='off' onSubmit={onSubmitSignature}>
                         <div>
                             <h2 className='mb-1 text-black dark:text-white'>Firma del comprador</h2>
-                            <SignaturePad onSave={handleSaveSignature} />
+                            <SignaturePad onSave={setSigntureBuyer} />
                         </div>
                         <div>
                             <h2 className='mb-1 text-black dark:text-white'>Firma del fiador</h2>
-                            <SignaturePad onSave={handleSaveSignature} />
+                            <SignaturePad onSave={setSigntureGuarantor} />
                         </div>
-                    </div>
+                        <div>
+                            <h2 className='mb-1 text-black dark:text-white'>Firma del vendedor</h2>
+                            <SignaturePad onSave={setSigntureSeller} />
+                        </div>
+                        <div className='pt-2 mt-2 border-t-2 dark:border-slate-600'>
+                            <button type='submit' className="btn btn-blue h-10">
+                                Guardar firmas
+                            </button>
+                        </div>
+                    </form>
                 </Modal>
-            )}       
+            )}
         </DelayedSuspense>
     );
 };

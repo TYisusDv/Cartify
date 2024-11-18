@@ -34,6 +34,7 @@ urlpatterns = [
     path('manage/expenses/details', ManageExpenseDetailsAPIView.as_view(), name='manage-expense-details'),
     path('manage/expenses/payments', ManageExpensePaymentsAPIView.as_view(), name='manage-expense-payments'),
     path('manage/banks', ManageBanksAPIView.as_view(), name='manage-banks'),
+    path('manage/signatures', ManageSignaturesAPIView.as_view(), name='manage-signatures'),
     path('pdf/payment', PDFGeneratorAPIView.as_view(), name='pdf-payment'),
     path('pdf/certificate', PDFCertificateAPIView.as_view(), name='pdf-certificate'),
     path('pdf/contract', PDFContractAPIView.as_view(), name='pdf-contract'),

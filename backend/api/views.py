@@ -4044,7 +4044,62 @@ class ManageBanksAPIView(APIView):
             'success': True,
             'resp': 'Deleted successfully.'
         }, status = 200)
- 
+
+#Signatures
+class ManageSignaturesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+        
+    def post(self, request):
+        data = request.data
+        signature_buyer = data.get('signature_buyer', None)
+        signature_guarantor = data.get('signature_guarantor', None)
+        signature_seller = data.get('signature_seller', None)
+        sale_id = data.get('sale_id', None)
+
+        with transaction.atomic():
+            if signature_buyer and signature_guarantor and signature_seller and sale_id:
+                buyer = {
+                    'type': 1,
+                    'signature': signature_buyer,
+                    'sale_id': sale_id
+                }
+                serializer = AddEditSignatureImageSerializer(data = buyer)
+                if not serializer.is_valid():
+                    transaction.set_rollback(True)
+                    return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+                serializer.save()
+
+                guarantor = {
+                    'type': 2,
+                    'signature': signature_guarantor,
+                    'sale_id': sale_id
+                }
+                serializer = AddEditSignatureImageSerializer(data = guarantor)
+                if not serializer.is_valid():
+                    transaction.set_rollback(True)
+                    return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+                serializer.save()
+
+                seller = {
+                    'type': 3,
+                    'signature': signature_seller,
+                    'sale_id': sale_id
+                }
+                serializer = AddEditSignatureImageSerializer(data = seller)
+                if not serializer.is_valid():
+                    transaction.set_rollback(True)
+                    return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+                serializer.save()
+
+                return JsonResponse({'success': True, 'resp': 'Added successfully.'})
+        
+        transaction.set_rollback(True)
+        return JsonResponse({'success': False, 'resp': 'Empty signatures'}, status = 400)
+
 #PDF
 class PDFGeneratorAPIView(APIView):
     authentication_classes = []
@@ -4120,7 +4175,7 @@ class PDFGeneratorAPIView(APIView):
             'resp': 'Error generating PDF.'
         }, status = 500)
 
-# PDF Certificate
+#PDF Certificate
 class PDFCertificateAPIView(APIView):
     authentication_classes = []
     permission_classes = []
@@ -4229,7 +4284,7 @@ class PDFCertificateAPIView(APIView):
         response['Content-Disposition'] = 'inline; filename=certificate_page.pdf'
         return response
 
-# PDF Contract
+#PDF Contract
 class PDFContractAPIView(APIView):
     authentication_classes = []
     permission_classes = []
@@ -4242,6 +4297,14 @@ class PDFContractAPIView(APIView):
         inventory_items = instance_sale.inventory_sale.all()
         sale_payments = instance_sale.sale_payments_sale.all()
         addresses = instance_sale.client.person.addresses.all()
+
+        signature_buyer = SignatureImagesModel.objects.filter(sale_id = sale_id, type = 1).first()
+        signature_guarantor = SignatureImagesModel.objects.filter(sale_id = sale_id, type = 2).first()
+        signature_seller = SignatureImagesModel.objects.filter(sale_id = sale_id, type = 3).first()
+
+        signature_buyer_url = signature_buyer.signature.url if signature_buyer else None
+        signature_guarantor_url = signature_guarantor.signature.url if signature_guarantor else None
+        signature_seller_url = signature_seller.signature.url if signature_seller else None
         
         data = {
             'base_url': request.build_absolute_uri('/'),
@@ -4249,7 +4312,10 @@ class PDFContractAPIView(APIView):
             'sale': instance_sale,
             'inventory': inventory_items,
             'sale_payments': sale_payments,
-            'addresses': addresses
+            'addresses': addresses,
+            'signature_buyer_url': signature_buyer_url,
+            'signature_guarantor_url': signature_guarantor_url,
+            'signature_seller_url': signature_seller_url
         }
 
         html = settings.BASE_DIR / 'api/templates/pdf/contract.html'
