@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Add01Icon, Delete01Icon, Invoice01Icon, Invoice02Icon, PencilEdit02Icon, Tick01Icon } from 'hugeicons-react';
+import { Add01Icon, Delete02Icon, Invoice01Icon, Invoice02Icon, PencilEdit02Icon, Tick01Icon } from 'hugeicons-react';
 import useTranslations from '../../../../hooks/useTranslations';
 import DelayedSuspense from '../../../../components/DelayedSuspense';
 import SkeletonLoader from '../../../../components/SkeletonLoader';
@@ -9,6 +9,7 @@ import Crud from './Crud';
 import { useLocation, useNavigate } from 'react-router-dom';
 import TBody from './TBody';
 import { getCountPayments } from '../../../../services/ExprensePayments';
+import TooltipButton from '../../../../components/TooltipButton';
 
 const Payments: React.FC = () => {
     const { translations } = useTranslations();
@@ -27,11 +28,11 @@ const Payments: React.FC = () => {
 
     useEffect(() => {
         if (!expenseId) {
-          navigate('/manage/expenses');
-          setExpenseId(undefined);
-          return;
+            navigate('/manage/expenses');
+            setExpenseId(undefined);
+            return;
         }
-      }, [expenseId, navigate]);
+    }, [expenseId, navigate]);
 
     const handleTableReload = () => {
         setReloadTable(prev => prev + 1);
@@ -71,10 +72,27 @@ const Payments: React.FC = () => {
                     <h1 className='text-2xl font-bold dark:text-white'>Pagos</h1>
                     <span className='text-sm text-gray-600 dark:text-slate-400'>Administra Pagos</span>
                 </div>
-                <div className='flex gap-2'>
-                    <button className='bg-red-500 text-white border-2 border-red-500 hover:bg-red-500/20 hover:text-red-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('delete', true)} disabled={selected === undefined}><Delete01Icon /></button>
-                    <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === undefined}><PencilEdit02Icon /></button>
-                    <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('add', true)}><Add01Icon /></button>
+                <div className="flex gap-2">
+                    <TooltipButton
+                        tooltip="Eliminar"
+                        onClick={() => toggleModal("delete", true)}
+                        disabled={selected === undefined}
+                        className="bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Delete02Icon />}
+                    />
+                    <TooltipButton
+                        tooltip="Editar"
+                        onClick={() => toggleModal("edit", true)}
+                        disabled={selected === undefined}
+                        className="bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<PencilEdit02Icon />}
+                    />
+                    <TooltipButton
+                        tooltip="Agregar"
+                        onClick={() => toggleModal("add", true)}
+                        className="bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Add01Icon />}
+                    />
                 </div>
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
@@ -118,7 +136,7 @@ const Payments: React.FC = () => {
             )}
 
             {isModalOpen.edit && (
-                <Modal title='Editar pago de la factura por pagar'  onClose={() => setIsModalOpen({ ...isModalOpen, edit: false })}>
+                <Modal title='Editar pago de la factura por pagar' onClose={() => setIsModalOpen({ ...isModalOpen, edit: false })}>
                     <Crud type='edit' expenseId={expenseId} selected_id={selected} onClose={() => setIsModalOpen({ ...isModalOpen, edit: false })} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}

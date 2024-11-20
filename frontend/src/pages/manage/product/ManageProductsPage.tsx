@@ -15,6 +15,7 @@ import SuppliersCrudPage from '../suppliers/CrudPage';
 import TaxCrudPage from '../taxes/CrudPage';
 import FiltersPage from './filtersPage';
 import ModalPhotos from '../../../components/ModalPhotos';
+import TooltipButton from '../../../components/TooltipButton';
 
 
 const ManageProductsPage: React.FC = () => {
@@ -22,7 +23,7 @@ const ManageProductsPage: React.FC = () => {
     const [selected, setSelected] = useState<string>('');
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, details: false, add_brand: false, add_category: false, add_supplier: false, add_tax: false, product_images: false });
     const [reloadTable, setReloadTable] = useState(0);
-    const [countData, setCountData] = useState({total: 0, visible: 0, hidden: 0});
+    const [countData, setCountData] = useState({ total: 0, visible: 0, hidden: 0 });
     const [imageUrl, setImageUrl] = useState<string>('');
 
     const handleTableReload = () => {
@@ -66,12 +67,36 @@ const ManageProductsPage: React.FC = () => {
                     <h1 className='text-2xl font-bold dark:text-white'>{translations.products}</h1>
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_products_info}</span>
                 </div>
-                <div className='flex gap-2'>
-                    <button className='bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('delete', true)} disabled={selected === ''}><Delete02Icon /></button>
-                    <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === ''}><PencilEdit02Icon /></button>
-                    <button className='bg-orange-500 text-white border-2 border-orange-500 hover:bg-orange-500/20 hover:text-orange-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-orange-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('details', true)} disabled={selected === ''}><EyeIcon /></button>
-                    <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('add', true)}><Add01Icon /></button>
+                <div className="flex gap-2">
+                    <TooltipButton
+                        tooltip="Eliminar"
+                        onClick={() => toggleModal('delete', true)}
+                        disabled={selected === ''}
+                        className="bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Delete02Icon />}
+                    />
+                    <TooltipButton
+                        tooltip="Editar"
+                        onClick={() => toggleModal('edit', true)}
+                        disabled={selected === ''}
+                        className="bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<PencilEdit02Icon />}
+                    />
+                    <TooltipButton
+                        tooltip="Ver detalles"
+                        onClick={() => toggleModal('details', true)}
+                        disabled={selected === ''}
+                        className="bg-orange-500 text-white border-2 border-orange-500 hover:bg-orange-500/20 hover:text-orange-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-orange-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<EyeIcon />}
+                    />
+                    <TooltipButton
+                        tooltip="Agregar"
+                        onClick={() => toggleModal('add', true)}
+                        className="bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Add01Icon />}
+                    />
                 </div>
+
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 border-t-2 border-b-2 border-gray-100 py-6 dark:border-slate-600'>
@@ -104,18 +129,18 @@ const ManageProductsPage: React.FC = () => {
                     </div>
                 </div>
                 <div className='w-full mt-6'>
-                    <Table 
-                        endpoint='manage/products' 
-                        reloadTable={reloadTable} 
-                        header={table_header} 
+                    <Table
+                        endpoint='manage/products'
+                        reloadTable={reloadTable}
+                        header={table_header}
                         tbody={
-                            <TablePage 
-                                selected={selected} 
+                            <TablePage
+                                selected={selected}
                                 toggleModal={toggleModal}
                                 setSelected={setSelected}
                                 setImageUrl={setImageUrl}
                             />
-                        } 
+                        }
                         filters={<FiltersPage />}
                     />
                 </div>
@@ -142,31 +167,31 @@ const ManageProductsPage: React.FC = () => {
                 <Modal title={translations.details_product} onClose={() => toggleModal('details', false)} className='max-w-screen-md'>
                     <CrudPage type='details' setImageUrl={setImageUrl} selected_id={selected} onClose={() => toggleModal('details', false)} handleTableReload={handleTableReload} setSelected={setSelected} toggleModal={toggleModal} />
                 </Modal>
-            )} 
+            )}
 
             {isModalOpen.add_brand && (
                 <Modal title={translations.add_product_brand} onClose={() => toggleModal('add_brand', false)}>
                     <BrandsCrudPage type='add' onClose={() => toggleModal('add_brand', false)} />
                 </Modal>
-            )}  
+            )}
 
             {isModalOpen.add_category && (
                 <Modal title={translations.add_product_category} onClose={() => toggleModal('add_category', false)}>
                     <CategoriesCrudPage type='add' onClose={() => toggleModal('add_category', false)} />
                 </Modal>
-            )}   
+            )}
 
             {isModalOpen.add_supplier && (
                 <Modal title={translations.add_supplier} onClose={() => toggleModal('add_supplier', false)}>
                     <SuppliersCrudPage type='add' onClose={() => toggleModal('add_supplier', false)} />
                 </Modal>
-            )} 
+            )}
 
             {isModalOpen.add_tax && (
                 <Modal title={translations.add_tax} onClose={() => toggleModal('add_tax', false)}>
                     <TaxCrudPage type='add' onClose={() => toggleModal('add_tax', false)} />
                 </Modal>
-            )} 
+            )}
 
             {isModalOpen.product_images && (
                 <ModalPhotos onClose={() => toggleModal('product_images', false)}>
@@ -174,7 +199,7 @@ const ManageProductsPage: React.FC = () => {
                         <img src={`${URL_BACKEND}${imageUrl}`} alt='Product' className='rounded-2xl' />
                     </div>
                 </ModalPhotos>
-            )}          
+            )}
         </DelayedSuspense>
     );
 };

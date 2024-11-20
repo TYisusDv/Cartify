@@ -8,6 +8,7 @@ import Modal from '../../../../components/Modal';
 import TablePage from './TBody';
 import CrudPage from './Crud';
 import { getCount } from '../../../../services/TypesIDs';
+import TooltipButton from '../../../../components/TooltipButton';
 
 const Identifications: React.FC = () => {
     const { translations } = useTranslations();
@@ -50,10 +51,27 @@ const Identifications: React.FC = () => {
                     <h1 className='text-2xl font-bold dark:text-white'>{translations.identifications}</h1>
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_identifications_info}</span>
                 </div>
-                <div className='flex gap-2'>
-                    <button className='bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('delete', true)} disabled={selected === undefined}><Delete02Icon /></button>
-                    <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === undefined}><PencilEdit02Icon /></button>
-                    <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('add', true)}><Add01Icon /></button>
+                <div className="flex gap-2">
+                    <TooltipButton
+                        tooltip="Eliminar"
+                        onClick={() => toggleModal("delete", true)}
+                        disabled={selected === undefined}
+                        className="bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Delete02Icon />}
+                    />
+                    <TooltipButton
+                        tooltip="Editar"
+                        onClick={() => toggleModal("edit", true)}
+                        disabled={selected === undefined}
+                        className="bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<PencilEdit02Icon />}
+                    />
+                    <TooltipButton
+                        tooltip="Agregar"
+                        onClick={() => toggleModal("add", true)}
+                        className="bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Add01Icon />}
+                    />
                 </div>
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>

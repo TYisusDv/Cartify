@@ -15,6 +15,7 @@ import { generateUUID } from '../../../../utils/uuidGen';
 import { extractMessages, formatNumber } from '../../../../utils/formUtils';
 import apiService from '../../../../services/apiService';
 import { IconFileExcel } from '@tabler/icons-react';
+import TooltipButton from '../../../../components/TooltipButton';
 
 const Sales: React.FC = () => {
     const { translations } = useTranslations();
@@ -30,7 +31,7 @@ const Sales: React.FC = () => {
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
     const formattedTomorrow = tomorrow.toISOString().split('T')[0];
-    const [formValues, setFormValues] = useState<CashRegisterType>({date_1: formattedToday, date_2: formattedTomorrow});
+    const [formValues, setFormValues] = useState<CashRegisterType>({ date_1: formattedToday, date_2: formattedTomorrow });
 
     const handleTableReload = () => {
         setReloadTable(prev => prev + 1);
@@ -102,12 +103,35 @@ const Sales: React.FC = () => {
                     <h1 className='text-2xl font-bold dark:text-white'>{translations.cash_register}</h1>
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_cash_register}</span>
                 </div>
-                <div className='flex gap-2'>
-                    <button className='bg-green-600 text-white border-2 border-green-600 hover:bg-green-600/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={downloadExcel}><IconFileExcel /></button>
-                    <button className='bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => setIsModalOpen({...isModalOpen, delete: true})} disabled={selected === undefined}><Delete02Icon /></button>
-                    <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => setIsModalOpen({...isModalOpen, edit: true})} disabled={selected === undefined}><PencilEdit02Icon /></button>
-                    <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => setIsModalOpen({...isModalOpen, add: true})}><Add01Icon /></button>
+                <div className="flex gap-2">
+                    <TooltipButton
+                        tooltip="Descargar Excel"
+                        onClick={downloadExcel}
+                        className="bg-green-600 text-white border-2 border-green-600 hover:bg-green-600/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<IconFileExcel />}
+                    />
+                    <TooltipButton
+                        tooltip="Eliminar"
+                        onClick={() => setIsModalOpen({ ...isModalOpen, delete: true })}
+                        disabled={selected === undefined}
+                        className="bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Delete02Icon />}
+                    />
+                    <TooltipButton
+                        tooltip="Editar"
+                        onClick={() => setIsModalOpen({ ...isModalOpen, edit: true })}
+                        disabled={selected === undefined}
+                        className="bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<PencilEdit02Icon />}
+                    />
+                    <TooltipButton
+                        tooltip="Agregar"
+                        onClick={() => setIsModalOpen({ ...isModalOpen, add: true })}
+                        className="bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Add01Icon />}
+                    />
                 </div>
+
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t-2 border-b-2 border-gray-100 py-6 dark:border-slate-600'>
@@ -131,16 +155,16 @@ const Sales: React.FC = () => {
                     </div>
                 </div>
                 <div className='w-full mt-6'>
-                    <Table 
-                        endpoint='manage/cashregister' 
-                        reloadTable={reloadTable} 
-                        header={table_header} 
+                    <Table
+                        endpoint='manage/cashregister'
+                        reloadTable={reloadTable}
+                        header={table_header}
                         tbody={
-                            <TablePage 
-                                selected={selected} 
-                                setSelected={setSelected} 
+                            <TablePage
+                                selected={selected}
+                                setSelected={setSelected}
                             />
-                        } 
+                        }
                         filters={<Filters formValuesPage={formValues} setFormValuesPage={setFormValues} />}
                         filters_params={formValues}
                     />

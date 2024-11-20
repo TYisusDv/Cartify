@@ -18,7 +18,7 @@ const TBodyPayments: React.FC<TBodyPaymentsProps> = ({ data, selected, setSelect
         <tbody>
             {data && data.length > 0 ? (
                 data.map((row, index) => (
-                    <tr key={generateKey(index)} className={`text-sm text-gray-800 bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/80 ${selected === row.sale?.id ? 'bg-gray-200/80 dark:bg-slate-700/60' : ''}`} onClick={() => setSelected(row.sale?.id)}>
+                    <tr key={index} className={`text-sm text-gray-800 dark:text-slate-200 ${selected === row.sale?.id ? 'bg-blue-500/40 dark:bg-blue-500/20' : ' bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:hover:bg-slate-700/80'}`} onClick={() => setSelected(row.sale?.id)}>
                         <td className='px-6 py-4'>
                             <span className='flex items-center gap-1'><Invoice03Icon size={22} /> {row.no || '-'}</span>
                         </td>   

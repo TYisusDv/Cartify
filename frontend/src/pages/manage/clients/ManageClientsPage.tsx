@@ -10,13 +10,14 @@ import CrudPage from './CrudPage';
 import { getCountClients } from '../../../services/clientsService';
 import { IconFileExcel } from '@tabler/icons-react';
 import { URL_BACKEND } from '../../../services/apiService';
+import TooltipButton from '../../../components/TooltipButton';
 
 const ManageClientsPage: React.FC = () => {
     const { translations } = useTranslations();
     const [selected, setSelected] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false, details: false });
     const [reloadTable, setReloadTable] = useState(0);
-    const [countData, setCountData] = useState({total: 0});
+    const [countData, setCountData] = useState({ total: 0 });
 
     const handleTableReload = () => {
         setReloadTable(prev => prev + 1);
@@ -63,13 +64,42 @@ const ManageClientsPage: React.FC = () => {
                     <h1 className='text-2xl font-bold dark:text-white'>{translations.clients}</h1>
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_clients_info}</span>
                 </div>
-                <div className='flex gap-2'>
-                    <button className='bg-green-600 text-white border-2 border-green-600 hover:bg-green-600/20 hover:text-green-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={handleExcel}><IconFileExcel /></button>
-                    <button className='bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('delete', true)} disabled={selected === 0}><Delete02Icon /></button>
-                    <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === 0}><PencilEdit02Icon /></button>
-                    <button className='bg-orange-500 text-white border-2 border-orange-500 hover:bg-orange-500/20 hover:text-orange-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-orange-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('details', true)} disabled={selected === 0}><EyeIcon /></button>
-                    <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('add', true)}><Add01Icon /></button>
+                <div className="flex gap-2">
+                    <TooltipButton
+                        tooltip="Exportar a Excel"
+                        onClick={handleExcel}
+                        className="bg-green-600 text-white border-2 border-green-600 hover:bg-green-600/20 hover:text-green-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<IconFileExcel />}
+                    />
+                    <TooltipButton
+                        tooltip="Eliminar"
+                        onClick={() => toggleModal('delete', true)}
+                        disabled={selected === 0}
+                        className="bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Delete02Icon />}
+                    />
+                    <TooltipButton
+                        tooltip="Editar"
+                        onClick={() => toggleModal('edit', true)}
+                        disabled={selected === 0}
+                        className="bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<PencilEdit02Icon />}
+                    />
+                    <TooltipButton
+                        tooltip="Ver detalles"
+                        onClick={() => toggleModal('details', true)}
+                        disabled={selected === 0}
+                        className="bg-orange-500 text-white border-2 border-orange-500 hover:bg-orange-500/20 hover:text-orange-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-orange-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<EyeIcon />}
+                    />
+                    <TooltipButton
+                        tooltip="Agregar"
+                        onClick={() => toggleModal('add', true)}
+                        className="bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Add01Icon />}
+                    />
                 </div>
+
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 border-t-2 border-b-2 border-gray-100 py-6 dark:border-slate-600'>
@@ -84,16 +114,16 @@ const ManageClientsPage: React.FC = () => {
                     </div>
                 </div>
                 <div className='w-full mt-6'>
-                    <Table 
-                        endpoint='manage/clients' 
-                        reloadTable={reloadTable} 
-                        header={table_header} 
+                    <Table
+                        endpoint='manage/clients'
+                        reloadTable={reloadTable}
+                        header={table_header}
                         tbody={
-                            <TablePage 
-                                selected={selected} 
+                            <TablePage
+                                selected={selected}
                                 setSelected={setSelected}
                             />
-                        } 
+                        }
                     />
                 </div>
             </div>
@@ -119,7 +149,7 @@ const ManageClientsPage: React.FC = () => {
                 <Modal title={translations.details_client} onClose={() => toggleModal('details', false)} className='max-w-screen-xl'>
                     <CrudPage type='details' selected_id={selected} onClose={() => toggleModal('details', false)} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
-            )}         
+            )}
         </DelayedSuspense>
     );
 };

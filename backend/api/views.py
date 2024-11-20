@@ -196,9 +196,14 @@ class ManageLocationsAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':
-            model = LocationsModel.objects.filter(
-                Q(id__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = LocationsModel.objects.filter(query_terms)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -338,9 +343,14 @@ class ManageTypesIdsAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':
-            model = TypesIdsModel.objects.filter(
-                Q(id__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = TypesIdsModel.objects.filter(query_terms)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -477,9 +487,14 @@ class ManageClientTypesAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':
-            model = ClientTypesModel.objects.filter(
-                Q(id__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = ClientTypesModel.objects.filter(query_terms)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -615,9 +630,14 @@ class ManageClientsAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':   
-            model = ClientsModel.objects.filter(
-                Q(id__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = ClientsModel.objects.filter(query_terms)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -821,10 +841,15 @@ class ManageSuppliersAPIView(APIView):
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
 
-        if query == 'table':           
-            model = SuppliersModel.objects.filter(
-                Q(id__icontains = search)
-            )
+        if query == 'table':         
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = SuppliersModel.objects.filter(query_terms)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -961,9 +986,14 @@ class ManageTaxesAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':
-            model = TaxesModel.objects.filter(
-                Q(id__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = TaxesModel.objects.filter(query_terms)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -1100,10 +1130,15 @@ class ManageProductBrandsAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':
-            model = ProductBrandsModel.objects.filter(
-                Q(id__icontains = search) |
-                Q(name__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term) |
+                    Q(name__icontains = term)
+                )
+
+            model = ProductBrandsModel.objects.filter(query_terms)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -1240,9 +1275,15 @@ class ManageProductCategoriesAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':           
-            model = ProductCategoriesModel.objects.filter(
-                Q(id__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term) |
+                    Q(name__icontains = term)
+                )
+
+            model = ProductCategoriesModel.objects.filter(query_terms)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -1383,11 +1424,16 @@ class ManageProductsAPIView(APIView):
         filter_type = request.query_params.get('filters[type]', None)
         
         if query == 'table':
-            model = ProductsModel.objects.filter(
-                Q(id__icontains = search) |
-                Q(name__icontains = search) |
-                Q(model__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term) |
+                    Q(name__icontains = term) | 
+                    Q(model__icontains = term)
+                )
+
+            model = ProductsModel.objects.filter(query_terms)
             
             if filter_type == 'pos':
                 model = model.filter(status = True)
@@ -1538,10 +1584,15 @@ class ManageInventoryTypesAPIView(APIView):
         order = request.query_params.get('order', 'desc')
         show = request.query_params.get('show', 10)
 
-        if query == 'table':           
-            model = InventoryTypesModel.objects.filter(
-                Q(id__icontains = search)
-            )
+        if query == 'table':      
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = InventoryTypesModel.objects.filter(query_terms)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -1732,8 +1783,15 @@ class AppInventoryAPIView(APIView):
             date_2 = datetime.strptime(date_2_str, '%Y-%m-%d').date()
 
         if query == 'table':  
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+                
             model = InventoryModel.objects.filter(
-                Q(id__icontains = search),
+                query_terms,
                 type__type__in = [1, 2]
             )
 
@@ -1773,8 +1831,15 @@ class AppInventoryAPIView(APIView):
             product_id = request.query_params.get('product[id]', None)
             location_id = request.query_params.get('location[id]', None)
 
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
             model = InventoryModel.objects.filter(
-                Q(id__icontains = search),
+               query_terms,
                 type__type = 3
             )
 
@@ -1982,9 +2047,14 @@ class ManagePaymentMethodsAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':
-            model = PaymentMethodsModel.objects.filter(
-                Q(id__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = PaymentMethodsModel.objects.filter(query_terms)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -2185,8 +2255,15 @@ class ManageSalePaymentsAPIView(APIView):
         type = request.query_params.get('type', None)   
 
         if query == 'table':
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
             model = SalePaymentsModel.objects.filter(
-                Q(id__icontains = search),
+                query_terms,
                 sale_id = data_id
             )
 
@@ -2423,12 +2500,17 @@ class ManageSalesAPIView(APIView):
                     date_limit__lt = timezone.now()
                 ).values_list('sale_id', flat = True)
                 model = SalesModel.objects.filter(id__in = overdue_sales)
-            else:          
-                model = SalesModel.objects.filter(
-                    Q(id__icontains = search) |
-                    Q(client__person__firstname__icontains = search) |
-                    Q(client__person__lastname__icontains = search)
-                )
+            else:   
+                search_terms = search.split()
+                query_terms = Q()
+                for term in search_terms:
+                    query_terms &= (
+                        Q(id__icontains = term) |
+                        Q(client__person__firstname__icontains = term) |
+                        Q(client__person__lastname__icontains = term)
+                    )
+
+                model = SalesModel.objects.filter(query_terms)
 
             if type not in [None,  0, '0']:
                 model = model.filter(type = type)
@@ -2658,9 +2740,14 @@ class ManageSaleReceiptAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':
-            model = SaleReceiptModel.objects.filter(
-                Q(id__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = SaleReceiptModel.objects.filter(query_terms)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -2785,9 +2872,14 @@ class ManageSaleStatusAPIView(APIView):
         show = request.query_params.get('show', 10)
 
         if query == 'table':
-            model = SaleStatusModel.objects.filter(
-                Q(id__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = SaleStatusModel.objects.filter(query_terms)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -2941,9 +3033,14 @@ class ManageCashRegisterAPIView(APIView):
             date_2 = datetime.strptime(date_2_str, '%Y-%m-%d').date()
 
         if query == 'table':
-            model = CashRegisterModel.objects.filter(
-                Q(id__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = CashRegisterModel.objects.filter(query_terms)
 
             if date_1:
                 model = model.filter(date_reg__gte = date_1)
@@ -3111,10 +3208,15 @@ class ManageCashRegisterSalesAPIView(APIView):
         if date_2_str:
             date_2 = datetime.strptime(date_2_str, '%Y-%m-%d').date()
 
-        if query == 'table':           
-            model = SalesModel.objects.filter(
-                Q(id__icontains = search)
-            )
+        if query == 'table':        
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                ) 
+
+            model = SalesModel.objects.filter(query_terms)
 
             if date_1:
                 model = model.filter(date_reg__gte = date_1)
@@ -3143,9 +3245,16 @@ class ManageCashRegisterSalesAPIView(APIView):
                 'total_pages': paginator.num_pages,
                 'current_page': model.number
             })
-        if query == 'table_payments':           
+        if query == 'table_payments':   
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                ) 
+
             model = SalePaymentsModel.objects.filter(
-                Q(id__icontains = search),
+                query_terms,
                 total__gt = 0
             )
 
@@ -3420,9 +3529,14 @@ class ManageExpensesAPIView(APIView):
         isactive = data.get('status', None)
 
         if query == 'table':
-            model = ExpensesModel.objects.filter(
-                Q(id__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = ExpensesModel.objects.filter(query_terms)
 
             if supplier_id not in [None,  0, '0']:
                 model = model.filter(supplier_id = supplier_id)
@@ -3579,8 +3693,15 @@ class ManageExpenseDetailsAPIView(APIView):
         show = data.get('show', 10)
 
         if query == 'table':
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
             model = ExpenseDetailsModel.objects.filter(
-                Q(id__icontains = search),
+                query_terms,
                 expense_id = data_id
             )
 
@@ -3742,8 +3863,15 @@ class ManageExpensePaymentsAPIView(APIView):
         show = data.get('show', 10)
 
         if query == 'table':
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
             model = ExpensePaymentsModel.objects.filter(
-                Q(id__icontains = search),
+                query_terms,
                 expense_id = data_id
             )
 
@@ -3926,9 +4054,14 @@ class ManageBanksAPIView(APIView):
         show = data.get('show', 10)
 
         if query == 'table':
-            model = BanksModel.objects.filter(
-                Q(id__icontains = search)
-            )
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = BanksModel.objects.filter(query_terms)
 
             if order == 'desc':
                 order_by = f'-{order_by}'

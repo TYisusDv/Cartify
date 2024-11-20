@@ -16,6 +16,7 @@ import { generateUUID } from '../../../utils/uuidGen';
 import { addAlert } from '../../../utils/Alerts';
 import { extractMessages } from '../../../utils/formUtils';
 import { addSignature } from '../../../services/Signature';
+import TooltipButton from '../../../components/TooltipButton';
 
 const ManageSalesPage: React.FC = () => {
     const { translations } = useTranslations();
@@ -69,10 +70,10 @@ const ManageSalesPage: React.FC = () => {
         window.open(`${URL_BACKEND}/pdf/contract?id=${selected}`, '_blank');
     }
 
-    const onSubmitSignature = async (e: React.FormEvent) => {        
+    const onSubmitSignature = async (e: React.FormEvent) => {
         try {
             e.preventDefault();
-            
+
             const response = await addSignature(signatureBuyer, signatureGuarantor, signatureSeller, selected);
             const response_resp = response?.resp;
 
@@ -105,12 +106,46 @@ const ManageSalesPage: React.FC = () => {
                     <h1 className='text-2xl font-bold dark:text-white'>{translations.sales}</h1>
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_sales_info}</span>
                 </div>
-                <div className='flex gap-2'>
-                    <button className='bg-red-500 text-white border-2 border-red-500 hover:bg-red-500/20 hover:text-red-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={handleContract} disabled={selected === undefined}><ContractsIcon /></button>
-                    <button className='bg-red-500 text-white border-2 border-red-500 hover:bg-red-500/20 hover:text-red-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={handleCertificate} disabled={selected === undefined}><Pdf01Icon /></button>
-                    <button className='bg-blue-500 text-white border-2 border-blue-500 hover:bg-blue-500/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('signature', true)} disabled={selected === undefined}><SignatureIcon /></button>
-                    <Link to={`/manage/sale/payments?id=${selected}`}><button className='bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' disabled={selected === undefined}><Invoice02Icon /></button></Link>
-                    <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === undefined}><PencilEdit02Icon /></button>
+                <div className="flex gap-2">
+                    <TooltipButton
+                        tooltip="Generar Contrato"
+                        onClick={handleContract}
+                        className="bg-red-500 text-white border-2 border-red-500 hover:bg-red-500/20 hover:text-red-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<ContractsIcon />}
+                        disabled={selected === undefined}
+                    />
+                    <TooltipButton
+                        tooltip="Generar Certificado"
+                        onClick={handleCertificate}
+                        className="bg-red-500 text-white border-2 border-red-500 hover:bg-red-500/20 hover:text-red-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Pdf01Icon />}
+                        disabled={selected === undefined}
+                    />
+                    <TooltipButton
+                        tooltip="Firma Digital"
+                        onClick={() => toggleModal('signature', true)}
+                        className="bg-blue-500 text-white border-2 border-blue-500 hover:bg-blue-500/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<SignatureIcon />}
+                        disabled={selected === undefined}
+                    />
+                    <TooltipButton
+                        tooltip="Ver Pagos"
+                        onClick={() => { }}
+                        className="bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={
+                            <Link to={`/manage/sale/payments?id=${selected}`}>
+                                <Invoice02Icon />
+                            </Link>
+                        }
+                        disabled={selected === undefined}
+                    />
+                    <TooltipButton
+                        tooltip="Editar"
+                        onClick={() => toggleModal('edit', true)}
+                        className="bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<PencilEdit02Icon />}
+                        disabled={selected === undefined}
+                    />
                 </div>
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>

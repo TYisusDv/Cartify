@@ -26,7 +26,7 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected, clas
         <tbody>
             {data && data.length > 0 ? (
                 data.map((row, index) => (
-                    <tr key={index} className={`text-sm text-gray-800 bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/80  ${className} ${selected === row.id ? 'bg-gray-200/80 dark:bg-slate-400/10' : ''}`} onClick={() => setSelected(row.id)}>
+                    <tr key={index} className={`text-sm text-gray-800 dark:text-slate-200 ${selected === row.id ? 'bg-blue-500/40 dark:bg-blue-500/20' : ' bg-gray-100 hover:bg-gray-200/70 dark:bg-slate-700 dark:hover:bg-slate-700/80'}`} onClick={() => setSelected(row.id)}>
                         <td className={`px-6 py-6 ${row?.person?.profile_image ? 'pr-0' : ''}`}>
                             {row?.person?.profile_image ? <img src={`${URL_BACKEND}${row?.person?.profile_image}`} alt='Profile' className='cursor-pointer rounded-full w-12 h-12 min-w-12 min-h-12' onClick={() => handleImage(row.person?.profile_image) }/> : '-'}
                         </td>

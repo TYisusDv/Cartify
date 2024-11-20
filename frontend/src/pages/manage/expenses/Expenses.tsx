@@ -11,6 +11,7 @@ import { getCount } from '../../../services/Exprenses';
 import { Link } from 'react-router-dom';
 import Filters from './Filters';
 import { formatNumber } from '../../../utils/formUtils';
+import TooltipButton from '../../../components/TooltipButton';
 
 const Expenses: React.FC = () => {
     const { translations } = useTranslations();
@@ -65,12 +66,49 @@ const Expenses: React.FC = () => {
                     <h1 className='text-2xl font-bold dark:text-white'>Gastos</h1>
                     <span className='text-sm text-gray-600 dark:text-slate-400'>Administra</span>
                 </div>
-                <div className='flex gap-2'>
-                    <Link to={`/manage/expenses/payments?id=${selected}`}><button className='bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' disabled={selected === undefined}><Invoice01Icon /></button></Link>
-                    <Link to={`/manage/expenses/details?id=${selected}`}><button className='bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' disabled={selected === undefined}><BarCode02Icon /></button></Link>
-                    <button className='bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('delete', true)} disabled={selected === undefined}><Delete02Icon /></button>
-                    <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === undefined}><PencilEdit02Icon /></button>
-                    <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('add', true)}><Add01Icon /></button>
+                <div className="flex gap-2">
+                    <TooltipButton
+                        tooltip="Ver Pagos"
+                        onClick={() => { }}
+                        className="bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={
+                            <Link to={`/manage/expenses/payments?id=${selected}`}>
+                                <Invoice01Icon />
+                            </Link>
+                        }
+                        disabled={selected === undefined}
+                    />
+                    <TooltipButton
+                        tooltip="Ver Detalles"
+                        onClick={() => { }}
+                        className="bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={
+                            <Link to={`/manage/expenses/details?id=${selected}`}>
+                                <BarCode02Icon />
+                            </Link>
+                        }
+                        disabled={selected === undefined}
+                    />
+                    <TooltipButton
+                        tooltip="Eliminar"
+                        onClick={() => toggleModal('delete', true)}
+                        disabled={selected === undefined}
+                        className="bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Delete02Icon />}
+                    />
+                    <TooltipButton
+                        tooltip="Editar"
+                        onClick={() => toggleModal('edit', true)}
+                        disabled={selected === undefined}
+                        className="bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<PencilEdit02Icon />}
+                    />
+                    <TooltipButton
+                        tooltip="Agregar"
+                        onClick={() => toggleModal('add', true)}
+                        className="bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Add01Icon />}
+                    />
                 </div>
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
@@ -113,18 +151,18 @@ const Expenses: React.FC = () => {
                     </div>
                 </div>
                 <div className='w-full mt-6'>
-                    <Table 
-                        endpoint='manage/expenses' 
-                        order='desc' 
-                        order_by='date_reg' 
-                        reloadTable={reloadTable} 
-                        header={table_header} 
+                    <Table
+                        endpoint='manage/expenses'
+                        order='desc'
+                        order_by='date_reg'
+                        reloadTable={reloadTable}
+                        header={table_header}
                         tbody={
-                            <TablePage 
-                                selected={selected} 
-                                setSelected={setSelected} 
+                            <TablePage
+                                selected={selected}
+                                setSelected={setSelected}
                             />
-                        } 
+                        }
                         filters={<Filters />}
                     />
                 </div>

@@ -11,6 +11,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getCountPayments } from '../../../../services/SalesService';
 import { URL_BACKEND } from '../../../../services/apiService';
 import { formatNumber } from '../../../../utils/formUtils';
+import TooltipButton from '../../../../components/TooltipButton';
 
 const Payments: React.FC = () => {
     const { translations } = useTranslations();
@@ -29,11 +30,11 @@ const Payments: React.FC = () => {
 
     useEffect(() => {
         if (!saleId) {
-          navigate('/manage/sales');
-          setSaleId(undefined);
-          return;
+            navigate('/manage/sales');
+            setSaleId(undefined);
+            return;
         }
-      }, [saleId, navigate]);
+    }, [saleId, navigate]);
 
     const handleTableReload = () => {
         setReloadTable(prev => prev + 1);
@@ -52,13 +53,13 @@ const Payments: React.FC = () => {
         { name: 'total', headerName: 'Total pagado' },
         { name: '', headerName: 'Total restante' },
         { name: 'location.name', headerName: 'Sucursal' },
-        { name: 'date_limit', headerName: 'Fecha limite' },        
+        { name: 'date_limit', headerName: 'Fecha limite' },
         { name: 'user.first_name', headerName: 'Empleado' },
     ];
 
     const handleInvoice = (one: boolean) => {
         if (one) {
-            window.open(`${URL_BACKEND}/pdf/payment?id=${selected}&one=true`, '_blank');            
+            window.open(`${URL_BACKEND}/pdf/payment?id=${selected}&one=true`, '_blank');
         } else {
             window.open(`${URL_BACKEND}/pdf/payment?id=${selected}`, '_blank');
         }
@@ -85,13 +86,43 @@ const Payments: React.FC = () => {
                     <h1 className='text-2xl font-bold dark:text-white'>{translations.manage_sale_payments}</h1>
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.manage_sale_payments_info}</span>
                 </div>
-                <div className='flex gap-2'>
-                    <button className='bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => handleInvoice(true)} disabled={selected === undefined}><Invoice04Icon /></button>
-                    <button className='bg-gray-50 text-black border-2 border-gray-50 hover:bg-gray-50/20 hover:text-gray-50 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-gray-50/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3'  onClick={() => handleInvoice(false)} disabled={selected === undefined}><Invoice02Icon /></button>
-                    <button className='bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('edit', true)} disabled={selected === undefined}><PencilEdit02Icon /></button>
-                    <button className='bg-orange-500 text-white border-2 border-orange-500 hover:bg-orange-500/20 hover:text-orange-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-orange-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('details', true)} disabled={selected === undefined}><EyeIcon /></button>
-                    <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => toggleModal('add', true)}><Add01Icon /></button>
+                <div className="flex gap-2">
+                    <TooltipButton
+                        tooltip="Generar Ticket 1"
+                        onClick={() => handleInvoice(true)}
+                        className="bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Invoice04Icon />}
+                        disabled={selected === undefined}
+                    />
+                    <TooltipButton
+                        tooltip="Ver Ticket 2"
+                        onClick={() => handleInvoice(false)}
+                        className="bg-gray-50 text-black border-2 border-gray-50 hover:bg-gray-50/20 hover:text-gray-50 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-gray-50/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Invoice02Icon />}
+                        disabled={selected === undefined}
+                    />
+                    <TooltipButton
+                        tooltip="Editar"
+                        onClick={() => toggleModal('edit', true)}
+                        className="bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<PencilEdit02Icon />}
+                        disabled={selected === undefined}
+                    />
+                    <TooltipButton
+                        tooltip="Ver Detalles"
+                        onClick={() => toggleModal('details', true)}
+                        className="bg-orange-500 text-white border-2 border-orange-500 hover:bg-orange-500/20 hover:text-orange-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-orange-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<EyeIcon />}
+                        disabled={selected === undefined}
+                    />
+                    <TooltipButton
+                        tooltip="Agregar"
+                        onClick={() => toggleModal('add', true)}
+                        className="bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Add01Icon />}
+                    />
                 </div>
+
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t-2 border-b-2 border-gray-100 py-6 dark:border-slate-600'>
@@ -133,14 +164,14 @@ const Payments: React.FC = () => {
                     </div>
                 </div>
                 <div className='w-full mt-6'>
-                    <Table 
-                    endpoint='manage/sale/payments' 
-                    id={saleId || 0} 
-                    order='asc' 
-                    order_by='date_limit' 
-                    reloadTable={reloadTable} 
-                    header={table_header} 
-                    tbody={<TablePage selected={selected} setSelected={setSelected} />} />
+                    <Table
+                        endpoint='manage/sale/payments'
+                        id={saleId || 0}
+                        order='asc'
+                        order_by='date_limit'
+                        reloadTable={reloadTable}
+                        header={table_header}
+                        tbody={<TablePage selected={selected} setSelected={setSelected} />} />
                 </div>
             </div>
             {isModalOpen.add && (

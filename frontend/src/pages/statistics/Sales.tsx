@@ -15,6 +15,7 @@ import { IconFileExcel } from '@tabler/icons-react';
 import { addAlert } from '../../utils/Alerts';
 import { extractMessages, formatNumber } from '../../utils/formUtils';
 import apiService from '../../services/apiService';
+import TooltipButton from '../../components/TooltipButton';
 
 interface PaymentMethod {
     name: string;
@@ -178,10 +179,21 @@ const Sales: React.FC = () => {
                     <h1 className='text-2xl font-bold dark:text-white'>{translations.statistics}</h1>
                     <span className='text-sm text-gray-600 dark:text-slate-400'>{translations.statistics}</span>
                 </div>
-                <div className='flex gap-2'>
-                    <button className='bg-green-600 text-white border-2 border-green-600 hover:bg-green-600/20 hover:text-green-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={downloadExcel}><IconFileExcel /></button>
-                    <button className='bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white rounded-full p-3' onClick={() => setIsModalOpen((prev) => ({ ...prev, search: true }))}><Search01Icon /></button>
+                <div className="flex gap-2">
+                    <TooltipButton
+                        tooltip="Descargar Excel"
+                        onClick={downloadExcel}
+                        className="bg-green-600 text-white border-2 border-green-600 hover:bg-green-600/20 hover:text-green-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<IconFileExcel />}
+                    />
+                    <TooltipButton
+                        tooltip="Buscar"
+                        onClick={() => setIsModalOpen((prev) => ({ ...prev, search: true }))}
+                        className="bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                        icon={<Search01Icon />}
+                    />
                 </div>
+
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
                 <h1 className='font-bold text-xl text-black dark:text-white'>Total vendido por sucursal</h1>
