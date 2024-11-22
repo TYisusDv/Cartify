@@ -7,6 +7,8 @@ import Input from '../components/Input';
 import { extractMessages } from '../utils/formUtils';
 import { addAlert } from '../utils/Alerts';
 import { generateUUID } from '../utils/uuidGen';
+import { URL_BACKEND } from '../services/apiService';
+import config from '../config.json'; 
 
 const AuthPage: React.FC = () => {
   const [formValues, setFormValues] = useState<AuthLoginValues>({ username: '', password: '' });
@@ -21,7 +23,7 @@ const AuthPage: React.FC = () => {
       addAlert({
         id: generateUUID(),
         title: 'Success',
-        msg: 'Welcome to Cartify.',
+        msg: `Welcome to ${config.name}.`,
         icon: 'CheckmarkCircle02Icon',
         timeout: 2000
       });
@@ -47,12 +49,20 @@ const AuthPage: React.FC = () => {
     }
   };
 
+const cleanedUrlBackend = URL_BACKEND?.replace("/v1", "");
+const backgroundUrl = `${cleanedUrlBackend}/static/images/background.jpg`;
+
   return (
-    <section className='auth-page relative h-screen w-screen bg-cover bg-no-repeat'>
+    <section 
+      className='relative h-screen w-screen bg-cover bg-no-repeat'
+      style={{
+        backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : "none",
+      }}
+    >
       <div className='h-screen w-screen bg-gradient-to-r from-white to-white/60 dark:from-slate-900 dark:to-slate-600/50'></div>
       <div className='flex flex-col h-full absolute top-0 left-0'>
         <header className='flex h-16 items-center px-14 w-screen box-border'>
-          <h1 className='text-xl font-bold cursor-default dark:text-white'>Cartify</h1>
+          <h1 className='text-xl font-bold cursor-default dark:text-white'>{config.name}</h1>
         </header>
         <div className='flex flex-col h-full px-14 box-border justify-center w-full md:w-8/12 lg:w-6/12 xl:w-4/12'>
           <div>

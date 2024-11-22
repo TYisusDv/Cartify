@@ -6,6 +6,7 @@ import SkeletonLoader from '../components/SkeletonLoader';
 import ErrorPage from '../pages/errorPage';
 import Modal from '../components/Modal';
 import DropdownMenu from '../components/DropdownMenu';
+import config from '../config.json'; 
 
 const AuthLogoutPage = React.lazy(() => import('../pages/auth/authLogoutPage'));
 const AppPOSPage = React.lazy(() => import('../pages/app/pos/AppPOSPage'));
@@ -66,7 +67,7 @@ const PanelPage: React.FC = () => {
     <section className='flex relative h-screen animate__animated animate__fadeIn animate__faster dark:bg-slate-800'>
       <nav className='fixed flex flex-col w-[260px] h-full border-r-2 border-gray-100 gap-2 p-8 z-[1] dark:border-r-slate-600'>
         <div className='w-full'>
-          <h1 className='text-2xl font-bold dark:text-white'>Cartify</h1>
+          <h1 className='text-xl font-bold dark:text-white'>{config.name}</h1>
         </div>
         <ul className='flex flex-col mt-16 gap-2 overflow-y-auto overflow-x-hidden'>
           <li><Link to='/home' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/home')}`}><DashboardSquare01Icon /> {translations.home}</Link></li>
@@ -206,7 +207,7 @@ const PanelPage: React.FC = () => {
       </div>
       {isModalSettingsOpen && (
         <Modal title={translations.settings} onClose={closeModalSettings}>
-          <div className='flex items-center gap-12'>
+          <div className='flex gap-2'>
             <ul>
               <li><Link to='#settings/general' className={`flex w-44 text-base p-2 hover:text-black gap-3 dark:hover:text-white ${getSettingsLinkClass('#settings/general')}`}><Settings02Icon />  {translations.general}</Link></li>
             </ul>

@@ -38,7 +38,7 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                     const response = await getWarranty(formValues);
                     const response_resp = response.resp;
 
-                    setFormValues(response_resp);
+                    setFormValues({...response_resp, sale_id: response_resp.sale.id, expense_detail_id: response_resp.expense_detail.id});
                 } catch (error) {
                 }
             };
@@ -125,6 +125,7 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                             name: 'sale',
                             onChange: (e) => setFormValues(prev => ({
                                 ...prev,
+                                sale_id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
                                 sale: {
                                     ...prev.sale,
                                     id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
@@ -151,6 +152,7 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                             onChange: (e: CustomChangeEvent) => {
                                 setFormValues(prev => ({
                                     ...prev,
+                                    expense_detail_id: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
                                     expense_detail: {
                                         ...e.object
                                     }

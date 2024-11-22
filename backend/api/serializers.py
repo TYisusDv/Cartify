@@ -2058,3 +2058,50 @@ class GetExpensePaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpensePaymentsModel
         fields = ['id']
+
+#Guarantees
+class GuaranteesSerializer(serializers.ModelSerializer):
+    sale = SalesSerializer(read_only = True)
+    expense_detail = ExpenseDetailsSerializer(read_only = True)
+
+    class Meta:
+        model = GuaranteesModel
+        fields = '__all__'
+
+class AddEditWarrantySerializer(serializers.ModelSerializer):
+    note = serializers.CharField(error_messages = {
+        'required': 'The note is required.',
+        'blank': 'The note cannot be blank.',
+        'null': 'The note cannot be blank.',
+        'max_length': 'The note cannot exceed 254 characters.',
+    }, required = False, max_length = 254, allow_blank = True, allow_null = True)
+    
+    sale_id = serializers.IntegerField(error_messages = {
+        'required': 'The sale is required.',
+        'blank': 'The sale cannot be blank.',
+        'null': 'The sale cannot be blank.',
+        'invalid': 'The sale is invalid.',
+    })
+
+    expense_detail_id = serializers.IntegerField(error_messages = {
+        'required': 'The expense detail is required.',
+        'blank': 'The expense detail cannot be blank.',
+        'null': 'The expense detail cannot be blank.',
+        'invalid': 'The expense detail is invalid.',
+    })
+    
+    class Meta:
+        model = GuaranteesModel
+        exclude = ['id', 'sale', 'expense_detail']
+
+class GetWarrantySerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The warranty is required.',
+        'blank': 'The warranty cannot be blank.',
+        'null': 'The warranty cannot be blank.',
+        'invalid': 'The warranty is invalid.',
+    })
+    
+    class Meta:
+        model = GuaranteesModel
+        fields = ['id']

@@ -6,6 +6,11 @@ import useTranslations from '../../hooks/useTranslations';
 import DelayedSuspense from '../../components/DelayedSuspense';
 import Select from '../../components/Select';
 import { getText, saveText } from '../../utils/TextUtils';
+import { convertToBase64 } from '../../utils/imageUtils';
+import apiService from '../../services/apiService';
+import { extractMessages } from '../../utils/formUtils';
+import { addAlert } from '../../utils/Alerts';
+import { generateUUID } from '../../utils/uuidGen';
 
 const SettingGeneralPage: React.FC = () => {
     const { translations } = useTranslations();
@@ -32,6 +37,85 @@ const SettingGeneralPage: React.FC = () => {
     const [valuesTheme, setValuesTheme] = useState({ theme: getTheme() });
     const [valuesLanguages, setValuesLanguages] = useState({ language: getLanguage() });
     const [valuesText, setValuesText] = useState(getText() || '16px');
+    const [uploading, setUploading] = useState(false);
+
+    const handleFileLogoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+          const file = event.target.files[0];
+          setUploading(true);
+    
+          try {
+            const base64Image = await convertToBase64(file);
+    
+            const response = await apiService.post('update/logo', {
+              image: base64Image,
+            });
+
+            const response_resp = response.data.resp;
+
+            addAlert({
+                id: generateUUID(),
+                title: 'Success',
+                msg: response_resp,
+                icon: 'CheckmarkCircle02Icon',
+                timeout: 2000
+            });    
+          } catch (error) {
+            const messages = extractMessages(error);
+            messages.forEach(msg => {
+                addAlert({
+                    id: generateUUID(),
+                    title: 'An error has occurred.',
+                    msg: msg,
+                    icon: 'Alert01Icon',
+                    color: 'red',
+                    timeout: 2000
+                });
+            });
+          } finally {
+            setUploading(false);
+          }
+        }
+    };
+
+    const handleFileBackgroundChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+          const file = event.target.files[0];
+          setUploading(true);
+    
+          try {
+            const base64Image = await convertToBase64(file);
+    
+            const response = await apiService.post('update/background', {
+              image: base64Image,
+            });
+
+            const response_resp = response.data.resp;
+
+            addAlert({
+                id: generateUUID(),
+                title: 'Success',
+                msg: response_resp,
+                icon: 'CheckmarkCircle02Icon',
+                timeout: 2000
+            });    
+          } catch (error) {
+            const messages = extractMessages(error);
+            messages.forEach(msg => {
+                addAlert({
+                    id: generateUUID(),
+                    title: 'An error has occurred.',
+                    msg: msg,
+                    icon: 'Alert01Icon',
+                    color: 'red',
+                    timeout: 2000
+                });
+            });
+          } finally {
+            setUploading(false);
+          }
+        }
+    };
 
     useEffect(() => {
         document.documentElement.classList.remove('dark', 'light', 'theme');
@@ -101,6 +185,36 @@ const SettingGeneralPage: React.FC = () => {
                         myOptions={text_options}
                         icon={<TextIcon size={20} />}
                         label='Tamaño de texto'
+                    />
+                </div>
+                <div className='flex flex-col border-2 border-gray-200 rounded-2xl p-3 dark:border-slate-600 w-full gap-2'>
+                    <label htmlFor='logo' className='text-sm font-semibold dark:text-gray-100'>
+                        Logo
+                    </label>
+                    <input
+                        type='file'
+                        id='logo'
+                        name='logo'
+                        accept='.png'
+                        multiple={false}
+                        onChange={handleFileLogoChange}
+                        className={`input-file file-blue`}
+                        disabled={uploading}
+                    />
+                </div>
+                <div className='flex flex-col border-2 border-gray-200 rounded-2xl p-3 dark:border-slate-600 w-full gap-2'>
+                    <label htmlFor='background' className='text-sm font-semibold dark:text-gray-100'>
+                        Fondo
+                    </label>
+                    <input
+                        type='file'
+                        id='background'
+                        name='background'
+                        accept='.jpg,.jpge'
+                        multiple={false}
+                        onChange={handleFileBackgroundChange}
+                        className={`input-file file-blue`}
+                        disabled={uploading}
                     />
                 </div>
             </div>

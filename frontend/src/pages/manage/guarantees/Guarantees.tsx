@@ -26,8 +26,12 @@ const Guarantees: React.FC = () => {
     };
 
     const table_header = [
-        { name: 'name', headerName: translations.name },
-        { name: 'status', headerName: translations.status },
+        { name: 'date_reg', headerName: 'Fecha de registro' },
+        { name: 'sale.id', headerName: 'No. Factura de venta' },
+        { name: 'expense_detail.expense.no', headerName: 'No. Factura de proveedor' },
+        { name: 'expense_detail.expense.transaction_number', headerName: 'Numero de transaccion' },
+        { name: 'expense_detail.serial_number', headerName: 'Numero de serie' },
+        { name: 'note', headerName: translations.note },
     ];
 
     useEffect(() => {
@@ -87,7 +91,7 @@ const Guarantees: React.FC = () => {
                     </div>
                 </div>
                 <div className='w-full mt-6'>
-                    <Table endpoint='manage/locations' reloadTable={reloadTable} header={table_header} tbody={<TablePage selected={selected} setSelected={setSelected} />} />
+                    <Table endpoint='manage/guarantees' reloadTable={reloadTable} header={table_header} tbody={<TablePage selected={selected} setSelected={setSelected} />} />
                 </div>
             </div>
             {isModalOpen.add && (
