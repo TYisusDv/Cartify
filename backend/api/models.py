@@ -348,6 +348,7 @@ class CashRegisterModel(models.Model):
 class ExpensesModel(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
     no = models.CharField(unique = True, null = False, blank = False)
+    transaction_number = models.CharField(null = False, blank = False)
     total = models.FloatField(default = 0, null = False, blank = False)
     date_limit = models.DateField(null = True, blank = False)
     date_reg = models.DateField(null = False, blank = False, default = timezone.now)
@@ -360,8 +361,10 @@ class ExpensesModel(models.Model):
 
 class ExpenseDetailsModel(models.Model):
     id = models.AutoField(primary_key = True)
+    serial_number = models.CharField(unique = True, null = False, blank = False)
     cost = models.FloatField(default = 0, null = False, blank = False)
     quantity = models.FloatField(default = 0, null = False, blank = False)
+    date_limit = models.DateField(null = True, blank = False)
     product = models.ForeignKey(ProductsModel, on_delete = models.RESTRICT)
     expense = models.ForeignKey(ExpensesModel, on_delete = models.RESTRICT)
     user = models.ForeignKey(User, null = False, blank = False, on_delete = models.RESTRICT)
@@ -413,3 +416,13 @@ class SignatureImagesModel(models.Model):
             if self.signature and default_storage.exists(self.signature.name):
                 default_storage.delete(self.signature.name)
             raise e
+
+class GuaranteesModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    note = models.CharField(null = False, blank = False)
+    date_reg = models.DateField(null = False, blank = False, default = timezone.now)
+    sale = models.ForeignKey(SalesModel, null = False, blank = False, on_delete = models.RESTRICT)   
+    expense_detail = models.ForeignKey(ExpenseDetailsModel, null = False, blank = False, on_delete = models.RESTRICT)     
+    
+    class Meta: 
+        db_table = 'guarantees'

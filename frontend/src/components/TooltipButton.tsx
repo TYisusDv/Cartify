@@ -16,10 +16,9 @@ const TooltipButton: React.FC<TooltipButtonProps> = ({
   icon,
 }) => {
   return (
-    <div className="relative group inline-block">
+    <div className="relative group inline-block" onClick={onClick}>
       <button
-        className={`rounded-full p-3 transition ${className}`}
-        onClick={onClick}
+        className={`rounded-full p-3 transition ${className}`}        
         disabled={disabled}
       >
         {icon}

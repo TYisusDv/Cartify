@@ -1,6 +1,6 @@
 import React, { Suspense, useState } from 'react';
 import { Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
-import { Analytics02Icon, BankIcon, BarCode02Icon, BrandfetchIcon, Cash01Icon, CreditCardIcon, DashboardBrowsingIcon, DashboardSquare01Icon, DistributionIcon, Invoice02Icon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserAccountIcon, UserGroupIcon, WaterfallDown01Icon, WaterfallUp01Icon } from 'hugeicons-react';
+import { Analytics02Icon, ArrowTurnBackwardIcon, BankIcon, BarCode02Icon, BrandfetchIcon, Cash01Icon, CreditCardIcon, DashboardBrowsingIcon, DashboardSquare01Icon, DistributionIcon, Invoice02Icon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserAccountIcon, UserGroupIcon, WaterfallDown01Icon, WaterfallUp01Icon } from 'hugeicons-react';
 import useTranslations from '../hooks/useTranslations';
 import SkeletonLoader from '../components/SkeletonLoader';
 import ErrorPage from '../pages/errorPage';
@@ -34,6 +34,7 @@ const ManageExpenses = React.lazy(() => import('../pages/manage/expenses/Expense
 const ManageExpenseDetails = React.lazy(() => import('../pages/manage/expenses/details/Details'));
 const ManageExpensePayments = React.lazy(() => import('../pages/manage/expenses/payments/Payments'));
 const ManageBanks = React.lazy(() => import('../pages/manage/banks/Banks'));
+const ManageGuarantees = React.lazy(() => import('../pages/manage/guarantees/Guarantees'));
 const SettingGeneralPage = React.lazy(() => import('../pages/settings/settingGeneralPage'));
 
 const PanelPage: React.FC = () => {
@@ -42,7 +43,7 @@ const PanelPage: React.FC = () => {
   const location = useLocation();
 
   const getLinkClass = (path: string) => {
-    return location.pathname === path ? 'text-black font-semibold dark:text-white' : 'text-gray-700 dark:text-slate-300';
+    return location.pathname === path ? 'text-blue-500 font-semibold' : 'text-gray-700 dark:text-slate-300';
   };
 
   const getSettingsLinkClass = (hash: string) => {
@@ -67,7 +68,7 @@ const PanelPage: React.FC = () => {
         <div className='w-full'>
           <h1 className='text-2xl font-bold dark:text-white'>Cartify</h1>
         </div>
-        <ul className='flex flex-col mt-16 gap-2'>
+        <ul className='flex flex-col mt-16 gap-2 overflow-y-auto overflow-x-hidden'>
           <li><Link to='/home' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/home')}`}><DashboardSquare01Icon /> {translations.home}</Link></li>
           <hr className='border dark:border-slate-600' />
           <li><Link to='/app/pos' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/app/pos')}`}><ShoppingCartCheck02Icon /> {translations.point_of_sell}</Link></li>
@@ -153,6 +154,8 @@ const PanelPage: React.FC = () => {
               <li><Link to='/manage/sale/status' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/sale/status')}`}><DashboardBrowsingIcon size={20} /> {translations.sale_status}</Link></li>
             </DropdownMenu>
           </li>
+          <li><Link to='/manage/guarantees' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/guarantees')}`}><ArrowTurnBackwardIcon />  Garantias</Link></li>
+
         </ul>
         <ul className='flex flex-col w-full bottom-0 gap-6 mt-auto'>
           <li className='flex justify-between items-center'>
@@ -195,6 +198,7 @@ const PanelPage: React.FC = () => {
             <Route path='/manage/expenses/details' element={<ManageExpenseDetails />} />
             <Route path='/manage/expenses/payments' element={<ManageExpensePayments />} />
             <Route path='/manage/banks' element={<ManageBanks />} />
+            <Route path='/manage/guarantees' element={<ManageGuarantees />} />
             <Route path='/auth/logout' element={<AuthLogoutPage />} />
             <Route path='*' element={<ErrorPage code={404} detail={translations.error_404} />} />
           </Routes>

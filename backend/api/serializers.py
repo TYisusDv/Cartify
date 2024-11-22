@@ -1833,6 +1833,13 @@ class AddEditExpenseSerializer(serializers.ModelSerializer):
         'max_length': 'The no cannot exceed 254 characters.',
     })
 
+    transaction_number = serializers.CharField(error_messages = {
+        'required': 'The transaction number is required.',
+        'blank': 'The transaction number cannot be blank.',
+        'null': 'The transaction number cannot be blank.',
+        'max_length': 'The transaction number cannot exceed 254 characters.',
+    })
+
     total = serializers.FloatField(error_messages = {
         'required': 'The total is required.',
         'blank': 'The total cannot be blank.',
@@ -1886,6 +1893,7 @@ class GetExpenseSerializer(serializers.ModelSerializer):
 
 #Expense details
 class ExpenseDetailsSerializer(serializers.ModelSerializer):
+    expense = ExpensesSerializer(read_only = True)
     product = ProductsSerializer(read_only = True)
     user = UserExcludeSerializer(read_only = True)
 
@@ -1906,14 +1914,7 @@ class AddEditExpenseDetailsSerializer(serializers.ModelSerializer):
         'blank': 'The quantity cannot be blank.',
         'null': 'The quantity cannot be blank.',
         'invalid': 'The quantity is invalid.',
-    })
-
-    date_reg = serializers.DateField(error_messages = {
-        'required': 'The date registration is required.',
-        'blank': 'The date registration cannot be blank.',
-        'null': 'The date registration cannot be blank.',
-        'invalid': 'The date registration is invalid.',
-    })
+    })    
 
     product_id = serializers.UUIDField(error_messages = {
         'required': 'The product is required.',

@@ -126,6 +126,21 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                 />
                 <Input
                     props={{
+                        id: 'transaction_number',
+                        name: 'transaction_number',
+                        value: formValues.transaction_number,
+                        onChange: (e) => setFormValues(prev => ({
+                            ...prev,
+                            transaction_number: e.target.value
+                        })),
+                        disabled: ['details', 'delete'].includes(type)
+                    }}
+                    label='Numero de transaccion'
+                    icon={<Invoice01Icon className='icon' size={24} />}
+                    color={colorPage}
+                />
+                <Input
+                    props={{
                         id: 'total',
                         name: 'total',
                         value: formValues.total,

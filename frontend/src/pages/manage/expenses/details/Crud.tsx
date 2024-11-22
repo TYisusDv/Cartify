@@ -118,6 +118,21 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                 </div>
                 <Input
                     props={{
+                        id: 'serial_number',
+                        name: 'serial_number',
+                        value: formValues.serial_number,
+                        onChange: (e) => setFormValues(prev => ({
+                            ...prev,
+                            serial_number: e.target.value
+                        })),
+                        disabled: ['details', 'delete'].includes(type)
+                    }}
+                    label='Numero de serie'
+                    icon={<Invoice01Icon className='icon' size={24} />}
+                    color={colorPage}
+                />
+                <Input
+                    props={{
                         id: 'cost',
                         name: 'cost',
                         value: formValues.cost,
@@ -146,6 +161,22 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                     }}
                     label='Cantidad'
                     icon={'Q'}
+                    color={colorPage}
+                />
+                <Input
+                    props={{
+                        id: 'date_limit',
+                        name: 'date_limit',
+                        value: formValues.date_limit,
+                        type: 'date',
+                        onChange: (e) => setFormValues(prev => ({
+                            ...prev,
+                            date_limit: e.target.value
+                        })),
+                        disabled: ['details', 'delete'].includes(type)
+                    }}
+                    label='Fecha limite de garantia'
+                    icon={<Invoice01Icon className='icon' size={24} />}
                     color={colorPage}
                 />
             </div>

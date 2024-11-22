@@ -291,6 +291,7 @@ export interface CashRegister {
 export interface Expense {
     id?: string;
     no?: string;
+    transaction_number?: string;
     total?: number;
     date_limit?: string;
     date_reg?: string;
@@ -306,8 +307,10 @@ export interface Expense {
 //Expense details
 export interface ExpenseDetails {
     id?: number;
+    serial_number?: string;
     cost?: number;
     quantity?: number;
+    date_limit?: string;
     expense_id?: string;
     product_id?: string;
     product?: Product;
@@ -335,4 +338,16 @@ export interface ExpensePayments {
     bank_id?: number;
     bank?: Bank;
     user?: User;
+}
+
+//Warranty
+export interface Warranty {
+    id?: number;    
+    note?: string;
+    date_reg?: string;
+    sale_id?: number;
+    expense_detail_id?: number;
+    
+    sale?: Sale;
+    expense_detail?: ExpenseDetails;
 }

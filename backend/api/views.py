@@ -634,7 +634,11 @@ class ManageClientsAPIView(APIView):
             query_terms = Q()
             for term in search_terms:
                 query_terms &= (
-                    Q(id__icontains = term)
+                    Q(id__icontains = term) |
+                    Q(person__firstname__icontains = term) |
+                    Q(person__middlename__icontains = term) |
+                    Q(person__lastname__icontains = term) |
+                    Q(person__second_lastname__icontains = term)
                 )
 
             model = ClientsModel.objects.filter(query_terms)
@@ -655,6 +659,27 @@ class ManageClientsAPIView(APIView):
                 'current_page': model.number
             })
 
+        elif query == 'list':
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term) |
+                    Q(person__firstname__icontains = term) |
+                    Q(person__middlename__icontains = term) |
+                    Q(person__lastname__icontains = term) |
+                    Q(person__second_lastname__icontains = term)
+                )
+
+            model = ClientsModel.objects.filter(query_terms)[:10]
+            serialized = ClientsSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        
         elif query == 'get':
             data_id = data.get('id', None)
 
@@ -2492,6 +2517,7 @@ class ManageSalesAPIView(APIView):
         location_id = data.get('location[id]', None)   
         status_id = data.get('status[id]', None)
         other = data.get('other', None)
+        client_id = data.get('client_id', None)
         
         if query == 'table': 
             if other in [1, '1']:
@@ -2551,6 +2577,17 @@ class ManageSalesAPIView(APIView):
                 'success': True,
                 'resp': serialized.data
             })   
+        elif query == 'list':          
+            model = SalesModel.objects.filter(
+                Q(id__icontains = search),
+                client_id = client_id
+            )[:10]
+            serialized = SalesSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
         elif query == 'count':
             total = SalesModel.objects.count()            
             
@@ -3743,7 +3780,8 @@ class ManageExpenseDetailsAPIView(APIView):
         elif query == 'list':
             model = ExpenseDetailsModel.objects.filter(
                 Q(id__icontains = search) |
-                Q(name__icontains = search)
+                Q(product__name__icontains = search) |
+                Q(serial_number__icontains = search) 
             )[:10]
             serialized = ExpenseDetailsSerializer(model, many = True)
             

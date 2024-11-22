@@ -5,6 +5,7 @@ import { getTheme } from './utils/themeUtils';
 import PreLoader from './components/PreLoader';
 import DelayedSuspense from './components/DelayedSuspense';
 import AlertsList from './components/AlertList';
+import { getText } from './utils/TextUtils';
 
 const AuthPage = React.lazy(() => import('./controllers/authPage'));
 const PanelPage = React.lazy(() => import('./controllers/panelPage'));
@@ -29,9 +30,16 @@ function App() {
     }
   };
 
+  const applyTextSize = useCallback(() => {
+    const savedTextSize = getText() || '16px';
+    document.documentElement.style.fontSize = savedTextSize;
+  }, []);
+
   useEffect(() => {
     const savedTheme = getTheme() || 'system';
     applyTheme(savedTheme);
+
+    applyTextSize();
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = () => applySystemTheme();
@@ -41,7 +49,7 @@ function App() {
     return () => {
       mediaQuery.removeEventListener('change', handleChange);
     };
-  }, [applyTheme]);
+  }, [applyTheme, applyTextSize]);
 
   return (
     <div className='App'>

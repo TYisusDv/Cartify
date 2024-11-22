@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar01Icon, Calendar03Icon, DistributionIcon, Tick01Icon, ToggleOnIcon, UserIcon, WaterfallDown01Icon } from 'hugeicons-react';
+import { Calendar01Icon, Calendar03Icon, DistributionIcon, TextNumberSignIcon, Tick01Icon, ToggleOnIcon, UserIcon, WaterfallDown01Icon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import { Expense } from '../../../types/modelType';
 import { calculateDaysRemaining } from '../../../utils/DateFuncs';
@@ -33,6 +33,9 @@ const TBody: React.FC<TBodyProps> = ({ data, selected, setSelected }) => {
                         </td>
                         <td className='px-6 py-4'>
                             <span className='flex items-center gap-[1px]'><WaterfallDown01Icon size={22} /> {row.no || '-'}</span>
+                        </td>
+                        <td className='px-6 py-4'>
+                            <span className='flex items-center gap-[1px]'><TextNumberSignIcon size={22} /> {row.transaction_number || '-'}</span>
                         </td>
                         <td className='px-6 py-4'>
                             <span className='flex items-center gap-[1px]'>Q{formatNumber(row.total || 0)}</span>

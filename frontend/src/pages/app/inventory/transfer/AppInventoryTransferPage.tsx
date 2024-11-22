@@ -92,7 +92,6 @@ const AppInventoryTransferPage: React.FC = () => {
                         onClick={() => toggleModal('add', true)}
                         className="bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
                         icon={<Add01Icon />}
-                        disabled={selected === undefined}
                     />
                 </div>
 

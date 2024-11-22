@@ -36,6 +36,7 @@ const Expenses: React.FC = () => {
     const table_header = [
         { name: 'date_reg', headerName: 'Fecha de registro' },
         { name: 'no', headerName: 'No. Factura' },
+        { name: 'transaction_number', headerName: 'No. Transaccion' },
         { name: 'total', headerName: 'Total de factura' },
         { name: '', headerName: 'Total abonado' },
         { name: '', headerName: 'Total restante' },

@@ -223,7 +223,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                             color={colorPage}
                             required={false}
                         />
-                        <button type='submit' className='btn btn-blue w-full h-10 rounded-xl'><Add01Icon /></button>
+                        <button className='btn btn-blue w-full h-10 rounded-xl'><Add01Icon /></button>
                         <div className='flex gap-1'>
                             <div className='overflow-x-auto rounded-lg w-full'>
                                 <table className='w-full text-sm text-left'>
