@@ -4512,6 +4512,8 @@ class PDFGeneratorAPIView(APIView):
             'address': ManageSaleReceiptAPIView.get_object_prompter('address'),
             'nit': ManageSaleReceiptAPIView.get_object_prompter('nit'),
             'tel': ManageSaleReceiptAPIView.get_object_prompter('tel'),
+            'title': ManageSaleReceiptAPIView.get_object_prompter('title'),
+            'type': ManageSaleReceiptAPIView.get_object_prompter('type'),
             'one': one
         }
 
