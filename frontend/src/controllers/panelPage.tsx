@@ -13,7 +13,7 @@ const AppPOSPage = React.lazy(() => import('../pages/app/pos/AppPOSPage'));
 const AppInventoryPage = React.lazy(() => import('../pages/app/inventory/AppInventoryPage'));
 const AppInventoryTransferPage = React.lazy(() => import('../pages/app/inventory/transfer/AppInventoryTransferPage'));
 const StatisticsSales = React.lazy(() => import('../pages/statistics/Sales'));
-const ManageUsersPage = React.lazy(() => import('../pages/manage/manageUsersPage'));
+const ManageUsersPage = React.lazy(() => import('../pages/manage/users/Users'));
 const ManageClientsPage = React.lazy(() => import('../pages/manage/clients/ManageClientsPage'));
 const ManageIdentifications = React.lazy(() => import('../pages/manage/clients/identifications/Identifications'));
 const ManageClientTypes = React.lazy(() => import('../pages/manage/clients/types/Types'));

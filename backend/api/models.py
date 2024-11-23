@@ -24,6 +24,7 @@ def upload_to_signatures(instance, filename):
     filename = f'{uuid.uuid4()}.{ext}'
     return os.path.join('signatures', filename)
 
+
 class LocationsModel(models.Model):
     id = models.AutoField(primary_key = True)
     name = models.CharField(max_length = 50, null = False, blank = False)
@@ -31,6 +32,14 @@ class LocationsModel(models.Model):
     
     class Meta: 
         db_table = 'locations'
+
+class ProfilesModel(models.Model):
+    user = models.OneToOneField(User, related_name = 'profile', primary_key = True, on_delete = models.RESTRICT)
+    phone = models.CharField(max_length = 50, null = True, blank = False)
+    location = models.ForeignKey(LocationsModel, null = True, blank = False, on_delete = models.RESTRICT)
+    
+    class Meta: 
+        db_table = 'profiles'
 
 class TypesIdsModel(models.Model):
     id = models.AutoField(primary_key = True)

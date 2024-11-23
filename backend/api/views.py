@@ -4417,6 +4417,126 @@ class ManageGuaranteesAPIView(APIView):
             'resp': 'Deleted successfully.'
         }, status = 200)
 
+#Users
+class ManageUsersAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    @classmethod
+    def get_object(self, pk) :
+        try:
+            return User.objects.get(pk = pk)
+        except User.DoesNotExist:
+            raise Http404('User not found.')
+        
+    def get(self, request):
+        data = request.query_params
+        data_id = data.get('id', None)
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = data.get('page', 1)
+        order_by = data.get('order_by', 'id').replace('.', '__')
+        order = data.get('order', 'desc')
+        show = data.get('show', 10)
+
+        if query == 'table':
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = User.objects.filter(query_terms)
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = UserSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            data_id = data.get('id', None)
+
+            serializer = GetUserSerializer(data = data)  
+            if not serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': serializer.errors
+                }, status = 400)    
+                    
+            instance = self.get_object(pk = data_id)
+
+            serialized = UserSerializer(instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = User.objects.filter(
+                Q(id__icontains = search)
+            )[:10]
+            serialized = UserSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = User.objects.filter().count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def put(self, request):
+        data = request.data
+
+        data_id = data.get('id', None)
+        profile = data.get('profile', None)
+
+        serializer = GetUserSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+        
+        instance = self.get_object(pk = data_id)
+
+        ProfilesModel.objects.get_or_create(user = instance)    
+
+        instance = self.get_object(pk = data_id)
+
+        serializer = AddEditProfileSerializer(instance.profile, data = profile)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
 class UpdateLogoView(APIView):
     def post(self, request):
         try:
@@ -4454,6 +4574,7 @@ class UpdateBackgroundView(APIView):
             return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
         except Exception as e:
             return JsonResponse({'success': False, 'resp': 'An ocurred has error.'}, status = 400)
+
 #PDF
 class PDFGeneratorAPIView(APIView):
     authentication_classes = []

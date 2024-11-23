@@ -1,4 +1,12 @@
 //User
+export interface Profile {
+    phone?: string;
+    location?: Location;
+
+    location_id?: number;
+}
+
+//User
 export interface User {
     id?: number;
     password?: string;
@@ -11,6 +19,8 @@ export interface User {
     is_staff?: boolean;
     is_active?: boolean;
     date_joined?: string;
+
+    profile?: Profile;
 }
 
 //Country

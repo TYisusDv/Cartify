@@ -15,10 +15,12 @@ def custom_exception(exc, context):
             detail = response.data.get('detail', 'Cannot delete this item because it is referenced by other records.') if response else 'Cannot delete this item because it is referenced by other records.'
             return Response({'success': False, 'resp': detail}, status = 400)
 
-        elif isinstance(exc, IntegrityError):
-            detail = response.data.get('detail', 'A field was not found! Please check your field.') if response else 'A field was not found! Please check your field.'
-            return Response({'success': False, 'resp': detail}, status = 400)
-        
+            '''
+            elif isinstance(exc, IntegrityError):
+                detail = response.data.get('detail', 'A field was not found! Please check your field.') if response else 'A field was not found! Please check your field.'
+                return Response({'success': False, 'resp': detail}, status = 400)
+            
+            '''
         elif isinstance(exc, Http404):
             detail = response.data.get('detail', 'Page not found.') if response else 'Page not found.'
             return Response({'success': False, 'resp': detail }, status = 404)     
