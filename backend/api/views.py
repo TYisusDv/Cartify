@@ -186,7 +186,9 @@ class ManageLocationsAPIView(APIView):
         except LocationsModel.DoesNotExist:
             raise Http404('Location not found.')
 
-    def get(self, request):       
+    def get(self, request):  
+        user = request.user
+        location = user.profile.location
         data = request.query_params
         query = data.get('query', None)
         search = data.get('search', '')
@@ -243,7 +245,13 @@ class ManageLocationsAPIView(APIView):
             model = LocationsModel.objects.filter(
                 Q(id__icontains = search) |
                 Q(name__icontains = search)
-            )[:10]
+            )
+
+            if location:
+                model = LocationsModel.objects.filter(id = location.id)
+
+            model = model[:10]
+
             serialized = LocationsSerializer(model, many = True)
             
             return JsonResponse({
@@ -1429,6 +1437,7 @@ class ManageProductsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
+    @classmethod
     def get_object(self, pk) :
         try:
             return ProductsModel.objects.get(pk = pk)
@@ -1783,6 +1792,8 @@ class AppInventoryAPIView(APIView):
             raise Http404('Inventory not found.')
 
     def get(self, request):
+        user = request.user
+        location = user.profile.location
         data = request.query_params
         query = data.get('query', None)
         search = data.get('search', '')
@@ -1834,6 +1845,9 @@ class AppInventoryAPIView(APIView):
             
             if location_id not in [None,  0, '0']:
                 model = model.filter(location_id = location_id)
+            else:
+                if location:
+                    model = model.filter(location_id = location.id)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -1882,6 +1896,9 @@ class AppInventoryAPIView(APIView):
             
             if location_id not in [None,  0, '0']:
                 model = model.filter(location_id = location_id)
+            else:
+                if location:
+                    model = model.filter(location_id = location.id)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -2504,6 +2521,8 @@ class ManageSalesAPIView(APIView):
             return 1
     
     def get(self, request):
+        user = request.user
+        location = user.profile.location
         data = request.query_params
         data_id = data.get('id', None)
         query = data.get('query', None)
@@ -2543,6 +2562,9 @@ class ManageSalesAPIView(APIView):
             
             if location_id not in [None,  0, '0']:
                 model = model.filter(location_id = location_id)
+            else:
+                if location:
+                    model = model.filter(location_id = location.id)
             
             if status_id not in [None,  0, '0']:
                 model = model.filter(status_id = status_id)
@@ -3043,6 +3065,8 @@ class ManageCashRegisterAPIView(APIView):
             raise Http404('Cash register not found.')
 
     def get(self, request):
+        user = request.user
+        location = user.profile.location
         data = request.query_params
         location_id = data.get('location[id]', None)
         data_id = data.get('id', None)
@@ -3087,6 +3111,9 @@ class ManageCashRegisterAPIView(APIView):
 
             if location_id not in [None,  0, '0']:
                 model = model.filter(location_id = location_id)
+            else:
+                if location:
+                    model = model.filter(location_id = location.id)
 
             if order == 'desc':
                 order_by = f'-{order_by}'
@@ -3139,6 +3166,9 @@ class ManageCashRegisterAPIView(APIView):
 
             if location_id not in [None,  0, '0']:
                 model = model.filter(location_id = location_id)
+            else:
+                if location:
+                    model = model.filter(location_id = location.id)
             
             if date_1:
                 model = model.filter(date_reg__gte = date_1)
@@ -3221,6 +3251,8 @@ class ManageCashRegisterSalesAPIView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
+        user = request.user
+        location = user.profile.location
         data = request.query_params
         data_id = data.get('id', None)        
         query = data.get('query', None)
@@ -3263,6 +3295,9 @@ class ManageCashRegisterSalesAPIView(APIView):
 
             if location_id not in [None,  0, '0']:
                 model = model.filter(location_id = location_id)
+            else:
+                if location:
+                    model = model.filter(location_id = location.id)
 
             if type not in [None,  0, '0']:
                 model = model.filter(type = type)
@@ -3303,6 +3338,9 @@ class ManageCashRegisterSalesAPIView(APIView):
 
             if location_id not in [None,  0, '0']:
                 model = model.filter(location_id = location_id)
+            else:
+                if location:
+                    model = model.filter(location_id = location.id)
                 
             if sale_type not in [None,  0, '0']:
                 model = model.filter(sale__type = sale_type)
@@ -3344,9 +3382,10 @@ class ManageCashRegisterSalesAPIView(APIView):
             model = SalesModel.objects.filter(status__calculate = True)                
             
             if location_id not in [None,  0, '0']:
-                model = model.filter(
-                    location_id = location_id
-                )
+                model = model.filter(location_id = location_id)
+            else:
+                if location:
+                    model = model.filter(location_id = location.id)
             
             if date_1:
                 model = model.filter(date_reg__gte = date_1)
@@ -3378,6 +3417,9 @@ class ManageCashRegisterSalesAPIView(APIView):
 
             if location_id not in [None,  0, '0']:
                 model = model.filter(location_id = location_id)
+            else:
+                if location:
+                    model = model.filter(location_id = location.id)
             
             if sale_type not in [None,  0, '0']:
                 model = model.filter(sale__type = sale_type)
@@ -4527,6 +4569,9 @@ class ManageUsersAPIView(APIView):
 
         ProfilesModel.objects.get_or_create(user = instance)    
 
+        result = send_whatsapp_message('5213481468309', 'Test')
+        print(result)
+
         instance = self.get_object(pk = data_id)
 
         serializer = AddEditProfileSerializer(instance.profile, data = profile)
@@ -4574,6 +4619,39 @@ class UpdateBackgroundView(APIView):
             return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
         except Exception as e:
             return JsonResponse({'success': False, 'resp': 'An ocurred has error.'}, status = 400)
+
+#Home
+class HomeAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+  
+    def get(self, request):
+        user = request.user
+        query = request.query_params.get('query', None)
+        search = request.query_params.get('search', '')
+        
+        if query == 'info':
+            sales = SalesModel.objects.filter(status__calculate = True, user_id = user.id).count()
+            total_sales = SalesModel.objects.filter(status__calculate = True, user_id = user.id).aggregate(total_sales = Sum('total'))['total_sales']
+            payments = SalePaymentsModel.objects.filter(sale__status__calculate = True, user_id = user.id).count()
+            total_payments = SalePaymentsModel.objects.filter(sale__status__calculate = True, user_id = user.id).aggregate(total_payments = Sum('total'))['total_payments']
+
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'sales': sales,
+                    'total_sales': total_sales,
+                    'payments': payments,
+                    'total_payments': total_payments,
+                    'commission': user.profile.commission
+                }
+            })
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
 
 #PDF
 class PDFGeneratorAPIView(APIView):
@@ -4639,6 +4717,52 @@ class PDFGeneratorAPIView(APIView):
         }
 
         html = render_to_string('pdf/payment.html', context = data)
+        #return HttpResponse(html)
+        
+        pdf_bytes = convert_html_to_pdf(html)
+        if pdf_bytes:
+            response = HttpResponse(pdf_bytes, content_type='application/pdf')
+            response['Content-Disposition'] = 'inline; filename=factura.pdf'
+            return response
+        
+        return JsonResponse({
+            'success': False, 
+            'resp': 'Error generating PDF.'
+        }, status = 500)
+
+#PDF
+class PDFPriceAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        user = request.user
+        data = request.data
+        product_id = data.get('id', None)
+        payments = int(data.get('payments', 12))
+        observations = data.get('observations', '')
+
+        instance_product = ManageProductsAPIView.get_object(product_id)
+        instance_user = ManageUsersAPIView.get_object(user.id)
+
+        data = {
+            'base_url': request.build_absolute_uri('/'),
+            'uuid': uuid.uuid4(),
+            'product': instance_product,  
+            'date': datetime.now(),
+            'address': ManageSaleReceiptAPIView.get_object_prompter('address'),
+            'nit': ManageSaleReceiptAPIView.get_object_prompter('nit'),
+            'tel': ManageSaleReceiptAPIView.get_object_prompter('tel'),
+            'title': ManageSaleReceiptAPIView.get_object_prompter('title'),
+            'type': ManageSaleReceiptAPIView.get_object_prompter('type'),      
+            'payments': payments,  
+            'price_total': ((((instance_product.credit_price - instance_product.cash_price) / 12) * payments) + instance_product.cash_price) if payments > 3 else instance_product.cash_price,
+            'quota': ((((instance_product.credit_price - instance_product.cash_price) / 12) * payments) + instance_product.cash_price) / payments if payments > 3 else instance_product.cash_price / payments,
+            'observations': observations,
+            'user': instance_user
+        }
+
+        html = render_to_string('pdf/price.html', context = data)
         #return HttpResponse(html)
         
         pdf_bytes = convert_html_to_pdf(html)
@@ -4873,6 +4997,8 @@ class ExcelCashRegisterAPIView(APIView):
     
     def get(self, request):
         try:
+            user = request.user
+            location = user.profile.location
             data = request.query_params
             date_1_str = data.get('filters[date_1]', None)
             date_2_str = data.get('filters[date_2]', None)    
@@ -4909,6 +5035,9 @@ class ExcelCashRegisterAPIView(APIView):
 
             if location_id not in [None,  0, '0']:
                 cash_register_model = cash_register_model.filter(location_id = location_id)
+            else:
+                if location:
+                    cash_register_model = cash_register_model.filter(location_id = location.id)
             
             for idx, cash_register in enumerate(cash_register_model):
                 row = start_row + idx

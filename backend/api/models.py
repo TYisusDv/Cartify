@@ -36,6 +36,7 @@ class LocationsModel(models.Model):
 class ProfilesModel(models.Model):
     user = models.OneToOneField(User, related_name = 'profile', primary_key = True, on_delete = models.RESTRICT)
     phone = models.CharField(max_length = 50, null = True, blank = False)
+    commission = models.FloatField(default = 0)
     location = models.ForeignKey(LocationsModel, null = True, blank = False, on_delete = models.RESTRICT)
     
     class Meta: 

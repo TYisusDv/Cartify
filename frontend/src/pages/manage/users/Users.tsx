@@ -30,6 +30,7 @@ const Users: React.FC = () => {
         { name: 'last_name', headerName: 'Apellido(s)' },
         { name: 'email', headerName: 'Correo electronico' },
         { name: 'profile.phone', headerName: translations.phone },
+        { name: 'profile.commission', headerName: 'Comision' },
         { name: 'profile.location.name', headerName: translations.location },
     ];
 

@@ -6,6 +6,7 @@ from .views import *
 urlpatterns = [
     path('auth/log-in', LoginAPIView.as_view(), name='auth-log-in'),
     path('auth/refresh', AuthRefreshAPIView.as_view(), name='auth-log-in'),
+    path('home', HomeAPIView.as_view(), name='home'),
     path('app/inventory', AppInventoryAPIView.as_view(), name='app-inventory'),
     path('manage/users', ManageUsersAPIView.as_view(), name='manage-users'),
     path('manage/countries', ManageCountriesAPIView.as_view(), name='manage-countries'),
@@ -42,6 +43,7 @@ urlpatterns = [
     path('pdf/payment', PDFGeneratorAPIView.as_view(), name='pdf-payment'),
     path('pdf/certificate', PDFCertificateAPIView.as_view(), name='pdf-certificate'),
     path('pdf/contract', PDFContractAPIView.as_view(), name='pdf-contract'),
+    path('pdf/price', PDFPriceAPIView.as_view(), name='pdf-price'),
     path('excel/clients', ExcelClientsAPIView.as_view(), name='excel-client'),
     path('excel/cashregister', ExcelCashRegisterAPIView.as_view(), name='excel-cashregister'),
     path('excel/statistics/sales', ExcelStatisticsSalesAPIView.as_view(), name='excel-statistics-sales'),

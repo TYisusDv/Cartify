@@ -7,8 +7,10 @@ import ErrorPage from '../pages/errorPage';
 import Modal from '../components/Modal';
 import DropdownMenu from '../components/DropdownMenu';
 import config from '../config.json'; 
+import CrudPrice from './CrudPrice';
 
 const AuthLogoutPage = React.lazy(() => import('../pages/auth/authLogoutPage'));
+const Home = React.lazy(() => import('../pages/Home'));
 const AppPOSPage = React.lazy(() => import('../pages/app/pos/AppPOSPage'));
 const AppInventoryPage = React.lazy(() => import('../pages/app/inventory/AppInventoryPage'));
 const AppInventoryTransferPage = React.lazy(() => import('../pages/app/inventory/transfer/AppInventoryTransferPage'));
@@ -42,6 +44,11 @@ const PanelPage: React.FC = () => {
   const { translations } = useTranslations();
   const [isModalSettingsOpen, setIsModalSettingsOpen] = useState(false);
   const location = useLocation();
+  const [isModalOpen, setIsModalOpen] = useState({ price: false });
+
+  const toggleModal = (modalType: 'price', isOpen: boolean) => {
+    setIsModalOpen(prev => ({ ...prev, [modalType]: isOpen }));
+  };  
 
   const getLinkClass = (path: string) => {
     return location.pathname === path ? 'text-blue-500 font-semibold' : 'text-gray-700 dark:text-slate-300';
@@ -94,6 +101,7 @@ const PanelPage: React.FC = () => {
               <li><Link to='/statistics/sales' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/statistics/sales')}`}><Analytics02Icon size={20} /> Ventas</Link></li>
             </DropdownMenu>
           </li>
+          <li><button onClick={() => toggleModal("price", true)} className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/app/price')}`}><Invoice02Icon /> Cotizar</button></li>
           <hr className='border dark:border-slate-600' />
           <li>
             <DropdownMenu 
@@ -173,6 +181,7 @@ const PanelPage: React.FC = () => {
         <Suspense fallback={<SkeletonLoader />}>
           <Routes>
             <Route path='/' element={<Navigate to='/home' />} />
+            <Route path='/home' element={<Home />} />
             <Route path='/app/pos' element={<AppPOSPage />} />
             <Route path='/app/inventory' element={<AppInventoryPage />} />
             <Route path='/app/inventory/transfer' element={<AppInventoryTransferPage  />} />
@@ -221,6 +230,12 @@ const PanelPage: React.FC = () => {
           </div>
         </Modal>
       )}
+      {isModalOpen.price && (
+          <Modal title='Cotizar' onClose={() => toggleModal('price', false)}>
+              <CrudPrice type='price' onClose={() => toggleModal('price', false)} />
+          </Modal>
+      )}
+
       <div id='portal-modal'></div>
     </section>
   );

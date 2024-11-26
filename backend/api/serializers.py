@@ -77,7 +77,20 @@ class AddEditProfileSerializer(serializers.ModelSerializer):
         'blank': 'The location cannot be blank.',
         'null': 'The location cannot be blank.',
         'invalid': 'The location is invalid.',
-    })
+    }, allow_null = True)
+
+    commission = serializers.FloatField(error_messages = {
+        'required': 'The commission is required.',
+        'blank': 'The commission cannot be blank.',
+        'null': 'The commission cannot be blank.',
+         'invalid': 'The commission is invalid.',
+    }, allow_null = True)
+
+    def to_internal_value(self, data):       
+        if data.get('location_id') in [0, '0']:
+            data['location_id'] = None
+            
+        return super().to_internal_value(data)
     
     class Meta:
         model = ProfilesModel

@@ -2,7 +2,7 @@ from PIL import Image
 from reportlab.pdfgen import canvas
 from io import BytesIO
 from datetime import datetime
-import json, imgkit, os, uuid, pytz, logging
+import json, imgkit, os, uuid, pytz, logging, requests
 
 logger = logging.getLogger(__name__)
 
@@ -80,3 +80,27 @@ def convert_html_to_pdf(html_content, width_mm = 88):
     finally:
         if os.path.exists(output_image_path):
             os.remove(output_image_path)
+
+def send_whatsapp_message(recipient_phone, message_text):
+    url = f'https://graph.facebook.com/v17.0/477014542165928/messages'
+    headers = {
+        'Authorization': f'Bearer EAAIQsh0ZBjoEBOZCxLJn1Cu3WV4QjG88tPvpUJwkRIqNGZBFRqHvmTecXyHSAjvKGtgTRvCrXdWB99CJ7uovZBQutXojm03ADUIXVZATXsd5unPg3OkIx1gZApsiQRZCADZAeygkeZCBB7otL6CCbMZAPhoEKQrAzTyRJTvcot0L62VZBVOsiAxt3SmcJd0IPZCMosQIVFkSgyz0WrROPUugUZCaC5Iqi1poo',
+        'Content-Type': 'application/json',
+    }
+    data = {
+        'messaging_product': 'whatsapp',
+        'to': recipient_phone,
+        'type': 'text',
+        'text': {
+            'body': message_text
+        }
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {'error': response.status_code, 'message': response.text}
+    except requests.exceptions.RequestException as e:
+        return {'error': 'exception', 'message': str(e)}

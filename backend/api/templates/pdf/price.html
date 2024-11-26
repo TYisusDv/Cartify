@@ -1,0 +1,79 @@
+{% load math_filters %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Ticket</title>
+  <link rel="stylesheet" type="text/css" href="{{base_url}}/static/css/payment.css?v={{uuid}}">
+</head>
+
+<body>
+  <div class="payment">
+    <div class="logo-content">
+      <div class="logo"></div>
+    </div>
+    <div class="company-info">
+      <p class="font-bold">{{type.description}}</p>
+      <p class="font-bold" style="margin-top: 10px;">{{title.description}}</p>
+      <p>{{address.description}}</p>
+    </div>
+    <div class="company-more">
+      <div class="item">
+        <p>Nit:</p> <span>{{nit.description}}</span>
+      </div>
+      <div class="item">
+        <p>Tel:</p> <span>{{tel.description}}</span>
+      </div>
+    </div>
+    <div class="payment-info">
+      <div class="item">
+      </div>
+      <div class="item">
+        <p>Fecha:</p> <span id="payment-date">{{ date }}</span>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Precio contado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{product.name}}</td>
+          <td>Q{{product.cash_price|format_number}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="payment-info">
+      <div class="item">
+        <p>Pagos:</p> <span>{{ payments }}</span>
+      </div>
+      <div class="item">
+        <p>Cotizacion:</p> <span>Q{{ price_total|format_number }}</span>
+      </div>
+    </div>
+    <div class="payment-info">
+      <div class="item">
+        <p>Quota:</p> <span>Q{{ quota|format_number }}</span>
+      </div>
+    </div>
+    <div class="payment-info">
+      <div class="item">
+        <p>Observaciones:</p> <span>{{ observations }}</span>
+      </div>
+    </div>
+    <div class="payment-info" style="margin-top: 12px;">
+      <div class="item">
+        <p>Empleado:</p> <span>{{ user.first_name }} {{ user.last_name }}</span>
+      </div>
+      <div class="item">
+        <p>Numero telefonico:</p> <span>{{ user.profile.phone }}</span>
+      </div>
+    </div>
+</body>
+
+</html>

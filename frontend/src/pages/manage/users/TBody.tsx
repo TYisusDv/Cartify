@@ -1,5 +1,5 @@
 import React from 'react';
-import { EyeIcon, Mail01Icon, StoreLocation02Icon, TelephoneIcon, UserIcon, ViewOffSlashIcon } from 'hugeicons-react';
+import { EyeIcon, Mail01Icon, PercentCircleIcon, StoreLocation02Icon, TelephoneIcon, UserIcon, ViewOffSlashIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import { User } from '../../../types/modelType';
 
@@ -38,6 +38,11 @@ const TBody: React.FC<TBodyProps> = ({ data, selected, setSelected }) => {
                             </span>
                         </td>
                         <td className='px-6 py-4'>
+                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 rounded-xl'>
+                                <PercentCircleIcon size={22} /> {row.profile?.commission || 0}
+                            </span>
+                        </td>
+                        <td className='px-6 py-4'>
                             <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
                                 <StoreLocation02Icon size={22} /> {row.profile?.location?.name || '-'}
                             </span>
@@ -46,7 +51,7 @@ const TBody: React.FC<TBodyProps> = ({ data, selected, setSelected }) => {
                 ))
             ) : (
                 <tr>
-                    <td colSpan={5} className='px-6 py-4 text-center dark:text-white'>{translations.no_data}</td>
+                    <td colSpan={6} className='px-6 py-4 text-center dark:text-white'>{translations.no_data}</td>
                 </tr>
             )}
         </tbody>

@@ -1,6 +1,7 @@
 //User
 export interface Profile {
     phone?: string;
+    commission?: number;
     location?: Location;
 
     location_id?: number;

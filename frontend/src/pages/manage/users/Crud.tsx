@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { User } from '../../../types/modelType';
-import { ProfileIcon, StoreLocation02Icon, TelephoneIcon } from 'hugeicons-react';
+import { PercentCircleIcon, ProfileIcon, StoreLocation02Icon, TelephoneIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import Input from '../../../components/Input';
 import Switch from '../../../components/Switch';
@@ -38,7 +38,7 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                     const response = await getUser(formValues);
                     const response_resp = response.resp;
 
-                    setFormValues({...response_resp, profile: {...response_resp.profile, location_id: response_resp.profile.location.id}});
+                    setFormValues({...response_resp, profile: {...response_resp.profile, location_id: response_resp?.profile?.location?.id || 0}});
                 } catch (error) {
                 }
             };
@@ -96,8 +96,8 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                 <div className='z-10'>
                     <Select
                         props={{
-                            id: 'client',
-                            name: 'client',
+                            id: 'location',
+                            name: 'location',
                             onChange: (e) => setFormValues(prev => ({
                                 ...prev,
                                 profile: {
@@ -131,6 +131,27 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                     }}
                     label='Telefono'
                     icon={<TelephoneIcon className='icon' size={24} />}
+                    color={colorPage}
+                />
+                <Input
+                    props={{
+                        id: 'commission',
+                        name: 'commission',
+                        type: 'number',
+                        min: 0,
+                        max: 100,
+                        value: formValues.profile?.commission,
+                        onChange: (e) => setFormValues(prev => ({
+                            ...prev,
+                            profile: {
+                                ...prev.profile,
+                                commission: !isNaN(parseFloat(e.target.value)) ? parseFloat(e.target.value) : 0,
+                            }
+                        })),
+                        disabled: ['details', 'delete'].includes(type)
+                    }}
+                    label='Comision'
+                    icon={<PercentCircleIcon className='icon' size={24} />}
                     color={colorPage}
                 />
             </div>
