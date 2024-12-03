@@ -16,6 +16,7 @@ const AppInventoryPage = React.lazy(() => import('../pages/app/inventory/AppInve
 const AppInventoryTransferPage = React.lazy(() => import('../pages/app/inventory/transfer/AppInventoryTransferPage'));
 const StatisticsSales = React.lazy(() => import('../pages/statistics/Sales'));
 const ManageUsersPage = React.lazy(() => import('../pages/manage/users/Users'));
+const ManageUsersFouls = React.lazy(() => import('../pages/manage/users/fouls/Fouls'));
 const ManageClientsPage = React.lazy(() => import('../pages/manage/clients/ManageClientsPage'));
 const ManageIdentifications = React.lazy(() => import('../pages/manage/clients/identifications/Identifications'));
 const ManageClientTypes = React.lazy(() => import('../pages/manage/clients/types/Types'));
@@ -189,6 +190,7 @@ const PanelPage: React.FC = () => {
             <Route path='/manage/cashregister' element={<ManageCashRegister/>} />
             <Route path='/manage/cashregister/sales' element={<ManageCashRegisterSales/>} />            
             <Route path='/manage/users' element={<ManageUsersPage />} />
+            <Route path='/manage/users/fouls' element={<ManageUsersFouls />} />
             <Route path='/manage/clients' element={<ManageClientsPage  />} />
             <Route path='/manage/identifications' element={<ManageIdentifications  />} />
             <Route path='/manage/clienttypes' element={<ManageClientTypes  />} />

@@ -2161,3 +2161,48 @@ class GetWarrantySerializer(serializers.ModelSerializer):
     class Meta:
         model = GuaranteesModel
         fields = ['id']
+
+#Absences
+class AbsencesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AbsencesModel
+        fields = '__all__'
+
+class AddEditAbsenceSerializer(serializers.ModelSerializer):
+    note = serializers.CharField(error_messages = {
+        'required': 'The note is required.',
+        'blank': 'The note cannot be blank.',
+        'null': 'The note cannot be blank.',
+        'max_length': 'The note cannot exceed 254 characters.',
+    })
+
+    date_reg = serializers.DateField(error_messages = {
+        'required': 'The date registration is required.',
+        'blank': 'The date registration cannot be blank.',
+        'null': 'The date registration cannot be blank.',
+        'invalid': 'The date registration is invalid.',
+    })
+
+    user_id = serializers.IntegerField(error_messages = {
+        'required': 'The user is required.',
+        'blank': 'The user cannot be blank.',
+        'null': 'The user cannot be blank.',
+        'invalid': 'The user is invalid.',
+    })
+    
+    class Meta:
+        model = AbsencesModel
+        fields = ['note', 'date_reg', 'user_id']
+
+class GetAbsenceSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The bank is required.',
+        'blank': 'The bank cannot be blank.',
+        'null': 'The bank cannot be blank.',
+        'invalid': 'The bank is invalid.',
+    })
+    
+    class Meta:
+        model = AbsencesModel
+        fields = ['id']
+

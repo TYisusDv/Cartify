@@ -436,3 +436,12 @@ class GuaranteesModel(models.Model):
     
     class Meta: 
         db_table = 'guarantees'
+
+class AbsencesModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    note = models.CharField(null = False, blank = False)
+    date_reg = models.DateField(null = False, blank = False)
+    user = models.ForeignKey(User, null = False, blank = False, on_delete = models.RESTRICT)
+    
+    class Meta: 
+        db_table = 'absences'

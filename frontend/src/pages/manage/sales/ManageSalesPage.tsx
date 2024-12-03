@@ -128,17 +128,15 @@ const ManageSalesPage: React.FC = () => {
                         icon={<SignatureIcon />}
                         disabled={selected === undefined}
                     />
-                    <TooltipButton
-                        tooltip="Ver Pagos"
-                        onClick={() => { }}
-                        className="bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
-                        icon={
-                            <Link to={`/manage/sale/payments?id=${selected}`}>
-                                <Invoice02Icon />
-                            </Link>
-                        }
-                        disabled={selected === undefined}
-                    />
+                    <Link to={`/manage/sale/payments?id=${selected}`}>
+                        <TooltipButton
+                            tooltip="Ver Pagos"
+                            onClick={() => { }}
+                            className="bg-green-500 text-white border-2 border-green-500 hover:bg-green-500/20 hover:text-green-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-green-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                            icon={<Invoice02Icon />}
+                            disabled={selected === undefined}
+                        />
+                    </Link>
                     <TooltipButton
                         tooltip="Editar"
                         onClick={() => toggleModal('edit', true)}

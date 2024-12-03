@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Add01Icon, Delete02Icon, PencilEdit02Icon, StoreLocation02Icon, UserGroupIcon } from 'hugeicons-react';
+import { Add01Icon, Delete02Icon, DoNotTouch01Icon, PencilEdit02Icon, StoreLocation02Icon, UserGroupIcon } from 'hugeicons-react';
 import useTranslations from '../../../hooks/useTranslations';
 import DelayedSuspense from '../../../components/DelayedSuspense';
 import SkeletonLoader from '../../../components/SkeletonLoader';
@@ -9,11 +9,12 @@ import TablePage from './TBody';
 import CrudPage from './Crud';
 import { getCount } from '../../../services/Users';
 import TooltipButton from '../../../components/TooltipButton';
+import { Link } from 'react-router-dom';
 
 const Users: React.FC = () => {
     const { translations } = useTranslations();
     const [selected, setSelected] = useState<number | undefined>();
-    const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false });
+    const [isModalOpen, setIsModalOpen] = useState({ edit: false });
     const [reloadTable, setReloadTable] = useState(0);
     const [countData, setCountData] = useState(0);
 
@@ -21,7 +22,7 @@ const Users: React.FC = () => {
         setReloadTable(prev => prev + 1);
     };
 
-    const toggleModal = (modalType: 'add' | 'edit' | 'delete', isOpen: boolean) => {
+    const toggleModal = (modalType: 'edit', isOpen: boolean) => {
         setIsModalOpen(prev => ({ ...prev, [modalType]: isOpen }));
     };
 
@@ -55,7 +56,16 @@ const Users: React.FC = () => {
                     <h1 className='text-2xl font-bold dark:text-white'>Usuarios</h1>
                     <span className='text-sm text-gray-600 dark:text-slate-400'>Admintrar usuarios</span>
                 </div>
-                <div className="flex gap-2">                    
+                <div className="flex gap-2">
+                    <Link to={`/manage/users/fouls?id=${selected}`}>
+                        <TooltipButton
+                            tooltip="Faltas"
+                            onClick={() => {}}
+                            disabled={selected === undefined}
+                            className="bg-red-500 text-white border-2 border-red-500 hover:bg-red-500/20 hover:text-red-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
+                            icon={<DoNotTouch01Icon />}
+                        />
+                    </Link>
                     <TooltipButton
                         tooltip="Editar"
                         onClick={() => toggleModal("edit", true)}
@@ -80,7 +90,7 @@ const Users: React.FC = () => {
                 <div className='w-full mt-6'>
                     <Table endpoint='manage/users' reloadTable={reloadTable} header={table_header} tbody={<TablePage selected={selected} setSelected={setSelected} />} />
                 </div>
-            </div>            
+            </div>
             {isModalOpen.edit && (
                 <Modal title='Editar usuario' onClose={() => toggleModal('edit', false)}>
                     <CrudPage type='edit' selected_id={selected} onClose={() => toggleModal('edit', false)} handleTableReload={handleTableReload} setSelected={setSelected} />

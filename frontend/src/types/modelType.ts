@@ -362,3 +362,13 @@ export interface Warranty {
     sale?: Sale;
     expense_detail?: ExpenseDetails;
 }
+
+//Absence
+export interface Absence {
+    id?: number;    
+    note?: string;
+    date_reg?: string;
+    user_id?: number;
+    
+    user?: User;
+}
