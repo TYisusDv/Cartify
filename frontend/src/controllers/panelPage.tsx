@@ -1,12 +1,12 @@
 import React, { Suspense, useState } from 'react';
 import { Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
-import { Analytics02Icon, ArrowTurnBackwardIcon, BankIcon, BarCode02Icon, BrandfetchIcon, Cash01Icon, CreditCardIcon, DashboardBrowsingIcon, DashboardSquare01Icon, DistributionIcon, Invoice02Icon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserAccountIcon, UserGroupIcon, WaterfallDown01Icon, WaterfallUp01Icon } from 'hugeicons-react';
+import { Analytics02Icon, ArrowTurnBackwardIcon, BankIcon, BarCode02Icon, BrandfetchIcon, Cash01Icon, CreditCardIcon, DashboardBrowsingIcon, DashboardSquare01Icon, DistributionIcon, Invoice02Icon, Layers01Icon, Loading03Icon, LocationUser04Icon, LogoutSquare01Icon, MedicalMaskIcon, SearchAreaIcon, SearchList02Icon, Settings02Icon, ShoppingBasketSecure03Icon, ShoppingCartCheck02Icon, StoreLocation02Icon, TaxesIcon, UserAccountIcon, UserGroupIcon, WaterfallDown01Icon, WaterfallUp01Icon } from 'hugeicons-react';
 import useTranslations from '../hooks/useTranslations';
 import SkeletonLoader from '../components/SkeletonLoader';
 import ErrorPage from '../pages/errorPage';
 import Modal from '../components/Modal';
 import DropdownMenu from '../components/DropdownMenu';
-import config from '../config.json'; 
+import config from '../config.json';
 import CrudPrice from './CrudPrice';
 
 const AuthLogoutPage = React.lazy(() => import('../pages/auth/authLogoutPage'));
@@ -17,6 +17,7 @@ const AppInventoryTransferPage = React.lazy(() => import('../pages/app/inventory
 const StatisticsSales = React.lazy(() => import('../pages/statistics/Sales'));
 const ManageUsersPage = React.lazy(() => import('../pages/manage/users/Users'));
 const ManageUsersFouls = React.lazy(() => import('../pages/manage/users/fouls/Fouls'));
+const ManageUsersBreaks = React.lazy(() => import('../pages/manage/users/breaks/Breaks'));
 const ManageClientsPage = React.lazy(() => import('../pages/manage/clients/ManageClientsPage'));
 const ManageIdentifications = React.lazy(() => import('../pages/manage/clients/identifications/Identifications'));
 const ManageClientTypes = React.lazy(() => import('../pages/manage/clients/types/Types'));
@@ -49,7 +50,7 @@ const PanelPage: React.FC = () => {
 
   const toggleModal = (modalType: 'price', isOpen: boolean) => {
     setIsModalOpen(prev => ({ ...prev, [modalType]: isOpen }));
-  };  
+  };
 
   const getLinkClass = (path: string) => {
     return location.pathname === path ? 'text-blue-500 font-semibold' : 'text-gray-700 dark:text-slate-300';
@@ -82,15 +83,15 @@ const PanelPage: React.FC = () => {
           <hr className='border dark:border-slate-600' />
           <li><Link to='/app/pos' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/app/pos')}`}><ShoppingCartCheck02Icon /> {translations.point_of_sell}</Link></li>
           <li>
-            <DropdownMenu 
-              label={translations.inventory} 
+            <DropdownMenu
+              label={translations.inventory}
               icon={<SearchList02Icon className='w-7' />}
               links={['/app/inventory', '/app/inventory/transfer', '/manage/inventory/types']}
 
             >
-                <li><Link to='/app/inventory' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/app/inventory')}`}><SearchList02Icon size={20} /> {translations.inventory}</Link></li>
-                <li><Link to='/app/inventory/transfer' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/app/inventory/transfer')}`}><SearchList02Icon size={20} /> Traslaciones</Link></li>
-                <li><Link to='/manage/inventory/types' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/inventory/types')}`}><SearchAreaIcon size={20} /> {translations.types}</Link></li>
+              <li><Link to='/app/inventory' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/app/inventory')}`}><SearchList02Icon size={20} /> {translations.inventory}</Link></li>
+              <li><Link to='/app/inventory/transfer' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/app/inventory/transfer')}`}><SearchList02Icon size={20} /> Traslaciones</Link></li>
+              <li><Link to='/manage/inventory/types' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/inventory/types')}`}><SearchAreaIcon size={20} /> {translations.types}</Link></li>
             </DropdownMenu>
           </li>
           <li>
@@ -105,38 +106,46 @@ const PanelPage: React.FC = () => {
           <li><button onClick={() => toggleModal("price", true)} className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/app/price')}`}><Invoice02Icon /> Cotizar</button></li>
           <hr className='border dark:border-slate-600' />
           <li>
-            <DropdownMenu 
-              label={translations.cash_register} 
+            <DropdownMenu
+              label={translations.cash_register}
               icon={<Cash01Icon className='w-7' />}
               links={['/manage/cashregister', '/manage/cashregister/sales']}
 
             >
-                <li><Link to='/manage/cashregister' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/cashregister')}`}><Cash01Icon size={20} /> Gastos</Link></li>
-                <li><Link to='/manage/cashregister/sales' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/cashregister/sales')}`}><WaterfallUp01Icon size={20} /> Ingresos</Link></li>
+              <li><Link to='/manage/cashregister' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/cashregister')}`}><Cash01Icon size={20} /> Gastos</Link></li>
+              <li><Link to='/manage/cashregister/sales' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/cashregister/sales')}`}><WaterfallUp01Icon size={20} /> Ingresos</Link></li>
             </DropdownMenu>
           </li>
           <li>
-            <DropdownMenu 
+            <DropdownMenu
               label='Gastos'
               icon={<WaterfallDown01Icon className='w-7' />}
-              links={['/manage/expenses','/manage/banks']}
+              links={['/manage/expenses', '/manage/banks']}
 
             >
               <li><Link to='/manage/expenses' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/expenses')}`}><WaterfallDown01Icon size={20} /> Gastos</Link></li>
               <li><Link to='/manage/banks' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/banks')}`}><BankIcon size={20} /> Bancos</Link></li>
             </DropdownMenu>
           </li>
-          <li><Link to='/manage/users' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/users')}`}><UserGroupIcon />  {translations.users}</Link></li>
-          <DropdownMenu 
-              label={translations.clients} 
-              icon={<LocationUser04Icon className='w-7' />}
-              links={['/manage/clients','/manage/identifications','/manage/clienttypes']}
+          <DropdownMenu
+            label={translations.users}
+            icon={<UserGroupIcon className='w-7' />}
+            links={['/manage/users', '/manage/users/breaks']}
 
-            >
-                <li><Link to='/manage/clients' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/clients')}`}><LocationUser04Icon size={20} /> {translations.clients}</Link></li>
-                <li><Link to='/manage/identifications' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/identifications')}`}><UserAccountIcon size={20} /> {translations.identifications}</Link></li>
-                <li><Link to='/manage/clienttypes' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/clienttypes')}`}><UserAccountIcon size={20} /> {translations.client_types}</Link></li>
-            </DropdownMenu>
+          >
+            <li><Link to='/manage/users' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/users')}`}><UserGroupIcon size={20} /> {translations.users}</Link></li>
+            <li><Link to='/manage/users/breaks' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/users/breaks')}`}><MedicalMaskIcon size={20} /> Descansos</Link></li>
+          </DropdownMenu>
+          <DropdownMenu
+            label={translations.clients}
+            icon={<LocationUser04Icon className='w-7' />}
+            links={['/manage/clients', '/manage/identifications', '/manage/clienttypes']}
+
+          >
+            <li><Link to='/manage/clients' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/clients')}`}><LocationUser04Icon size={20} /> {translations.clients}</Link></li>
+            <li><Link to='/manage/identifications' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/identifications')}`}><UserAccountIcon size={20} /> {translations.identifications}</Link></li>
+            <li><Link to='/manage/clienttypes' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/clienttypes')}`}><UserAccountIcon size={20} /> {translations.client_types}</Link></li>
+          </DropdownMenu>
           <li><Link to='/manage/locations' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/locations')}`}><StoreLocation02Icon />  {translations.locations}</Link></li>
           <li><Link to='/manage/taxes' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/manage/taxes')}`}><TaxesIcon />  {translations.taxes}</Link></li>
           <li>
@@ -185,16 +194,17 @@ const PanelPage: React.FC = () => {
             <Route path='/home' element={<Home />} />
             <Route path='/app/pos' element={<AppPOSPage />} />
             <Route path='/app/inventory' element={<AppInventoryPage />} />
-            <Route path='/app/inventory/transfer' element={<AppInventoryTransferPage  />} />
-            <Route path='/statistics/sales' element={<StatisticsSales  />} />
-            <Route path='/manage/cashregister' element={<ManageCashRegister/>} />
-            <Route path='/manage/cashregister/sales' element={<ManageCashRegisterSales/>} />            
+            <Route path='/app/inventory/transfer' element={<AppInventoryTransferPage />} />
+            <Route path='/statistics/sales' element={<StatisticsSales />} />
+            <Route path='/manage/cashregister' element={<ManageCashRegister />} />
+            <Route path='/manage/cashregister/sales' element={<ManageCashRegisterSales />} />
             <Route path='/manage/users' element={<ManageUsersPage />} />
             <Route path='/manage/users/fouls' element={<ManageUsersFouls />} />
-            <Route path='/manage/clients' element={<ManageClientsPage  />} />
-            <Route path='/manage/identifications' element={<ManageIdentifications  />} />
-            <Route path='/manage/clienttypes' element={<ManageClientTypes  />} />
-            <Route path='/manage/locations' element={<ManageLocations  />} />
+            <Route path='/manage/users/breaks' element={<ManageUsersBreaks />} />
+            <Route path='/manage/clients' element={<ManageClientsPage />} />
+            <Route path='/manage/identifications' element={<ManageIdentifications />} />
+            <Route path='/manage/clienttypes' element={<ManageClientTypes />} />
+            <Route path='/manage/locations' element={<ManageLocations />} />
             <Route path='/manage/taxes' element={<ManageTaxesPage />} />
             <Route path='/manage/suppliers' element={<ManageSuppliersPage />} />
             <Route path='/manage/products' element={<ManageProductsPage />} />
@@ -205,7 +215,7 @@ const PanelPage: React.FC = () => {
             <Route path='/manage/sales' element={<ManageSalesPage />} />
             <Route path='/manage/sale/payments' element={<ManageSalePayments />} />
             <Route path='/manage/sale/receipt' element={<ManageSaleReceipt />} />
-            <Route path='/manage/sale/status' element={<ManageSaleStatus/>} />
+            <Route path='/manage/sale/status' element={<ManageSaleStatus />} />
             <Route path='/manage/expenses' element={<ManageExpenses />} />
             <Route path='/manage/expenses/details' element={<ManageExpenseDetails />} />
             <Route path='/manage/expenses/payments' element={<ManageExpensePayments />} />
@@ -233,9 +243,9 @@ const PanelPage: React.FC = () => {
         </Modal>
       )}
       {isModalOpen.price && (
-          <Modal title='Cotizar' onClose={() => toggleModal('price', false)}>
-              <CrudPrice type='price' onClose={() => toggleModal('price', false)} />
-          </Modal>
+        <Modal title='Cotizar' onClose={() => toggleModal('price', false)}>
+          <CrudPrice type='price' onClose={() => toggleModal('price', false)} />
+        </Modal>
       )}
 
       <div id='portal-modal'></div>

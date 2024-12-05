@@ -2093,10 +2093,10 @@ class AddEditExpensePaymentSerializer(serializers.ModelSerializer):
     })
 
     bank_id = serializers.IntegerField(error_messages = {
-        'required': 'The bank is required.',
-        'blank': 'The bank cannot be blank.',
-        'null': 'The bank cannot be blank.',
-        'invalid': 'The bank is invalid.',
+        'required': 'The expense payment is required.',
+        'blank': 'The expense payment cannot be blank.',
+        'null': 'The expense payment cannot be blank.',
+        'invalid': 'The expense payment is invalid.',
     })
     
     class Meta:
@@ -2196,13 +2196,59 @@ class AddEditAbsenceSerializer(serializers.ModelSerializer):
 
 class GetAbsenceSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(error_messages = {
-        'required': 'The bank is required.',
-        'blank': 'The bank cannot be blank.',
-        'null': 'The bank cannot be blank.',
-        'invalid': 'The bank is invalid.',
+        'required': 'The absences is required.',
+        'blank': 'The absences cannot be blank.',
+        'null': 'The absences cannot be blank.',
+        'invalid': 'The absences is invalid.',
     })
     
     class Meta:
         model = AbsencesModel
+        fields = ['id']
+
+#Breaks
+class BreaksSerializer(serializers.ModelSerializer):
+    user = UserExcludeSerializer(read_only = True)
+
+    class Meta:
+        model = BreaksModel
+        fields = '__all__'
+
+class AddEditBreakSerializer(serializers.ModelSerializer):
+    note = serializers.CharField(error_messages = {
+        'required': 'The note is required.',
+        'blank': 'The note cannot be blank.',
+        'null': 'The note cannot be blank.',
+        'max_length': 'The note cannot exceed 254 characters.',
+    })
+
+    date_reg = serializers.DateField(error_messages = {
+        'required': 'The date registration is required.',
+        'blank': 'The date registration cannot be blank.',
+        'null': 'The date registration cannot be blank.',
+        'invalid': 'The date registration is invalid.',
+    })
+
+    user_id = serializers.IntegerField(error_messages = {
+        'required': 'The user is required.',
+        'blank': 'The user cannot be blank.',
+        'null': 'The user cannot be blank.',
+        'invalid': 'The user is invalid.',
+    })
+    
+    class Meta:
+        model = BreaksModel
+        fields = ['note', 'date_reg', 'user_id']
+
+class GetBreakSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(error_messages = {
+        'required': 'The break is required.',
+        'blank': 'The break cannot be blank.',
+        'null': 'The break cannot be blank.',
+        'invalid': 'The break is invalid.',
+    })
+    
+    class Meta:
+        model = BreaksModel
         fields = ['id']
 

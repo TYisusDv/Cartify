@@ -372,3 +372,13 @@ export interface Absence {
     
     user?: User;
 }
+
+//Break
+export interface UserBreak {
+    id?: number;    
+    note?: string;
+    date_reg?: string;
+    user_id?: number;
+    
+    user?: User;
+}

@@ -39,6 +39,7 @@ urlpatterns = [
     path('manage/guarantees', ManageGuaranteesAPIView.as_view(), name='manage-guarantees'),
     path('manage/users', ManageGuaranteesAPIView.as_view(), name='manage-users'),
     path('manage/users/absences', ManageAbsencesAPIView.as_view(), name='manage-users-absences'),
+    path('manage/users/breaks', ManageBreaksAPIView.as_view(), name='manage-users-breaks'),
     path('update/logo', UpdateLogoView.as_view(), name='update-logo'),
     path('update/background', UpdateBackgroundView.as_view(), name='update-background'),
     path('pdf/payment', PDFGeneratorAPIView.as_view(), name='pdf-payment'),
