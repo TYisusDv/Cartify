@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar03Icon, Note01Icon, UserGroupIcon, UserStatusIcon } from 'hugeicons-react';
-import useTranslations from '../../../../hooks/useTranslations';
-import { UserBreak } from '../../../../types/modelType';
+import useTranslations from '../../../hooks/useTranslations';
+import { UserBreak } from '../../../types/modelType';
 
 interface TablePageProps {
     data?: Array<UserBreak>;
@@ -33,16 +33,7 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
                             <span className='flex items-center gap-1'><Note01Icon size={22} /> {row.note || '-'}</span>
                         </td>
                         <td className='px-6 py-4'>
-                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
-                                <UserGroupIcon size={22} />
-                                {row.user?.first_name || ''} {row.user?.last_name || ''}
-                            </span>
-                        </td>
-                        <td className='px-6 py-4'>
-                            <span className='inline-flex items-center w-auto whitespace-nowrap gap-1 p-1 pr-2 font-bold bg-gray-200 dark:bg-slate-600 rounded-xl'>
-                                <UserStatusIcon size={22} />
-                                {row.status?.name || ''}
-                            </span>
+                            <span className='flex items-center gap-1'><UserStatusIcon size={22} /> {row.status?.name || '-'}</span>
                         </td>
                     </tr>
                 ))

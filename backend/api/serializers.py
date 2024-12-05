@@ -2206,9 +2206,16 @@ class GetAbsenceSerializer(serializers.ModelSerializer):
         model = AbsencesModel
         fields = ['id']
 
+#Break status
+class BreakStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BreakStatusModel
+        fields = '__all__'
+
 #Breaks
 class BreaksSerializer(serializers.ModelSerializer):
     user = UserExcludeSerializer(read_only = True)
+    status = BreakStatusSerializer(read_only = True)
 
     class Meta:
         model = BreaksModel
@@ -2235,10 +2242,17 @@ class AddEditBreakSerializer(serializers.ModelSerializer):
         'null': 'The user cannot be blank.',
         'invalid': 'The user is invalid.',
     })
+
+    status_id = serializers.IntegerField(error_messages = {
+        'required': 'The status is required.',
+        'blank': 'The status cannot be blank.',
+        'null': 'The status cannot be blank.',
+        'invalid': 'The status is invalid.',
+    })
     
     class Meta:
         model = BreaksModel
-        fields = ['note', 'date_reg', 'user_id']
+        fields = ['note', 'date_reg', 'user_id', 'status_id']
 
 class GetBreakSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(error_messages = {

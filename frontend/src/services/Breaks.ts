@@ -1,15 +1,24 @@
 import { UserBreak } from '../types/modelType';
 import apiService from './apiService';
 
-export const getCount = async (id: number) => {
+export const getCount = async () => {
     const response = await apiService.get('/manage/users/breaks', {
         params: {
-            query: 'count',
-            id: id
+            query: 'count'
         }
     });
     return response.data;
 };
+
+export const getMyCount = async () => {
+    const response = await apiService.get('/app/breaks', {
+        params: {
+            query: 'count'
+        }
+    });
+    return response.data;
+};
+
 
 export const listBreaks = async () => {
     const response = await apiService.get('/manage/users/breaks', {
@@ -37,6 +46,11 @@ export const addBreak = async (user_break: UserBreak) => {
 
 export const editBreak = async (user_break: UserBreak) => {
     const response = await apiService.put('/manage/users/breaks', user_break);
+    return response.data;
+};
+
+export const editMyBreak = async (user_break: UserBreak) => {
+    const response = await apiService.put('/app/breaks', user_break);
     return response.data;
 };
 

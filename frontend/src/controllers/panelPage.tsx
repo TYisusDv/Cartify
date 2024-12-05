@@ -14,6 +14,7 @@ const Home = React.lazy(() => import('../pages/Home'));
 const AppPOSPage = React.lazy(() => import('../pages/app/pos/AppPOSPage'));
 const AppInventoryPage = React.lazy(() => import('../pages/app/inventory/AppInventoryPage'));
 const AppInventoryTransferPage = React.lazy(() => import('../pages/app/inventory/transfer/AppInventoryTransferPage'));
+const AppBreaksPage = React.lazy(() => import('../pages/app/breaks/Breaks'));
 const StatisticsSales = React.lazy(() => import('../pages/statistics/Sales'));
 const ManageUsersPage = React.lazy(() => import('../pages/manage/users/Users'));
 const ManageUsersFouls = React.lazy(() => import('../pages/manage/users/fouls/Fouls'));
@@ -104,6 +105,7 @@ const PanelPage: React.FC = () => {
             </DropdownMenu>
           </li>
           <li><button onClick={() => toggleModal("price", true)} className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/app/price')}`}><Invoice02Icon /> Cotizar</button></li>
+          <li><Link to='/app/breaks' className={`flex h-10 items-center text-base hover:text-black gap-3 dark:hover:text-white ${getLinkClass('/app/breaks')}`}><MedicalMaskIcon /> Mis descansos</Link></li>
           <hr className='border dark:border-slate-600' />
           <li>
             <DropdownMenu
@@ -194,6 +196,7 @@ const PanelPage: React.FC = () => {
             <Route path='/home' element={<Home />} />
             <Route path='/app/pos' element={<AppPOSPage />} />
             <Route path='/app/inventory' element={<AppInventoryPage />} />
+            <Route path='/app/breaks' element={<AppBreaksPage />} />
             <Route path='/app/inventory/transfer' element={<AppInventoryTransferPage />} />
             <Route path='/statistics/sales' element={<StatisticsSales />} />
             <Route path='/manage/cashregister' element={<ManageCashRegister />} />

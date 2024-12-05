@@ -446,11 +446,19 @@ class AbsencesModel(models.Model):
     class Meta: 
         db_table = 'absences'
 
+class BreakStatusModel(models.Model):
+    id = models.AutoField(primary_key = True)
+    name = models.CharField(max_length = 100, null = False, blank = False)
+
+    class Meta: 
+        db_table = 'break_status'
+
 class BreaksModel(models.Model):
     id = models.AutoField(primary_key = True)
     note = models.CharField(null = False, blank = False)
     date_reg = models.DateField(null = False, blank = False)
     user = models.ForeignKey(User, null = False, blank = False, on_delete = models.RESTRICT)
+    status = models.ForeignKey(BreakStatusModel, null = False, blank = False, on_delete = models.RESTRICT)
     
     class Meta: 
         db_table = 'breaks'

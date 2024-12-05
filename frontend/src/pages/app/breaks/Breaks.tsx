@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Add01Icon, Delete02Icon, MedicalMaskIcon, PencilEdit02Icon, UserIcon } from 'hugeicons-react';
-import useTranslations from '../../../../hooks/useTranslations';
-import DelayedSuspense from '../../../../components/DelayedSuspense';
-import SkeletonLoader from '../../../../components/SkeletonLoader';
-import Table from '../../../../components/Table';
-import Modal from '../../../../components/Modal';
+import { MedicalMaskIcon, PencilEdit02Icon } from 'hugeicons-react';
+import useTranslations from '../../../hooks/useTranslations';
+import DelayedSuspense from '../../../components/DelayedSuspense';
+import SkeletonLoader from '../../../components/SkeletonLoader';
+import Table from '../../../components/Table';
+import Modal from '../../../components/Modal';
 import TablePage from './TablePage';
 import CrudPage from './CrudPage';
-import TooltipButton from '../../../../components/TooltipButton';
-import { getCount } from '../../../../services/Breaks';
+import TooltipButton from '../../../components/TooltipButton';
+import { getMyCount } from '../../../services/Breaks';
 
 const Breaks: React.FC = () => {
     const { translations } = useTranslations();
@@ -32,14 +32,13 @@ const Breaks: React.FC = () => {
     const table_header = [
         { name: 'date_reg', headerName: 'Fecha de registro' },
         { name: 'note', headerName: 'Nota' },
-        { name: 'user.first_name', headerName: 'Empleado' },
-        { name: 'status.name', headerName: 'Estado' },
+        { name: 'status', headerName: 'Estado' },
     ];
 
     useEffect(() => {
         const fetchCount = async () => {
             try {
-                const response = await getCount();
+                const response = await getMyCount();
                 const response_resp = response.resp;
 
                 setCountData(response_resp);
@@ -54,29 +53,16 @@ const Breaks: React.FC = () => {
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
             <div className='flex items-center justify-between w-full p-8 animate__animated animate__fadeIn animate__faster'>
                 <div className='flex flex-col'>
-                    <h1 className='text-2xl font-bold dark:text-white'>Descansos</h1>
-                    <span className='text-sm text-gray-600 dark:text-slate-400'>Administra los descansos de los empleados</span>
+                    <h1 className='text-2xl font-bold dark:text-white'>Mis descansos</h1>
+                    <span className='text-sm text-gray-600 dark:text-slate-400'>Administra mis descansos</span>
                 </div>
-                <div className="flex gap-2">
-                    <TooltipButton
-                        tooltip="Eliminar"
-                        onClick={() => toggleModal("delete", true)}
-                        disabled={selected === undefined}
-                        className="bg-red-600 text-white border-2 border-red-600 hover:bg-red-600/20 hover:text-red-600 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-red-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
-                        icon={<Delete02Icon />}
-                    />
+                <div className="flex gap-2">                    
                     <TooltipButton
                         tooltip="Editar"
                         onClick={() => toggleModal('edit', true)}
                         className="bg-yellow-500 text-white border-2 border-yellow-500 hover:bg-yellow-500/20 hover:text-yellow-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-yellow-500/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
                         icon={<PencilEdit02Icon />}
                         disabled={selected === undefined}
-                    />
-                    <TooltipButton
-                        tooltip="Agregar"
-                        onClick={() => toggleModal('add', true)}
-                        className="bg-blue-600 text-white border-2 border-blue-600 hover:bg-blue-600/20 hover:text-blue-500 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-black dark:hover:bg-blue-600/40 dark:disabled:bg-slate-600 dark:disabled:border-slate-600 dark:disabled:text-white"
-                        icon={<Add01Icon />}
                     />
                 </div>
             </div>
@@ -94,7 +80,7 @@ const Breaks: React.FC = () => {
                 </div>
                 <div className='w-full mt-6'>
                     <Table
-                        endpoint='manage/users/breaks'
+                        endpoint='app/breaks'
                         order='desc'
                         order_by='date_reg'
                         reloadTable={reloadTable}
@@ -102,19 +88,9 @@ const Breaks: React.FC = () => {
                         tbody={<TablePage selected={selected} setSelected={setSelected} />} />
                 </div>
             </div>
-            {isModalOpen.add && (
-                <Modal title='Agregar descanso' onClose={() => setIsModalOpen({ ...isModalOpen, add: false })}>
-                    <CrudPage type='add' selected_id={selected} onClose={() => setIsModalOpen({ ...isModalOpen, add: false })} handleTableReload={handleTableReload} setSelected={setSelected} />
-                </Modal>
-            )}
             {isModalOpen.edit && (
                 <Modal title='Editar descanso' onClose={() => setIsModalOpen({ ...isModalOpen, edit: false })}>
                     <CrudPage type='edit' selected_id={selected} onClose={() => setIsModalOpen({ ...isModalOpen, edit: false })} handleTableReload={handleTableReload} setSelected={setSelected} />
-                </Modal>
-            )}
-            {isModalOpen.delete && (
-                <Modal title='Eliminar descanso' onClose={() => setIsModalOpen({ ...isModalOpen, delete: false })}>
-                    <CrudPage type='delete' selected_id={selected} onClose={() => setIsModalOpen({ ...isModalOpen, delete: false })} handleTableReload={handleTableReload} setSelected={setSelected} />
                 </Modal>
             )}
         </DelayedSuspense>

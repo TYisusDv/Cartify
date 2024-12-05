@@ -373,12 +373,19 @@ export interface Absence {
     user?: User;
 }
 
+//Break status
+export interface BreakStatus {
+    id?: number;    
+    name?: string;
+}
+
 //Break
 export interface UserBreak {
     id?: number;    
     note?: string;
     date_reg?: string;
     user_id?: number;
+    status?: BreakStatus,
     
     user?: User;
 }

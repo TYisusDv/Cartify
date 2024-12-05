@@ -123,6 +123,140 @@ class ManageCountriesAPIView(APIView):
                 'resp': serialized.data
             })
 
+#Break status
+class BreakStatusAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+  
+    def get(self, request):
+        query = request.query_params.get('query', None)
+        search = request.query_params.get('search', '')
+        
+        if query == 'list':
+            model = BreakStatusModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = BreakStatusSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+
+#My breaks
+class AppBreaksAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+        
+    def get(self, request):
+        data = request.query_params
+        user = request.user
+        data_id = data.get('id', None)
+        query = data.get('query', None)
+        search = data.get('search', '')
+        page_number = data.get('page', 1)
+        order_by = data.get('order_by', 'id').replace('.', '__')
+        order = data.get('order', 'desc')
+        show = data.get('show', 10)
+
+        if query == 'table':
+            search_terms = search.split()
+            query_terms = Q()
+            for term in search_terms:
+                query_terms &= (
+                    Q(id__icontains = term)
+                )
+
+            model = BreaksModel.objects.filter(query_terms, user_id = user.id)
+
+            if order == 'desc':
+                order_by = f'-{order_by}'
+
+            model = model.order_by(order_by)
+            paginator = Paginator(model, show)
+            model = paginator.page(page_number)
+
+            serialized = BreaksSerializer(model, many = True)
+
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data,
+                'total_pages': paginator.num_pages,
+                'current_page': model.number
+            })
+
+        elif query == 'get':
+            data_id = data.get('id', None)
+
+            serializer = GetBreakSerializer(data = data)  
+            if not serializer.is_valid():
+                return JsonResponse({
+                    'success': False, 
+                    'resp': serializer.errors
+                }, status = 400)    
+                    
+            instance = ManageBreaksAPIView.get_object(pk = data_id)
+
+            serialized = BreaksSerializer(instance)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            }) 
+        
+        elif query == 'list':
+            model = BreaksModel.objects.filter(
+                Q(id__icontains = search) |
+                Q(name__icontains = search)
+            )[:10]
+            serialized = BreaksSerializer(model, many = True)
+            
+            return JsonResponse({
+                'success': True,
+                'resp': serialized.data
+            })
+        
+        elif query == 'count':
+            total = BreaksModel.objects.filter(user_id = user.id).count()            
+            
+            return JsonResponse({
+                'success': True,
+                'resp': {
+                    'total': total
+                }
+            })      
+        
+        return JsonResponse({
+            'success': True, 
+            'resp': 'Page not found.'
+        }, status = 404) 
+
+    def put(self, request):
+        data = request.data
+        user = request.user
+
+        data_id = data.get('id', None)
+        data['user_id'] = user.id
+        data['status_id'] = 1
+
+        serializer = GetBreakSerializer(data = data)  
+        if not serializer.is_valid():
+            return JsonResponse({
+                'success': False, 
+                'resp': serializer.errors
+            }, status = 400)    
+                
+        instance = ManageBreaksAPIView.get_object(pk = data_id)     
+
+        serializer = AddEditBreakSerializer(instance, data = data)
+        if not serializer.is_valid():
+            return JsonResponse({'success': False, 'resp': serializer.errors}, status = 400)
+
+        serializer.save()
+
+        return JsonResponse({'success': True, 'resp': 'Edited successfully.'})
+    
 #States
 class ManageStatesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
