@@ -14,6 +14,7 @@ from django.core.paginator import Paginator
 from .serializers import *
 from .models import *
 from .utils import *
+from .permissions import *
 from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
@@ -78,29 +79,6 @@ class AuthRefreshAPIView(APIView):
                 'accessToken': str(token['access']),
             }
         })
-
-#Users
-class ManageUsersAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-  
-    def get(self, request):
-        query = request.query_params.get('query', None)
-        search = request.query_params.get('search', '')
-        
-        if query == 'list':
-            model = User.objects.filter(
-                Q(id__icontains = search) |
-                Q(username__icontains = search) |
-                Q(first_name__icontains = search) | 
-                Q(last_name__icontains = search)
-            )[:10]
-            serialized = UserExcludeSerializer(model, many = True)
-            
-            return JsonResponse({
-                'success': True,
-                'resp': serialized.data
-            })
 
 #Countries
 class ManageCountriesAPIView(APIView):
@@ -312,7 +290,7 @@ class ManageCitiesAPIView(APIView):
 #Locations
 class ManageLocationsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageLocationsPermission]
     
     def get_object(self, pk) :
         try:
@@ -464,7 +442,7 @@ class ManageLocationsAPIView(APIView):
 #Types ids
 class ManageTypesIdsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageTypesIdsPermission]
     
     def get_object(self, pk) :
         try:
@@ -611,7 +589,7 @@ class ManageTypesIdsAPIView(APIView):
 #Client types    
 class ManageClientTypesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageClientTypesPermission]
     
     def get_object(self, pk) :
         try:
@@ -754,7 +732,7 @@ class ManageClientTypesAPIView(APIView):
 #Clients
 class ManageClientsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageClientsPermission]
     
     def get_object(self, pk) :
         try:
@@ -967,7 +945,7 @@ class ManageClientsAPIView(APIView):
             'resp': 'Deleted successfully.'
         }, status = 200)
 
-#Product contact types
+#Contact types
 class ManageContactTypesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -991,7 +969,7 @@ class ManageContactTypesAPIView(APIView):
 #Suppliers
 class ManageSuppliersAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageSuppliersPermission]
     
     def get_object(self, pk) :
         try:
@@ -1135,7 +1113,7 @@ class ManageSuppliersAPIView(APIView):
 #Taxes
 class ManageTaxesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageTaxesPermission]
     
     def get_object(self, pk) :
         try:
@@ -1279,7 +1257,7 @@ class ManageTaxesAPIView(APIView):
 #Product brands
 class ManageProductBrandsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageProductBrandsPermission]
     
     def get_object(self, pk) :
         try:
@@ -1424,7 +1402,7 @@ class ManageProductBrandsAPIView(APIView):
 #Product categories
 class ManageProductCategoriesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageProductCategoriesPermission]
     
     def get_object(self, pk) :
         try:
@@ -1569,7 +1547,7 @@ class ManageProductCategoriesAPIView(APIView):
 #Products
 class ManageProductsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageProductsPermission]
     
     @classmethod
     def get_object(self, pk) :
@@ -1734,7 +1712,7 @@ class ManageProductsAPIView(APIView):
 #Inventory types
 class ManageInventoryTypesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageInventoryTypesPermission]
     
     @classmethod
     def get_object(self, pk) :
@@ -1905,7 +1883,7 @@ class ManageInventoryTypesAPIView(APIView):
 #Inventory
 class AppInventoryAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, AppInventoryPermission]
     
     @classmethod
     def get_object(self, pk) :
@@ -2205,7 +2183,7 @@ class AppInventoryAPIView(APIView):
 #Payment Methods
 class ManagePaymentMethodsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManagePaymentMethodsPermission]
     
     def get_object(self, pk) :
         try:
@@ -2349,7 +2327,7 @@ class ManagePaymentMethodsAPIView(APIView):
 #Sale payments
 class ManageSalePaymentsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageSalePaymentsPermission]
     
     @classmethod
     def get_object(self, pk) :
@@ -2906,7 +2884,7 @@ class ManageSalesAPIView(APIView):
 #Sale receipt
 class ManageSaleReceiptAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageSaleReceiptPermission]
     
     @classmethod
     def get_object(self, pk) :
@@ -3045,7 +3023,7 @@ class ManageSaleReceiptAPIView(APIView):
 #Sale status
 class ManageSaleStatusAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageSaleStatusPermission]
     
     @classmethod
     def get_object(self, pk) :
@@ -3189,7 +3167,7 @@ class ManageSaleStatusAPIView(APIView):
 #Cash register
 class ManageCashRegisterAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageCashRegisterPermission]
     
     @classmethod
     def get_object(self, pk) :
@@ -3382,7 +3360,7 @@ class ManageCashRegisterAPIView(APIView):
 #Cash register sales
 class ManageCashRegisterSalesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageCashRegisterPermission]
     
     def get(self, request):
         user = request.user
@@ -3701,7 +3679,7 @@ class StatisticsSalesAPIView(APIView):
 #Expenses
 class ManageExpensesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageExpensesPermission]
     
     @classmethod
     def get_object(self, pk) :
@@ -3887,7 +3865,7 @@ class ManageExpensesAPIView(APIView):
 #Expense details
 class ManageExpenseDetailsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageExpenseDetailsPermission]
     
     def get_object(self, pk) :
         try:
@@ -4043,7 +4021,7 @@ class ManageExpenseDetailsAPIView(APIView):
 #Expense payments
 class ManageExpensePaymentsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageExpensePaymentsPermission]
     
     @classmethod
     def get_object(self, pk) :
@@ -4248,7 +4226,7 @@ class ManageExpensePaymentsAPIView(APIView):
 #Banks
 class ManageBanksAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageBanksPermission]
     
     @classmethod
     def get_object(self, pk) :
@@ -4395,7 +4373,7 @@ class ManageBanksAPIView(APIView):
 #Signatures
 class ManageSignaturesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageSignaturesPermission]
         
     def post(self, request):
         data = request.data
@@ -4450,7 +4428,7 @@ class ManageSignaturesAPIView(APIView):
 #Guarantees
 class ManageGuaranteesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageGuaranteesPermission]
     
     @classmethod
     def get_object(self, pk) :
@@ -4596,7 +4574,7 @@ class ManageGuaranteesAPIView(APIView):
 #Users
 class ManageUsersAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageUsersPermission]
     
     @classmethod
     def get_object(self, pk) :
@@ -4662,9 +4640,12 @@ class ManageUsersAPIView(APIView):
         
         elif query == 'list':
             model = User.objects.filter(
-                Q(id__icontains = search)
+                Q(id__icontains = search) |
+                Q(username__icontains = search) |
+                Q(first_name__icontains = search) | 
+                Q(last_name__icontains = search)
             )[:10]
-            serialized = UserSerializer(model, many = True)
+            serialized = UserExcludeSerializer(model, many = True)
             
             return JsonResponse({
                 'success': True,
@@ -4719,7 +4700,7 @@ class ManageUsersAPIView(APIView):
 #Absences
 class ManageAbsencesAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageAbsencesPermission]
     
     @classmethod
     def get_object(self, pk) :
@@ -4866,7 +4847,7 @@ class ManageAbsencesAPIView(APIView):
 #Breaks
 class ManageBreaksAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ManageBreaksPermission]
     
     @classmethod
     def get_object(self, pk) :
