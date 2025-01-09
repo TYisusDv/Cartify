@@ -5003,7 +5003,7 @@ class UpdateLogoView(APIView):
             ext = format.split('/')[-1]
             image_data = ContentFile(base64.b64decode(imgstr), name=f'logo.{ext}')
             
-            file_path = settings.BASE_DIR / 'api/static/images/logo.png'
+            file_path = settings.BASE_DIR / 'static/images/logo.png'
             with open(file_path, 'wb') as f:
                 f.write(image_data.read())
 
@@ -5022,7 +5022,7 @@ class UpdateBackgroundView(APIView):
             ext = format.split('/')[-1]
             image_data = ContentFile(base64.b64decode(imgstr), name=f'logo.{ext}')
             
-            file_path = settings.BASE_DIR / 'api/static/images/background.jpg'
+            file_path = settings.BASE_DIR / 'static/images/background.jpg'
             with open(file_path, 'wb') as f:
                 f.write(image_data.read())
 

@@ -32,11 +32,11 @@ class ApiConfig(AppConfig):
             print("Sale status initial data inserted or already exists.")
 
             sale_receipt_data = [
-                {"id": 1, "prompt": "Address", "description": "Av 1"},
-                {"id": 2, "prompt": "Tel", "description": "1234"},
-                {"id": 3, "prompt": "NIT", "description": "1234"},
-                {"id": 4, "prompt": "Title", "description": "Cartify"},
-                {"id": 5, "prompt": "Type", "description": "GRUPO CARTIFY"},
+                {"id": 1, "prompter": "address", "description": "Av 1"},
+                {"id": 2, "prompter": "tel", "description": "1234"},
+                {"id": 3, "prompter": "nit", "description": "1234"},
+                {"id": 4, "prompter": "title", "description": "Cartify"},
+                {"id": 5, "prompter": "type", "description": "GRUPO CARTIFY"},
             ]
             for data in sale_receipt_data:
                 SaleReceiptModel.objects.get_or_create(**data)
