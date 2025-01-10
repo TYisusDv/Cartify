@@ -14,7 +14,7 @@ const useTranslations = () => {
         const translationModule = await import(`../locales/${language}.json`);
         setTranslations(translationModule.default);
       } catch (err) {
-        const defaultTranslation = await import(`../locales/en.json`);
+        const defaultTranslation = await import(`../locales/es.json`);
         setTranslations(defaultTranslation.default);
       } finally {
         setLoading(false);

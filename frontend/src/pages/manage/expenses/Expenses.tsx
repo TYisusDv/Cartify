@@ -64,8 +64,8 @@ const Expenses: React.FC = () => {
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
             <div className='flex items-center justify-between w-full p-8 animate__animated animate__fadeIn animate__faster'>
                 <div className='flex flex-col'>
-                    <h1 className='text-2xl font-bold dark:text-white'>Gastos</h1>
-                    <span className='text-sm text-gray-600 dark:text-slate-400'>Administra</span>
+                    <h1 className='text-2xl font-bold dark:text-white'>Cuentas por pagar</h1>
+                    <span className='text-sm text-gray-600 dark:text-slate-400'>Administra las cuentas por pagar</span>
                 </div>
                 <div className="flex gap-2">
                     <TooltipButton

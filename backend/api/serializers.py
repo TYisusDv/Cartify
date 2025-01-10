@@ -1200,6 +1200,14 @@ class AddEditInventorySerializer(serializers.ModelSerializer):
         'invalid': 'The quantity is invalid.',
     }, required = False)
 
+    area = serializers.CharField(error_messages = {
+        'required': 'The area is required.',
+        'blank': 'The area cannot be blank.',
+        'null': 'The area cannot be blank.',
+        'max_length': 'The area cannot exceed 100 characters.',
+    }, required= False, max_length = 100, allow_blank = True, allow_null = True)
+
+
     note = serializers.CharField(error_messages = {
         'required': 'The note is required.',
         'blank': 'The note cannot be blank.',
@@ -1894,7 +1902,7 @@ class AddEditExpenseSerializer(serializers.ModelSerializer):
         'blank': 'The transaction number cannot be blank.',
         'null': 'The transaction number cannot be blank.',
         'max_length': 'The transaction number cannot exceed 254 characters.',
-    })
+    }, required = False)
 
     total = serializers.FloatField(error_messages = {
         'required': 'The total is required.',

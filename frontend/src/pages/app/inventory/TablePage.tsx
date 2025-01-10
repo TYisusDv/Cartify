@@ -55,6 +55,9 @@ const TablePage: React.FC<TablePageProps> = ({ data, selected, setSelected }) =>
 
                         </td>
                         <td className='px-6 py-6'>
+                            <span className='flex items-center gap-[1px]'>{row.area || '-'}</span>
+                        </td>
+                        <td className='px-6 py-6'>
                             <span className='flex items-center gap-[1px]'>{row.note || '-'}</span>
                         </td>
                         <td className='px-6 py-6'>

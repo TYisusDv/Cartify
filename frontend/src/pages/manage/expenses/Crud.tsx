@@ -138,6 +138,7 @@ const Crud: React.FC<CrudProps> = ({ onClose, handleTableReload, setSelected, ty
                     label='Numero de transaccion'
                     icon={<Invoice01Icon className='icon' size={24} />}
                     color={colorPage}
+                    required={false}
                 />
                 <Input
                     props={{

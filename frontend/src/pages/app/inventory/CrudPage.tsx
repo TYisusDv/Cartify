@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Add01Icon, BarCode02Icon, Cancel01Icon, LiftTruckIcon, Note04Icon, SearchAreaIcon, StoreLocation01Icon } from 'hugeicons-react';
+import { Add01Icon, BarCode02Icon, Cancel01Icon, LiftTruckIcon, Note04Icon, Note05Icon, SearchAreaIcon, StoreLocation01Icon } from 'hugeicons-react';
 import { Inventory } from '../../../types/modelType';
 import { addInventory, deleteInventory, editInventory, getInventory } from '../../../services/inventoryService';
 import useTranslations from '../../../hooks/useTranslations';
@@ -209,6 +209,22 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                         </div>
                         <Input
                             props={{
+                                id: 'area',
+                                name: 'area',
+                                value: formValues.area,
+                                onChange: (e) => setFormValues(prev => ({
+                                    ...prev,
+                                    area: e.target.value || ''
+                                })),
+                                disabled: ['details', 'delete'].includes(type)
+                            }}
+                            label='Area'
+                            icon={<Note05Icon className='icon' size={24} />}
+                            color={colorPage}
+                            required={false}
+                        />
+                        <Input
+                            props={{
                                 id: 'note',
                                 name: 'note',
                                 value: formValues.note,
@@ -242,6 +258,9 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                                                 Tipo
                                             </th>
                                             <th scope='col' className='px-6 py-3'>
+                                                Area
+                                            </th>
+                                            <th scope='col' className='px-6 py-3'>
                                                 Nota
                                             </th>
                                             <th scope='col' className='px-6 py-3'></th>
@@ -260,6 +279,7 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                                                         <td className='px-6 py-4'>
                                                             {movement.type?.name || '-'}
                                                         </td>
+                                                        <td className='px-6 py-4'>{movement.area || '-'}</td>
                                                         <td className='px-6 py-4'>{movement.note || '-'}</td>
                                                         <td className='px-6 py-4'>
                                                             <button
@@ -388,6 +408,22 @@ const CrudPage: React.FC<CrudPageProps> = ({ onClose, handleTableReload, setSele
                                 />
                             </div>
                         </div>
+                        <Input
+                            props={{
+                                id: 'area',
+                                name: 'area',
+                                value: formValues.area,
+                                onChange: (e) => setFormValues(prev => ({
+                                    ...prev,
+                                    area: e.target.value || ''
+                                })),
+                                disabled: ['details', 'delete'].includes(type)
+                            }}
+                            label='Area'
+                            icon={<Note05Icon className='icon' size={24} />}
+                            color={colorPage}
+                            required={false}
+                        />
                         <Input
                             props={{
                                 id: 'note',

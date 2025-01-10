@@ -334,6 +334,7 @@ class InventoryModel(models.Model):
     product = models.ForeignKey(ProductsModel, on_delete = models.RESTRICT)
     location = models.ForeignKey(LocationsModel, on_delete = models.RESTRICT)
     user = models.ForeignKey(User, on_delete = models.RESTRICT)
+    area = models.CharField(max_length = 100, null = True, blank = False)
     location_transfer = models.ForeignKey(LocationsModel, null = True, blank = False, related_name='inventory_location_transfer', on_delete = models.RESTRICT)
     user_transfer = models.ForeignKey(User, null = True, blank = False, related_name='inventory_user_transfer', on_delete = models.RESTRICT)
     user_transfer_receives = models.ForeignKey(User, null = True, blank = False, related_name='inventory_user_transfer_receives', on_delete = models.RESTRICT)

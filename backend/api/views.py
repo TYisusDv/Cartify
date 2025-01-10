@@ -4115,14 +4115,17 @@ class ManageExpensePaymentsAPIView(APIView):
             })
         
         elif query == 'count':
+            instance = ManageExpensesAPIView.get_object(data_id)
             total = ExpensePaymentsModel.objects.filter(expense_id = data_id).count()            
             
             return JsonResponse({
                 'success': True,
                 'resp': {
+                    'company_name': instance.supplier.company_name,
                     'total': total,
                     'total_paid': self.get_total_paid(data_id),
-                    'total_remaining': self.get_remaining(data_id)
+                    'total_remaining': self.get_remaining(data_id),
+                    'total_invoice': self.get_total_paid(data_id) + self.get_remaining(data_id)
                 }
             })      
         

@@ -38,6 +38,7 @@ const AppInventoryPage: React.FC = () => {
         { name: 'product.name', headerName: 'Producto' },
         { name: 'location.name', headerName: 'Ubicación' },
         { name: 'type', headerName: 'Tipo' },
+        { name: 'area', headerName: 'Area' },
         { name: 'note', headerName: 'Nota' },
         { name: 'user.first_name', headerName: 'Empleado' },
     ];

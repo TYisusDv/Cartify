@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Add01Icon, Delete02Icon, Invoice01Icon, Invoice02Icon, PencilEdit02Icon, Tick01Icon } from 'hugeicons-react';
+import { Add01Icon, Delete02Icon, Invoice01Icon, Invoice02Icon, Invoice04Icon, PencilEdit02Icon, Tick01Icon } from 'hugeicons-react';
 import useTranslations from '../../../../hooks/useTranslations';
 import DelayedSuspense from '../../../../components/DelayedSuspense';
 import SkeletonLoader from '../../../../components/SkeletonLoader';
@@ -10,6 +10,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import TBody from './TBody';
 import { getCountPayments } from '../../../../services/ExprensePayments';
 import TooltipButton from '../../../../components/TooltipButton';
+import { formatNumber } from '../../../../utils/formUtils';
 
 const Payments: React.FC = () => {
     const { translations } = useTranslations();
@@ -21,9 +22,11 @@ const Payments: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState({ add: false, edit: false, delete: false });
     const [reloadTable, setReloadTable] = useState(0);
     const [countData, setCountData] = useState({
+        company_name: '',
         total: 0,
         total_paid: 0,
-        total_remaining: 0
+        total_remaining: 0,
+        total_invoice: 0
     });
 
     useEffect(() => {
@@ -69,8 +72,8 @@ const Payments: React.FC = () => {
         <DelayedSuspense fallback={<SkeletonLoader />} delay={1000}>
             <div className='flex items-center justify-between w-full p-8 animate__animated animate__fadeIn animate__faster'>
                 <div className='flex flex-col'>
-                    <h1 className='text-2xl font-bold dark:text-white'>Pagos</h1>
-                    <span className='text-sm text-gray-600 dark:text-slate-400'>Administra Pagos</span>
+                    <h1 className='text-2xl font-bold dark:text-white'>Pagos - Proveedor {countData.company_name}</h1>
+                    <span className='text-sm text-gray-600 dark:text-slate-400'>Administra pagos a {countData.company_name}</span>
                 </div>
                 <div className="flex gap-2">
                     <TooltipButton
@@ -96,7 +99,7 @@ const Payments: React.FC = () => {
                 </div>
             </div>
             <div className='flex flex-col p-8 animate__animated animate__fadeIn animate__faster'>
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 border-t-2 border-b-2 border-gray-100 py-6 dark:border-slate-600'>
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t-2 border-b-2 border-gray-100 py-6 dark:border-slate-600'>
                     <div className='col-span-1 flex items-center gap-3 border-r-0 border-b-2 pb-5 border-gray-100 lg:border-r-2 lg:border-b-0 lg:p-0 dark:border-slate-600'>
                         <div className='flex justify-center items-center h-12 w-12 bg-gray-200 rounded-full dark:bg-slate-600 dark:text-white'>
                             <Invoice01Icon />
@@ -112,16 +115,25 @@ const Payments: React.FC = () => {
                         </div>
                         <div>
                             <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total pagado</h2>
-                            <h3 className='text-lg font-bold dark:text-white'>Q{countData.total_paid}</h3>
+                            <h3 className='text-lg font-bold dark:text-white'>Q{formatNumber(countData.total_paid)}</h3>
                         </div>
                     </div>
-                    <div className='col-span-1 flex items-center gap-3 border-r-0 pt-3 border-gray-100 md:border-r-0 lg:border-r-0 lg:p-0 dark:border-slate-600'>
+                    <div className='col-span-1 flex items-center gap-3 border-r-0 border-b-2 pb-5 pt-3 border-gray-100 md:pt-0 md:border-r-0 lg:border-r-2 lg:border-b-0 lg:p-0 dark:border-slate-600'>
                         <div className='flex justify-center items-center h-12 w-12 bg-gray-200 rounded-full dark:bg-slate-600 dark:text-white'>
                             <Invoice02Icon />
                         </div>
                         <div>
                             <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total pendiente</h2>
-                            <h3 className='text-lg font-bold dark:text-white'>Q{countData.total_remaining}</h3>
+                            <h3 className='text-lg font-bold dark:text-white'>Q{formatNumber(countData.total_remaining)}</h3>
+                        </div>
+                    </div>
+                    <div className='col-span-1 flex items-center gap-3 border-r-0 pt-3 border-gray-100 md:border-r-0 lg:border-r-0 lg:p-0 dark:border-slate-600'>
+                        <div className='flex justify-center items-center h-12 w-12 bg-gray-200 rounded-full dark:bg-slate-600 dark:text-white'>
+                            <Invoice04Icon />
+                        </div>
+                        <div>
+                            <h2 className='text-sm font-semibold text-gray-600 dark:text-slate-400'>Total factura</h2>
+                            <h3 className='text-lg font-bold dark:text-white'>Q{formatNumber(countData.total_invoice)}</h3>
                         </div>
                     </div>
                 </div>

@@ -120,12 +120,12 @@ const PanelPage: React.FC = () => {
           </li>
           <li>
             <DropdownMenu
-              label='Gastos'
+              label='Cuentas'
               icon={<WaterfallDown01Icon className='w-7' />}
               links={['/manage/expenses', '/manage/banks']}
 
             >
-              <li><Link to='/manage/expenses' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/expenses')}`}><WaterfallDown01Icon size={20} /> Gastos</Link></li>
+              <li><Link to='/manage/expenses' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/expenses')}`}><WaterfallDown01Icon size={20} /> Cuentas por pagar</Link></li>
               <li><Link to='/manage/banks' className={`flex h-8 items-center hover:text-black gap-2 dark:hover:text-white ${getLinkClass('/manage/banks')}`}><BankIcon size={20} /> Bancos</Link></li>
             </DropdownMenu>
           </li>

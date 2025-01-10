@@ -206,6 +206,7 @@ export interface Inventory {
     cost?: number; 
     quantity?: number;    
     note?: string;
+    area?: string;
     date_reg?: Date;
     type?: InventoryType;
     product?: Product;
