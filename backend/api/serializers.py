@@ -1207,7 +1207,6 @@ class AddEditInventorySerializer(serializers.ModelSerializer):
         'max_length': 'The area cannot exceed 100 characters.',
     }, required= False, max_length = 100, allow_blank = True, allow_null = True)
 
-
     note = serializers.CharField(error_messages = {
         'required': 'The note is required.',
         'blank': 'The note cannot be blank.',
